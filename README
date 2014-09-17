@@ -1,0 +1,25 @@
+Algumas padronizações que serão de grande ajuda quando nosso desenvolvimento ficar mais complicado:
+ - Nomeclatura:
+	- variáveis: cada palavra que compõe o nome da variável deve começar com letra minúscula e devem 
+		ser separadas por underline. Exemplo:
+			 int velocidade_candidato;
+			 char nome_do_candidato[] = "Nome";
+
+	-Funções:A primeira palavra da função com letra miúscula e as demais iniciando com letra maiúscula,
+		 sem separação ente elas. Exemplo:
+			int calculaVelocidade (int aceleracao);
+			void mostraNomeCandidato (char nome[]);
+	
+	- typedef: A regra de nomeclatura pode seguir a mesma de nome de variáveis, mas necessariamente
+		finalizar com _type no nome, dessa forma fica fácil a identificação. Exemplo:
+			typedef struct{
+				int velocidade;
+				char nome[];
+				char cor[];
+				char partido[];
+			}candidato_type;
+
+---------------------------------------------------------------------------------------------------------
+
+ - Documentação:
+	Seguir a padronnização de comentários para documentação Doxygen (http://www.stack.nl/~dimitri/doxygen/manual/docblocks.html)
