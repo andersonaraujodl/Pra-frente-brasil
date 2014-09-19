@@ -1,4 +1,7 @@
 Algumas padronizações que serão de grande ajuda quando nosso desenvolvimento ficar mais complicado:
+
+-----------------------------------------------------------------------------------------------------
+
  - Nomeclatura:
 	- variáveis: cada palavra que compõe o nome da variável deve começar com letra minúscula e devem 
 		ser separadas por underline. Exemplo:
@@ -23,3 +26,21 @@ Algumas padronizações que serão de grande ajuda quando nosso desenvolvimento 
 
  - Documentação:
 	Seguir a padronnização de comentários para documentação Doxygen (http://www.stack.nl/~dimitri/doxygen/manual/docblocks.html)
+
+
+ - Requesitos do jogo
+	Ferramentas: DEVC++ / BGI
+	Funcional: Movimento(Qualquer coisa)
+		   Uso de pelo menos 5 teclas
+		   Pontuacão
+                   Jogador x Computador/ Jogador x Jogador
+
+ - Entrega:
+	CD com o número do grupo contendo código fonte C/C++ (DEVC++)
+        Executável
+        Quaiquer arquivos de dependência do Jogo.
+ - GDD:
+	Proposta do JOgo
+	Objetivo
+	Funcionalidades
+	Pontuacão
