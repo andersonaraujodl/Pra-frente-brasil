@@ -31,16 +31,16 @@ Algumas padronizações que serão de grande ajuda quando nosso desenvolvimento 
  - Requesitos do jogo
 	Ferramentas: DEVC++ / BGI
 	Funcional: Movimento(Qualquer coisa)
-		   Uso de pelo menos 5 teclas
-		   Pontuacão
-                   Jogador x Computador/ Jogador x Jogador
+		  * Uso de pelo menos 5 teclas
+		  * Pontuacão
+                  * Jogador x Computador/ Jogador x Jogador
 
  - Entrega:
-	CD com o número do grupo contendo código fonte C/C++ (DEVC++)
-        Executável
-        Quaiquer arquivos de dependência do Jogo.
+	* CD com o número do grupo contendo código fonte C/C++ (DEVC++)
+        * Executável
+        * Quaiquer arquivos de dependência do Jogo.
  - GDD:
-	Proposta do JOgo
-	Objetivo
-	Funcionalidades
-	Pontuacão
+	* Proposta do Jogo
+	* Objetivo
+	* Funcionalidades
+	* Pontuacão
