@@ -1,4 +1,4 @@
-Organizacão das pastas:
+﻿Organizacão das pastas:
 
 - source -> Pasta conténdo todos os códigos fontes. Se possível, separar os códigos em sub pastas por funcões (gráfico, física, controles, etc)
 
@@ -7,3 +7,5 @@ Organizacão das pastas:
 - build -> Pasta onde deve ser compilado o programa, conténdo o executável e demais arquivos gerados pelo compilador.
 
 - proj -> Local para colocar os arquivos do projeto utilizado pelo compilador.
+
+- lib -> Pasta na qual serão mantidas as bibliotecas que forem pegas prontas, para utilização no projeto.
