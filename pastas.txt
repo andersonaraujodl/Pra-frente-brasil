@@ -4,6 +4,8 @@ Organizacão das pastas:
 
 - resorces -> Quaisquer arquivos auxiliares para que o programa rode, por exemplo imagens, sons, textos, save files, etc.
 
-- build -> Pasta onde deve ser compilado o programa, conténdo o executável e demais arquivos gerados pelo compilador.
+- output -> Pasta onde deve ser compilado o programa, conténdo o executável.
+
+- Obj ->  Pasta onde contémmos demais arquivos gerados pelo compilador.
 
 - proj -> Local para colocar os arquivos do projeto utilizado pelo compilador.
