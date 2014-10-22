@@ -1,24 +1,17 @@
 #ifndef _FORMULAS_H__
 #define _FORMULAS_H__
 
+#include "../h/types.h"
+
 #define SCREEN_W 1024
 #define SCREEN_H 600
 #define SCREEN_CENTER SCREEN_W/2
 
 
-// Declaração de tipos
-typedef struct{
-	float y;
-	float x;
-	
-}vetor2d_type;
-
 /*typedef struct{
 	void *img;
-	vetor2d_type pos;
-	float h;
-	float w;
-	vetor2d_type vel; 
+	float height;
+	float width;
 }graph_data_type;*/
 
 
