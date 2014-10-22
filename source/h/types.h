@@ -28,7 +28,7 @@ typedef struct{
 	 *  @return O valor do módulo
 	 */
 	float modulo(){
-		return (((x<<2) + (y<<2)) >> 2); // sqrt( x^2 + y^2 )
+		return sqrt(((x*x) + (y*y)));
 	}
 	
 	/**
