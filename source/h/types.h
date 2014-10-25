@@ -59,6 +59,17 @@ typedef struct {
     float mass;
 } physics_data_type;
 
+/**
+* Marcelo, comente aqui por favor
+*/
+typedef struct{
+	int type;
+	void *img;
+	vetor2d_type pos;
+	float h;
+	float w;
+	vetor2d_type vel;
+}graph_data_type;
 
 /**
 *	Estrutura de manipulação dos objetos do jogo,

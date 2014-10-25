@@ -2,6 +2,7 @@
 #define __PHYSICS_H__
 
 #include<math.h>
+#include "../h/types.h"
 
 #define GRAVIDADE 10
 
