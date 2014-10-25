@@ -51,6 +51,16 @@ typedef struct{
 }vetor2d_type;
 
 /**
+* Carol preencher a doc aqui
+*/
+typedef struct {
+    vetor2d_type speed; /**< Carol, explica o que é isso*/
+    vetor2d_type pos;   /**< Carol, explica o que é isso*/
+    float mass;
+} physics_data_type;
+
+
+/**
 *	Estrutura de manipulação dos objetos do jogo,
 *  reunindo todas as propriedades básicas para tal.
 */
@@ -59,7 +69,7 @@ typedef struct
 	physics_data_type body; /**< Propriedades físicas*/
 	graph_data_type graph; /**< Propriedades gráficas*/
 	long int collision_mask; /**< Máscara para a análise de colisões entre objetos*/
-}game_object;
+}game_object_type;
 
 /**
 * Enumeração dos bloqueios encontrados durante o jogo

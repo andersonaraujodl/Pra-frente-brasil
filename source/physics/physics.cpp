@@ -3,7 +3,7 @@
 
 
 /**
- * @brief Funç~ao de convers~ao de graus em radianos
+ * @brief Função de conversão de graus em radianos
  * @param Valor do angulo em graus
  * @return valor do angulo em radianos
  */
@@ -13,31 +13,31 @@ float radianos(float ang){
 
 
 /**
- * @brief Calcula a nova posiç~ao do objeto em trajet´oria obliqua (sem alteraç~ao em x)
- * @param p Corpo sobre a qual a nova posiç~ao ser´a calculada
+ * @brief Calcula a nova posição do objeto em trajetória obliqua (sem alteração em x)
+ * @param p Corpo sobre a qual a nova posição será calculada
  * @param dt delta tempo
  */
-void lancamento(corpo_type *p, float dt){
-    p->pos.x = p->pos.x +(p->speed.x*dt);
-    p->pos.y = p->pos.y+(p->speed.y*dt)+(g*(dt*dt))/2;
+void lancamento(game_object_type *p, float dt){
+    p->body.pos.x = p->body.pos.x +(p->body.speed.x*dt);
+    p->body.pos.y = p->body.pos.y+(p->body.speed.y*dt)+(GRAVIDADE*(dt*dt))/2;
 }
 
 /**
- * @brief Calcula o efeito da colis~ao sobre os corpos
+ * @brief Calcula o efeito da colisão sobre os corpos
  * @param c Corpo 1
  * @param p Corpo 2
  */
-void colisao (corpo_type *c, corpo_type *p){
+void colisao (game_object_type *c, game_object_type *p){
     vetor2d_type c_v_ini;
 
     c_v_ini = c->speed;
 
-    c->speed = sqrt(p->mass * p->speed * p->speed + p->mass * p->speed * p->speed / c->mass);
-    p->speed = sqrt(c->mass * c_v_ini.speed * c_v_ini.speed + c->mass * c->speed * c->speed / p->mass);
+    c->body.speed = sqrt(p->body.mass * p->body.speed * p->body.speed + p->body.mass * p->body.speed * p->body.speed / c->body.mass);
+    p->body.speed = sqrt(c->body.mass * c_v_ini.speed * c_v_ini.speed + c->body.mass * c->body.speed * c->body.speed / p->body.mass);
 }
 
 
 //função atrito
-void atrito (corpo_type *a, float coefatrito, float dt){
-    a->speed.x = (coefatrito * g) * (dt);
+void atrito (game_object_type *a, float coefatrito, float dt){
+    a->body.speed.x = (coefatrito * GRAVIDADE) * (dt);
 }
