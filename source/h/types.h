@@ -60,15 +60,14 @@ typedef struct {
 } physics_data_type;
 
 /**
-* Marcelo, comente aqui por favor
+* Estrutura de manipulação gráfica dos objetos
 */
 typedef struct{
-	int type;
-	void *img;
-	vetor2d_type pos;
-	float h;
-	float w;
-	vetor2d_type vel;
+	void *img; /**< Imagem que será impressa*/
+	vetor2d_type pos; /**< Vetor2D contendo as coordenadas X e Y onde a imagem será impressa*/
+	float h; /**< Altura da imagem*/
+	float w; /**< Largura da imagem*/
+	vetor2d_type vel; /**< Vetor2D contendo as velocidades relativas aos eixos X e Y em relação ao ponto fixo da tela, utilizado para movimentar o fundo*/
 }graph_data_type;
 
 /**
