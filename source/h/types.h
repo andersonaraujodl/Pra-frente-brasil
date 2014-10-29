@@ -60,13 +60,12 @@ typedef struct {
 } physics_data_type;
 
 /**
-* Marcelo, comente aqui por favor
+* Estrutura de manipulação gráfica dos objetos
 */
 typedef struct{
-	int type;
-	void *img;
-	float h;
-	float w;
+	void *img; /**< Imagem que será impressa*/
+	float h; /**< Altura da imagem*/
+	float w; /**< Largura da imagem*/
 }graph_data_type;
 
 /**
