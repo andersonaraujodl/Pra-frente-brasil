@@ -9,13 +9,13 @@
 
 #include<iostream>
 #include "bgi/graphics.h"
+#include <time.h>
 
 int main(int argc, char** argv) {
+
+	srand (time(NULL));
 	
-	initwindow(400, 300); //abre uma janela gráfic	a de 400X300 pixels
-
-
-
+	while(gameStates());
 
 	while(!kbhit()); // espera até alguma tecla	se pressiona
 	closegraph(); // fecha janela gráfica

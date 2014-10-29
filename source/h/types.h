@@ -10,7 +10,7 @@
 #include <math.h>
 
 /**
-* Macro para facilitar as contas utilizando o @ref block_type.
+* Macro para facilitar as contas utilizando o @ref NUM_OBJECTS_DEFINE.
 * Exemplo: if(player.collision_mask & MASK_BIT(MST)){...}
 */
 #define MASK_BIT(x) (long int)( 1 << x)
@@ -65,10 +65,8 @@ typedef struct {
 typedef struct{
 	int type;
 	void *img;
-	vetor2d_type pos;
 	float h;
 	float w;
-	vetor2d_type vel;
 }graph_data_type;
 
 /**
@@ -87,7 +85,7 @@ typedef struct
 * 
 * @todo Definir os bloqueios finais
 */
-typedef enum{
+enum{
 	NUVEM_POLUICAO,
 	IGREJA,
 	LGBT,
@@ -97,10 +95,15 @@ typedef enum{
 	CLASSE_MEDIA,
 	RURALISTAS,
 	MST,
-	MONTADORAS
-}block_type;
+	MONTADORAS,
+	PLAYER,
+	NUM_OBJECTS_DEFINE
+};
 
-
+/**
+ *  Quantidade de Objetos - o player
+ */
+#define NUM_BLOCKS NUM_OBJECTS_DEFINE -1
 
 
 
