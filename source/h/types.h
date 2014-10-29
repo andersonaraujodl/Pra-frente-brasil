@@ -64,10 +64,8 @@ typedef struct {
 */
 typedef struct{
 	void *img; /**< Imagem que será impressa*/
-	vetor2d_type pos; /**< Vetor2D contendo as coordenadas X e Y onde a imagem será impressa*/
 	float h; /**< Altura da imagem*/
 	float w; /**< Largura da imagem*/
-	vetor2d_type vel; /**< Vetor2D contendo as velocidades relativas aos eixos X e Y em relação ao ponto fixo da tela, utilizado para movimentar o fundo*/
 }graph_data_type;
 
 /**
