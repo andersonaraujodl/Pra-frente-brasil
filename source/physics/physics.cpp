@@ -19,7 +19,8 @@ float radianos(float ang){
  */
 void lancamento(game_object_type *p, float dt){
     p->body.pos.x = p->body.pos.x +(p->body.speed.x*dt);
-    p->body.pos.y = p->body.pos.y+(p->body.speed.y*dt)+(GRAVIDADE*(dt*dt))/2;
+    p->body.speed.y = p->body.speed.y +GRAVIDADE;
+	p->body.pos.y = p->body.pos.y + (p->body.speed.y*dt) +(GRAVIDADE*(dt*dt))/2 ; 
 }
 
 /**
@@ -39,5 +40,5 @@ void colisao (game_object_type *c, game_object_type *p){
 
 //função atrito
 void atrito (game_object_type *a, float coefatrito, float dt){
-    a->body.speed.x = (coefatrito * GRAVIDADE) * (dt);
+    a->body.speed.x = a->body.speed.x+(coefatrito * GRAVIDADE) * (dt);
 }
