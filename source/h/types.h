@@ -19,7 +19,7 @@
 /**
  *  Vetor2D básico
  */
-typedef struct{
+typedef struct vetor2d_type{
 	float x; /**< Decomposição x do vetor*/
 	float y; /**< Decomposição y do vetor*/
 	
@@ -44,9 +44,9 @@ typedef struct{
 		y = sin(angle)*modulo;
 	}
 	
-	void sum(vetor2d_type &vec){
-		x+= vec.x;
-		y+= vec.y;
+	void sum(vetor2d_type *vec){
+		x+= vec->x;
+		y+= vec->y;
 	};
 }vetor2d_type;
 

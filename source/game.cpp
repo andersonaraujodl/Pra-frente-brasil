@@ -7,22 +7,77 @@
 *  @date 10/10/14
 */ 
 
-#include "h/types.h"
-#include "graphs/graficos.h"
+#include "game.h"
+#include "graph/grafico.h"
+#include "physics/physics.h"
+#include <stdlib.h>
+#include <conio.h>
+// Defines =====================================================
+#define MAX_OBSTACLES 300 /**< Número máximo de obstáculos que serão gerados por partida.*/
+#define PLAYER_FIX_POS PLAYER_SPOT /**< Posição máxima que o player avançará em relação a tela*/
 
-#define MAX_OBSTACLES 300
- 
-game_object_type player1,player2;
-game_object_type world_obstacles[MAX_OBSTACLES];
+#define PLAYER_INIT_X 10 /**< Posição incial do player em x*/
+#define PLAYER_INIT_Y 0  /**< Posição incial do player em y*/
 
-graph_data_type graphs_profiles[NUM_OBJECTS_DEFINE];
-
+// typedefs privados ===========================================
 typedef struct{
-	char file_name[20];
+	char *file_name;
 	int heigth;
 	int width;
 }init_file_type;
 
+
+// Protótipos Privados ==========================================
+int showMenu (float dt);
+int loadSingleGame (float dt);
+int preLancamento (float dt);
+int singleStep (float dt);
+//Variáveis privadas ============================================
+game_object_type player1,player2;
+game_object_type world_obstacles[MAX_OBSTACLES];
+
+graph_data_type graphs_profiles[NUM_OBJECTS_DEFINE];
+unsigned int left_obstacles_index = 0,right_obstacles_index = 0;
+
+game_state_type menu_state ={
+	showMenu,
+	(game_state_type*[]){
+		&menu_state,		 // return 0
+		&load_single/*, 	 // return 1
+		conectaServer,		 // return 2	
+		aguardaClient,		 // return 3
+		&terminaPrograma*/ // return 4
+	}
+};
+
+game_state_type load_single ={
+	loadSingleGame,
+	(game_state_type*[]){
+		&load_single,	 // return 0
+		&pre_lancamento // return 1
+	},
+	1
+};
+
+game_state_type pre_lancamento ={
+	preLancamento,
+	(game_state_type*[]){
+		&pre_lancamento,	// return 0
+		&step_single 		// return 1
+	},
+	1
+};
+
+game_state_type step_single ={
+	singleStep,
+	(game_state_type*[]){
+		&step_single,	 // return 0
+		&pre_lancamento  // return 1
+	},
+	1
+};
+
+game_state_type *game_states =  &menu_state;
 
 /**
  *  @brief Inicia os recursos que serão utilzados no game
@@ -30,7 +85,7 @@ typedef struct{
  *  
  *  @details Details
  */ 
-void initGame (void){
+void initGame (char *path){
 	// FAZER LOAD DO ARQUIVO COM OS NOMES DAS IMAGENS ==========
 	init_file_type init_file[] = {
 		{"../resources/player1.gif",10,10},
@@ -42,18 +97,21 @@ void initGame (void){
 	for(int i = 0; i < 3 /*subistituir 3 por NUM_OBJECTS_DEFINE*/;++i){
 	
 		graphs_profiles[i].h = init_file[i].heigth;
-		graphs_profiles[i].w = init_file[i].width;
-		graphs_profiles
+		graphs_profiles[i].w = init_file[i].width;	
 	
-	
-		graphInitObject(&graphs_profiles[i],init_file[i].file_name);
+		graphInitObjects(&graphs_profiles[i],init_file[i].file_name);
 	}
 	
-	player1.graphs = graphs_profiles[PLAYER].graphs;
+	player1.graph = graphs_profiles[PLAYER];
 	
 }
 
-void initObstacles (){
+int showMenu (float dt){
+
+	return 1;
+}
+
+void initObstacles (void){
 	
 	for(int i = 0; i < MAX_OBSTACLES;++i){
 		// Coloca cada objeto subdividindo cada espaço em dezenas, deixando aleatório a casa das unidades.
@@ -65,10 +123,9 @@ void initObstacles (){
 		// Randomiza qual o perfil (tipo) de obstáculo ele será, Igreja, nuvem....
 		int obj_profile = (rand() % NUM_BLOCKS);
 		world_obstacles[i].collision_mask = obj_profile;
-		world_obstacles[i].graph.img = bitmaps[i]; // Aponta para qual o bitmap que pertence aquele perfil
+		world_obstacles[i].graph.img = graphs_profiles[obj_profile].img; // Aponta para qual o bitmap que pertence aquele perfil
 	}
 }
-
 
 void loadMultiGame (void){
 
@@ -79,102 +136,87 @@ void connectToServer (void){
 
 }
 
-void gameStep (void){
+bool atualizaObjetos (game_object_type &ref){
 	
 	
+	float ref_x = (ref.body.pos.x < PLAYER_FIX_POS) ? ref.body.pos.x: PLAYER_FIX_POS;
+	
+	print(vetor2d_type{ref_x,ref.body.pos.y},ref.graph.img);
+	
+	// Enquanto o objeto.pos.x mais a esquerda for menor que o canto mais a esquerda da tela
+	while(world_obstacles[left_obstacles_index].body.pos.x < ref.body.pos.x - PLAYER_FIX_POS){
+		if(++left_obstacles_index == MAX_OBSTACLES)
+			return false;// impede que estoure o buffer
+	}
+	// Enquanto o objeto mais a direita (+1) for menor que o canto direito da tela
+	while(world_obstacles[right_obstacles_index+1].body.pos.x < ref.body.pos.x +(SCREEN_W - PLAYER_FIX_POS)){
+		if(++right_obstacles_index == MAX_OBSTACLES)
+			return false; // Impede que estoure o buffer
+	}
+	
+	// Imprime todos aqueles que estão dentro do range da tela
+	for (int i = left_obstacles_index; i <= right_obstacles_index; ++i){
+		float obj_x = world_obstacles[i].body.pos.x -  ref.body.pos.x + PLAYER_FIX_POS;
+		print(vetor2d_type{obj_x,world_obstacles[i].body.pos.y},world_obstacles[i].graph.img);
+	
+	}
 }
 
-void loadSingleGame (void){
+/**
+*	@brief Inicializa as condições para um novo jogo posicionando
+*  o player no local certo e gerando um novo mapa.
+*	@param dt Nessa função não há utilidade a não ser compatibilidade com os demais states
+*
+*   @return 1 para passar para o próximo estado, -1 em caso de erro
+*/
+int loadSingleGame (float dt){
 	
-	player1.body.pos.x = 0;
-	player1.body.pos.y = 0;
+	player1.body.pos.x = PLAYER_INIT_X;
+	player1.body.pos.y = PLAYER_INIT_Y;
 	
-// TESTE =============================================	
-// Depois do teste iniciar com 0,0 e mudar depois com a opção do jogador
-	player1.body.speed.setVector(50,45);
-//====================================================
-	player1.graphs.img = bitmaps[PLAYER];
+	player1.body.speed.setVector(0,0);
+
+	player1.graph.img = graphs_profiles[PLAYER].img;
 
 	initObstacles();
 	
-	
+	return 1; // next state = preLancamento
 }
 
-
-void rodadaSingle (){
+/**
+*	@brief Estado no qual o jogo aguarda o jogador escolher o ângulo e 
+*	o momento em que ele deseja lançar o player1.
+*
+*	@param dt delta tempo para a atualização do demonstrativo do ângulo escolhido
+*	@return 0 caso o jogador ainda não tenha feito a escolha, 1 para quando deve-se iniciar o jogo.
+*/
+int preLancamento (float dt){
+	int key;
+	key = kbhit();
 	
-	loadSingleGame();
-
-}
-
-enum{
-	MENU_INICIAL,
-	MENU_COMPRA,
-	JOGO_SINGLE,
-	JOGO_MULTI,
-	SCORE_FINAL
-};
-
-
-bool gameStates(){
-	static int state = MENU_INICIAL;
-	static prev_state = MENU_INICIAL;
-	static int rodadas;
-	
-	switch(states){
-		case MENU_INICIAL:
-			switch(printMenu())
-			{
-				case 0:
-					loadSingleGame();
-					rodadas = 5;
-					state = JOGO_SINGLE;
-					prev_state = MENU_INICIAL;
-				break;
-				case 1:
-					loadMultServer();
-					rodadas = 5;
-					state = JOGO_MULTI;
-					prev_state = MENU_INICIAL;
-				break;
-				case 2:
-					loadMultClient();
-					rodadas = 5;
-					state = JOGO_MULTI;
-					prev_state = MENU_INICIAL;
-				break;
-				
-				case 3:
-					return false;
-			}
-			
-		return true;
+	player1.body.speed.setVector(50,45);
 		
-		case MENU_COMPRA:
-			showMenuCompra();
-			
-			state = prev_state;
-		return true;
+	atualizaObjetos(player1);
 		
-		case JOGO_SINGLE:
-			
-			if(--rodadas){
-				while(rodadaSingle());
-			
-				state = MENU_COMPRA;
-				prev_state = JOGO_SINGLE;
-				return true;
-			}
-			
-			state = SCORE_FINAL;
-	
-		return true;
-	
-	
-	
-	}
-
-	
+	if(key) 
+		return 1; // singleStep
+	else
+		return 0; // preLancamento
 }
-
-
+/**
+*	@brief Estado no qual o jogo está rodando. 
+*
+*	@param dt delta tempo para o cálculo do espaço percorrido.
+*	@return 0 para o jogo em andamento, 1 para quando a velocidade seja igual a 0.
+*/
+int singleStep (float dt){
+	
+	lancamento(&player1,dt);
+	
+	atualizaObjetos(player1);
+	
+	if(player1.body.speed.modulo())
+		return 0;     //singleStep
+	else
+		return 1;
+}

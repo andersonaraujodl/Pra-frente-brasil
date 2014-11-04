@@ -29,12 +29,6 @@ void lancamento(game_object_type *p, float dt){
  * @param p Corpo 2
  */
 void colisao (game_object_type *c, game_object_type *p){
-    vetor2d_type c_v_ini;
-
-    c_v_ini = c->speed;
-
-    c->body.speed = sqrt(p->body.mass * p->body.speed * p->body.speed + p->body.mass * p->body.speed * p->body.speed / c->body.mass);
-    p->body.speed = sqrt(c->body.mass * c_v_ini.speed * c_v_ini.speed + c->body.mass * c->body.speed * c->body.speed / p->body.mass);
 }
 
 

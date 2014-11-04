@@ -1,4 +1,5 @@
 #include "grafico.h"
+#include "../bgi/graphics.h"
 
 
 

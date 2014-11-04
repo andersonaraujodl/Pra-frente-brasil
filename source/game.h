@@ -1,6 +1,26 @@
 #ifndef __GAME_H__
 #define __GAME_H__
 
+#include "h/types.h"
+
+
+// Typedefs públicos ====================================
+typedef struct game_state_type{
+
+	int (*func)(float dt);
+	game_state_type **states;
+	int num_states;
+}game_state_type;
+
+// Protótipos Públicos ==================================
 void initGame (void);
+
+
+// Variáveis públicas ===================================
+extern game_state_type *game_states;
+extern game_state_type menu_state;
+extern game_state_type pre_lancamento;
+extern game_state_type step_single;
+extern game_state_type load_single;
 
 #endif
