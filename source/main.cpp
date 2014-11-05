@@ -11,15 +11,20 @@
 #include "bgi/graphics.h"
 #include <time.h>
 #include "game.h"
+#include "h/types.h"
+#include "graph/grafico.h"
 
 
-#define RESOURCES_ROOT "../resources/mimimi.txt"
+
+
+
 
 int main(int argc, char** argv) {
 	
 	int ret = 0;
 
 	srand (time(NULL));
+	initwindow(SCREEN_W,SCREEN_H);
 	
 	while(ret >= 0){
 		
@@ -29,7 +34,7 @@ int main(int argc, char** argv) {
 		
 		game_states = game_states->states[ret];
 		
-	
+		updateScreen();
 		delay(1000/30);
 	}
 
@@ -39,9 +44,4 @@ int main(int argc, char** argv) {
 }
 
 
-/**
- *  @brief Carrega os recursos necessários em memória
- */
-void loadResorces (void){
 
-}

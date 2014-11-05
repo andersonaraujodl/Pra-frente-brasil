@@ -13,7 +13,7 @@ typedef struct game_state_type{
 }game_state_type;
 
 // Protótipos Públicos ==================================
-void initGame (void);
+
 
 
 // Variáveis públicas ===================================

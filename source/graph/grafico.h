@@ -11,10 +11,6 @@
 
 //definições de IDs pros objetos gráficos utilizados para definir o que deve ser desenhado no initobj
 //pode ser útil também na hora de cálcular as posições dos ítens
-#define BACKGROUND 0 // o objeto do cenario ( podendo ser composto por uma ou mais camadas 
-#define PLAYER 1 //não preciso explicar, né? :P
-#define OPONENT 2 //AKA player2
-#define ITENS 3 //barreiras
 	
 // Protótipo das funções ------------------------------
 void updateScreen();

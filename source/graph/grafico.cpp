@@ -1,6 +1,6 @@
 #include "grafico.h"
 #include "../bgi/graphics.h"
-
+#include<iostream>
 
 
 #define TO_GROUND_LEVEL(y) (SCREEN_H - y)
@@ -38,9 +38,11 @@ void graphInitObjects(graph_data_type *objeto, const char* caminho){//puxar arqu
 	getimage(left, top, right, bottom, objeto->img);
 	
 	cleardevice();
+	std::cout<<"Carregando imagem"<<std::endl;
 	
 	
 }
+
 void updateScreen(){
 	int page = getactivepage();
 	setvisualpage(page);

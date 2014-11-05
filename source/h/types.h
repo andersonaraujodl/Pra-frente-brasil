@@ -85,7 +85,7 @@ typedef struct
 * @todo Definir os bloqueios finais
 */
 enum{
-	NUVEM_POLUICAO,
+/*	NUVEM_POLUICAO,
 	IGREJA,
 	LGBT,
 	MIDIA,
@@ -94,9 +94,13 @@ enum{
 	CLASSE_MEDIA,
 	RURALISTAS,
 	MST,
-	MONTADORAS,
-	PLAYER,
+	MONTADORAS,*/
+	
+	OBSTACULO,
+	GROUND,
+	PLAYER1,
 	NUM_OBJECTS_DEFINE
+
 };
 
 /**
