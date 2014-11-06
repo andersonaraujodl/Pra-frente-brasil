@@ -161,6 +161,10 @@ void initObstacles (void){
 		// Coloca cada objeto subdividindo cada espaço em dezenas, deixando aleatório a casa das unidades.
 		// O primeiro objeto é colocado apartir da primeira dezena e assim por diante (1x, 2x, 3x, ...)
 		//world_obstacles[i].body.pos.x = ((rand() % 100) + ( (i+1) * 1000));
+		
+		//partindo da posição minima para deixar fora da tela, a posição de cada obstaculo varia 100px,
+		//a partir do primeiro objeto colocado a posicao minima vira a posição do objeto anterior
+		//e a ele é somado a largura desse mesmo objeto objeto anterior, de forma a evitar a sobreposição
 		world_obstacles[i].body.pos.x = (rand() % 100) + minPos + ((obj_profile)?graphs_profiles[obj_profile].w : 0);
 		minPos = world_obstacles[i].body.pos.x;
 		// A priori todos os objetos estarão no chão
