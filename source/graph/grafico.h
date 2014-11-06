@@ -7,7 +7,7 @@
 #define SCREEN_H 600
 #define SCREEN_CENTER SCREEN_W/2
 #define PLAYER_SPOT SCREEN_W/3
-#define BGCOLOR COLOR(100,50,50)
+#define BGCOLOR COLOR(131,169,196)
 
 //definições de IDs pros objetos gráficos utilizados para definir o que deve ser desenhado no initobj
 //pode ser útil também na hora de cálcular as posições dos ítens

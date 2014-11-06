@@ -85,18 +85,21 @@ typedef struct
 * @todo Definir os bloqueios finais
 */
 enum{
-/*	NUVEM_POLUICAO,
+/*	MIDIA,
+	CLASSE_MEDIA,
+	MONTADORAS,
+*/
+	FEMINISTAS,
+	LEGALIZACAO,
+	CONGRESSO,
+	SAUDE,
+	NUVEM_POLUICAO,
 	IGREJA,
 	LGBT,
-	MIDIA,
 	BANCO,
-	COMUNIDADES,
-	CLASSE_MEDIA,
+	INDUSTRIA,
 	RURALISTAS,
-	MST,
-	MONTADORAS,*/
-	
-	OBSTACULO,
+	MTST,
 	GROUND,
 	PLAYER1,
 	NUM_OBJECTS_DEFINE
@@ -106,7 +109,7 @@ enum{
 /**
  *  Quantidade de Objetos - o player
  */
-#define NUM_BLOCKS (NUM_OBJECTS_DEFINE -2)
+#define NUM_BLOCKS (NUM_OBJECTS_DEFINE -3)
 
 
 

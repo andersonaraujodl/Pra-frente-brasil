@@ -123,15 +123,15 @@ int initGame (float dt){
 	for(int i = 0; i <NUM_OBJECTS_DEFINE; ++i){
 		static char temp[200], t_width[4], t_height[5];
 		strcpy(temp,pch);
-		cout<<temp<<endl;
+		//cout<<temp<<endl;
 		pch = strtok(NULL,",");
 		strcpy(t_height,pch);
-		graphs_profiles[i].h = atoi(t_height);
-		cout<<graphs_profiles[i].h<<endl;
+		graphs_profiles[i].w = atoi(t_height);
+		//cout<<graphs_profiles[i].w<<endl;
 		pch = strtok(NULL,"\n\0");
 		strcpy(t_width,pch);
-		graphs_profiles[i].w = atoi(t_width);
-		cout<<graphs_profiles[i].w<<endl;
+		graphs_profiles[i].h = atoi(t_width);
+		//cout<<graphs_profiles[i].h<<endl;
 		pch = strtok(NULL,",");
 		
 		graphInitObjects(&graphs_profiles[i], temp);
@@ -155,20 +155,26 @@ int showMenu (float dt){
 }
 
 void initObstacles (void){
-	
+	static int minPos = SCREEN_W;
 	for(int i = 0; i < MAX_OBSTACLES;++i){
+		unsigned int obj_profile;
 		// Coloca cada objeto subdividindo cada espaço em dezenas, deixando aleatório a casa das unidades.
 		// O primeiro objeto é colocado apartir da primeira dezena e assim por diante (1x, 2x, 3x, ...)
-		world_obstacles[i].body.pos.x = ((rand() % 100) + ( (i+1) * 100));
+		//world_obstacles[i].body.pos.x = ((rand() % 100) + ( (i+1) * 1000));
+		world_obstacles[i].body.pos.x = (rand() % 100) + minPos + ((obj_profile)?graphs_profiles[obj_profile].w : 0);
+		minPos = world_obstacles[i].body.pos.x;
 		// A priori todos os objetos estarão no chão
 		world_obstacles[i].body.pos.y = 0;
 		
 		// Randomiza qual o perfil (tipo) de obstáculo ele será, Igreja, nuvem....
-		unsigned int obj_profile = (rand() % NUM_BLOCKS);
+		obj_profile = (rand() % NUM_BLOCKS);
 		std::cout<<"obj_profile = "<<obj_profile<<std::endl;
 		world_obstacles[i].collision_mask = obj_profile;
 		world_obstacles[i].graph = graphs_profiles[obj_profile]; // Aponta para qual o bitmap que pertence aquele perfil
+
 	}
+	
+	minPos = SCREEN_W;
 }
 
 void loadMultiGame (void){
@@ -184,7 +190,7 @@ bool atualizaObjetos (game_object_type &ref){
 	
 	float ref_x = (ref.body.pos.x < PLAYER_FIX_POS) ? ref.body.pos.x: PLAYER_FIX_POS;
 	
-	print(vetor2d_type{ref_x, ref.body.pos.y},&ref.graph);
+	
 	
 	// Enquanto o objeto.pos.x mais a esquerda for menor que o canto mais a esquerda da tela
 	while((world_obstacles[left_obstacles_index].body.pos.x + world_obstacles[left_obstacles_index].graph.w) < ref.body.pos.x - PLAYER_FIX_POS){
@@ -203,6 +209,8 @@ bool atualizaObjetos (game_object_type &ref){
 		print(vetor2d_type{obj_x,world_obstacles[i].body.pos.y}, &world_obstacles[i].graph);
 	
 	}
+	
+	print(vetor2d_type{ref_x, ref.body.pos.y},&ref.graph);
 }
 
 /**
