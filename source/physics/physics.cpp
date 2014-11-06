@@ -34,5 +34,5 @@ void colisao (game_object_type *c, game_object_type *p){
 
 //função atrito
 void atrito (game_object_type *a, float coefatrito, float dt){
-    a->body.speed.x = a->body.speed.x+(coefatrito * GRAVIDADE) * (dt);
+    a->body.speed.x *= (coefatrito * dt);
 }

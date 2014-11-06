@@ -4,12 +4,13 @@
 #include<math.h>
 #include "../h/types.h"
 
-#define GRAVIDADE 10
+#define GRAVIDADE -10
 
 
 // Protótipos ======================================================
 void lancamento(game_object_type *p, float dt);
 void colisao (game_object_type *c, game_object_type *p);
+void atrito (game_object_type *a, float coefatrito, float dt);
 // =================================================================
 
 

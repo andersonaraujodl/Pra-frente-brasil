@@ -3,13 +3,13 @@
 #include<iostream>
 
 
-#define TO_GROUND_LEVEL(y) (SCREEN_H - y)
+#define TO_GROUND_LEVEL(y) ((SCREEN_H-10)- y)
 
 using namespace std;
 
-void print(vetor2d_type pos, void *img){
-	
-	putimage(pos.x, TO_GROUND_LEVEL(pos.y), img, OR_PUT);
+void print(vetor2d_type pos, graph_data_type *obj){
+	float ref_y = pos.y + obj->h;
+	putimage(pos.x, TO_GROUND_LEVEL(ref_y), obj->img, OR_PUT);
 	
 }
 
@@ -38,7 +38,6 @@ void graphInitObjects(graph_data_type *objeto, const char* caminho){//puxar arqu
 	getimage(left, top, right, bottom, objeto->img);
 	
 	cleardevice();
-	std::cout<<"Carregando imagem"<<std::endl;
 	
 	
 }
@@ -49,5 +48,5 @@ void updateScreen(){
 	
 	page = page ? 0:1;
 	setactivepage(page);
-	
+	erase();
 }

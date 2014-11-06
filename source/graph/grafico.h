@@ -14,7 +14,7 @@
 	
 // Protótipo das funções ------------------------------
 void updateScreen();
-void print(vetor2d_type pos, void *img);
+void print(vetor2d_type pos, graph_data_type *obj);
 void erase();
 void graphInitObjects(graph_data_type *objeto, const char* caminho);
 

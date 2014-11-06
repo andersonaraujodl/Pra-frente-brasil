@@ -106,7 +106,7 @@ enum{
 /**
  *  Quantidade de Objetos - o player
  */
-#define NUM_BLOCKS NUM_OBJECTS_DEFINE -1
+#define NUM_BLOCKS (NUM_OBJECTS_DEFINE -2)
 
 
 

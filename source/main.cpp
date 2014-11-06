@@ -27,9 +27,9 @@ int main(int argc, char** argv) {
 	initwindow(SCREEN_W,SCREEN_H);
 	
 	while(ret >= 0){
+		//if(kbhit()) keyCapture();
 		
-		
-		ret = game_states->func(1000/30);
+		ret = game_states->func((float)1/30);
 		
 		
 		game_states = game_states->states[ret];

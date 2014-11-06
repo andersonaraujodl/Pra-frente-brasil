@@ -12,8 +12,15 @@ typedef struct game_state_type{
 	int num_states;
 }game_state_type;
 
-// Protótipos Públicos ==================================
 
+// defines públicos =====================================
+#define UP 72
+#define DOWN 80
+#define SPACE (int)' '
+#define ESC 27
+
+// Protótipos Públicos ==================================
+void keyCapture();
 
 
 // Variáveis públicas ===================================
