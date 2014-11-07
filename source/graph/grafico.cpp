@@ -7,9 +7,9 @@
 
 using namespace std;
 
-void print(vetor2d_type pos, graph_data_type *obj){
+void print(vetor2d_type pos, graph_data_type *obj, int mode= COPY_PUT){
 	float ref_y = pos.y + obj->h;
-	putimage(pos.x, TO_GROUND_LEVEL(ref_y), obj->img, COPY_PUT);
+	putimage(pos.x, TO_GROUND_LEVEL(ref_y), obj->img, mode);
 	
 }
 
