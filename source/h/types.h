@@ -107,6 +107,8 @@ enum{
 	MTST,
 	GROUND,
 	PLAYER1,
+	PLAYER2,
+	PLAYERS_MASK,
 	NUM_OBJECTS_DEFINE
 
 };
@@ -114,7 +116,7 @@ enum{
 /**
  *  Quantidade de Objetos - o player
  */
-#define NUM_BLOCKS (NUM_OBJECTS_DEFINE -3)
+#define NUM_BLOCKS (NUM_OBJECTS_DEFINE -5)
 
 
 
