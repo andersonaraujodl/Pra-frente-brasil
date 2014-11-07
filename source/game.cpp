@@ -39,7 +39,7 @@ int loadSingleGame (float dt);
 int preLancamento (float dt);
 int singleStep (float dt);
 void floorCheck(game_object_type *player);
-void groundstep(game_object_type *objeto, game_object_type *ground, float dt);
+void groundStep(game_object_type *objeto, game_object_type *ground, float dt);
 
 
 //Variáveis privadas ============================================
@@ -47,7 +47,7 @@ game_object_type player1,player2, ground;
 game_object_type world_obstacles[MAX_OBSTACLES];
 graph_data_type graphs_profiles[NUM_OBJECTS_DEFINE];
 unsigned int left_obstacles_index = 0,right_obstacles_index = 0;
-int key;
+int  ground_offset;
 
 game_state_type load_state ={
 	initGame,
@@ -89,7 +89,7 @@ game_state_type step_single ={
 	singleStep,
 	(game_state_type*[]){
 		&step_single,	 // return 0
-		&pre_lancamento  // return 1
+		&load_single  // return 1
 	},
 	1
 };
@@ -99,8 +99,7 @@ game_state_type *game_states =  &load_state;
 /**
  *  @brief Inicia os recursos que serão utilzados no game
  *  
- *  
- *  @details Details
+ *  @param dt
  */ 
 int initGame (float dt){
 	
@@ -123,15 +122,15 @@ int initGame (float dt){
 	for(int i = 0; i <NUM_OBJECTS_DEFINE; ++i){
 		static char temp[200], t_width[4], t_height[5];
 		strcpy(temp,pch);
-		//cout<<temp<<endl;
+
 		pch = strtok(NULL,",");
 		strcpy(t_height,pch);
 		graphs_profiles[i].w = atoi(t_height);
-		//cout<<graphs_profiles[i].w<<endl;
+
 		pch = strtok(NULL,"\n\0");
 		strcpy(t_width,pch);
 		graphs_profiles[i].h = atoi(t_width);
-		//cout<<graphs_profiles[i].h<<endl;
+
 		pch = strtok(NULL,",");
 		
 		graphInitObjects(&graphs_profiles[i], temp);
@@ -146,21 +145,39 @@ int initGame (float dt){
 	return 1;
 }
 
+/**
+ *  @brief Limpa a memória heap
+ */
 void endGame (void){
 	
 	for(int i = 0; i <NUM_OBJECTS_DEFINE; ++i){
-	delete graphs_profiles[i].img;
+		delete graphs_profiles[i].img;
 	}
 }
 
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] dt Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
 int showMenu (float dt){
 
 	print(vetor2d_type{SCREEN_W/2, SCREEN_H/2}, &player1.graph);
 	if(kbhit()) return 1;
 	
-	return 0;
+	return 1;
 }
 
+/**
+ *  @brief Brief
+ *  
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
 void initObstacles (void){
 
 	for(int i = 0; i < MAX_OBSTACLES;++i){
@@ -173,9 +190,12 @@ void initObstacles (void){
 		//partindo da posição minima para deixar fora da tela, a posição de cada obstaculo varia 100px,
 		//a partir do primeiro objeto colocado a posicao minima vira a posição do objeto anterior
 		//e a ele é somado a largura desse mesmo objeto objeto anterior, de forma a evitar a sobreposição
-		world_obstacles[i].body.pos.x = ((rand() % 600) + 50) + (i ? world_obstacles[i-1].graph.w + world_obstacles[i-1].body.pos.x: SCREEN_W);
-		// A priori todos os objetos estarão no chão
-		world_obstacles[i].body.pos.y = 0;
+		world_obstacles[i].body.pos.x = ((rand() % 600) + 50) + ((i != 0) ? world_obstacles[i-1].graph.w + world_obstacles[i-1].body.pos.x: SCREEN_W - 50);
+		
+		if(obj_profile == NUVEM_POLUICAO)
+			world_obstacles[i].body.pos.y = ((rand() % 300) + 50);
+		else
+			world_obstacles[i].body.pos.y = 0;
 
 	}
 }
@@ -189,11 +209,18 @@ void connectToServer (void){
 
 }
 
+
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] ref Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
 bool atualizaObjetos (game_object_type &ref){
 	
 	float ref_x = (ref.body.pos.x < PLAYER_FIX_POS) ? ref.body.pos.x: PLAYER_FIX_POS;
-	
-	
 	
 	// Enquanto o objeto.pos.x mais a esquerda for menor que o canto mais a esquerda da tela
 	while((world_obstacles[left_obstacles_index].body.pos.x + world_obstacles[left_obstacles_index].graph.w) < ref.body.pos.x - PLAYER_FIX_POS){
@@ -224,14 +251,19 @@ bool atualizaObjetos (game_object_type &ref){
 *   @return 1 para passar para o próximo estado, -1 em caso de erro
 */
 int loadSingleGame (float dt){
-	
+
 	player1.body.pos.x = PLAYER_INIT_X;
 	player1.body.pos.y = PLAYER_INIT_Y;
 	
 	player1.body.speed.setVector(0,0);
+	
 
 	initObstacles();
 	
+	ground_offset = 0;
+	left_obstacles_index = 0;
+	right_obstacles_index = 0;
+
 	return 1; // next state = preLancamento
 }
 
@@ -244,16 +276,43 @@ int loadSingleGame (float dt){
 */
 int preLancamento (float dt){
 	int key;
-	key = kbhit();
+	static int forca = 2000;
+	static int angulo =0;
 	
-	player1.body.speed.setVector(300,45);
-	groundstep( &player1, &ground,dt);	
-	atualizaObjetos(player1);
+	if(kbhit()){
+		key = (int)getch();
 		
-	if(key) 
-		return 1; // singleStep
-	else
-		return 0; // preLancamento
+		switch(key){
+			
+			case SPACE:
+				player1.body.speed.setVector(forca,angulo);
+				
+				angulo =0;
+				forca = 2000;
+				return 1;
+			case UP:
+				angulo = angulo+5;
+				if(angulo >90)
+					angulo = 90;
+				break;
+			case DOWN:
+				angulo = angulo-5;
+				if(angulo <0)
+					angulo = 0;
+				break;
+				
+				
+		}
+		key = 0;
+		
+	}
+	
+	
+	groundStep( &player1, &ground,dt);	
+	atualizaObjetos(player1);
+	printDirection(vetor2d_type{player1.body.pos.x+(player1.graph.w/2) ,player1.body.pos.y+(player1.graph.h/2)}, angulo,300);
+
+	return 0; // preLancamento
 }
 /**
 *	@brief Estado no qual o jogo está rodando. 
@@ -265,13 +324,16 @@ int singleStep (float dt){
 	
 	lancamento(&player1,dt);
 	floorCheck(&player1);
-	groundstep( &player1, &ground, dt);
+	groundStep( &player1, &ground, dt);
 	atualizaObjetos(player1);
 	
 	if(player1.body.speed.modulo())
 		return 0;     //singleStep
-	else
-		return 1;
+	else if(kbhit()) {
+			getch();
+			return 1;
+	}
+		return 0;
 }
 /**
 *	@brief Testa o contato do player com o chão 
@@ -293,24 +355,21 @@ void floorCheck(game_object_type *player){
 /**
 *	@brief Função que calcula o deslocamento do chão em funão da posição do player1 
 *
-*	@param *objeto (game_object_type) do player, *ground(game_object_type) do ground e dt dt delta tempo para o cálculo do espaço percorrido.
+*	@param objeto 	player
+*	@param ground   ground
+* 	@param dt delta tempo para o cálculo do espaço percorrido.
 */
-void groundstep(game_object_type *objeto, game_object_type *ground, float dt){
-	static int offset =0;
+void groundStep(game_object_type *objeto, game_object_type *ground, float dt){
+	
 
 	if(objeto->body.pos.x>= PLAYER_FIX_POS)
-		offset = offset -objeto->body.speed.x*dt;
+		ground_offset = ground_offset - objeto->body.speed.x*dt;
 		
-	if(offset <=(float)-ground->graph.w)
-		offset = offset + ground->graph.w;
+	if(ground_offset <=(float)-ground->graph.w)
+		ground_offset = ground_offset + ground->graph.w;
 	
 	for(int i =0; i<=(SCREEN_W/ground->graph.w)+1;i++){
-		int posground=i*ground->graph.w+offset;
+		int posground=i*ground->graph.w+ ground_offset;
 		print(vetor2d_type{posground, ground->body.pos.y}, &ground->graph);
 	}	
 }
-void keyCapture(){
-	key = (int)getch();
-	
-}
-

@@ -20,7 +20,6 @@ typedef struct game_state_type{
 #define ESC 27
 #define TARGET_FRAME_RATE (1.0/60.0)
 // Protótipos Públicos ==================================
-void keyCapture();
 
 
 // Variáveis públicas ===================================
