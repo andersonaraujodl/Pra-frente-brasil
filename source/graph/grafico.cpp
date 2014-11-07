@@ -20,6 +20,9 @@ using namespace std;
  */
 void print(vetor2d_type pos, graph_data_type *obj, int mode){
 	float ref_y = pos.y + obj->h;
+	
+	if(obj->masked) putimage(pos.x, TO_GROUND_LEVEL(ref_y), obj->msk, AND_PUT);
+	
 	putimage(pos.x, TO_GROUND_LEVEL(ref_y), obj->img, mode);
 	
 }
@@ -46,7 +49,7 @@ void erase(){
  *  
  *  @details Details
  */
-void graphInitObjects(graph_data_type *objeto, const char* caminho){
+void graphInitObjects(graph_data_type *objeto, const char* caminho, const char* caminhomsk){
 	unsigned size;
 	int left, top, right, bottom;
 	setbkcolor(BGCOLOR);
@@ -59,13 +62,20 @@ void graphInitObjects(graph_data_type *objeto, const char* caminho){
 	top = (SCREEN_H/2)-(objeto->h/2);
 	right = (SCREEN_W/2)+(objeto->w/2);
 	bottom = (SCREEN_H/2)+(objeto->h/2);	
-	readimagefile(caminho,left, top, right, bottom );
 	
+	readimagefile(caminho,left, top, right, bottom );
 	size= imagesize(left, top,right,bottom);
 	objeto->img = new int[size];
 	getimage(left, top, right, bottom, objeto->img);
-	
 	cleardevice();
+	
+	if(objeto->masked){
+		readimagefile(caminhomsk,left, top, right, bottom );
+		size= imagesize(left, top,right,bottom);
+		objeto->msk = new int[size];
+		getimage(left, top, right, bottom, objeto->msk);
+		cleardevice();	
+	}
 	
 	setvisualpage(page);
 }

@@ -17,7 +17,7 @@
 void updateScreen();
 void print(vetor2d_type pos, graph_data_type *obj, int mode = COPY_PUT);
 void erase();
-void graphInitObjects(graph_data_type *objeto, const char* caminho);
+void graphInitObjects(graph_data_type *objeto, const char* caminho, const char* caminhomsk="");
 void printDirection(vetor2d_type pos,float angulo, float forca);
 
 #endif
