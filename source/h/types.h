@@ -69,6 +69,8 @@ typedef struct {
 */
 typedef struct{
 	void *img; /**< Imagem que será impressa*/
+	void *msk; /**< Imagem que será usada como mascara*/
+	bool masked;
 	float h; /**< Altura da imagem*/
 	float w; /**< Largura da imagem*/
 }graph_data_type;
@@ -108,7 +110,6 @@ enum{
 	GROUND,
 	PLAYER1,
 	PLAYER2,
-	PLAYERS_MASK,
 	NUM_OBJECTS_DEFINE
 
 };
@@ -116,7 +117,7 @@ enum{
 /**
  *  Quantidade de Objetos - o player
  */
-#define NUM_BLOCKS (NUM_OBJECTS_DEFINE -5)
+#define NUM_BLOCKS (NUM_OBJECTS_DEFINE -4)
 
 
 

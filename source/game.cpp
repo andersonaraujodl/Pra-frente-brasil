@@ -107,7 +107,7 @@ int initGame (float dt){
 	using namespace std;	
 	ifstream file(RESOURCES_ROOT);
 	
-	char data[1000];
+	char data[3000];
 	int pos =0;
 	while(file.good()){
 		data[pos] = file.get();
@@ -117,23 +117,42 @@ int initGame (float dt){
 	
 	char * pch;
 		
-	pch = strtok(data,",");
+	pch = strtok(data,",");//carrega o primeiro booleano
 	
 	for(int i = 0; i <NUM_OBJECTS_DEFINE; ++i){
-		static char temp[200], t_width[4], t_height[5];
-		strcpy(temp,pch);
+		static char temp[200],tempmsk[200], t_width[4], t_height[5],t_bool[1];
+		std::cout<<" ciclo = "<<i<<std::endl;
+		
+		//carrega valor booleano de masked	
+		strcpy(t_bool,pch);
+		graphs_profiles[i].masked = atoi(t_bool);
+		std::cout<<" masked = "<<graphs_profiles[i].masked<<std::endl;
+		
+		//carrega valor da largura
+		pch = strtok(NULL,",");
+		strcpy(t_width,pch);
+		graphs_profiles[i].w = atoi(t_width);
+		std::cout<<" width = "<<graphs_profiles[i].w<<std::endl;
 
+		//carrega valor da altura
 		pch = strtok(NULL,",");
 		strcpy(t_height,pch);
-		graphs_profiles[i].w = atoi(t_height);
-
+		graphs_profiles[i].h = atoi(t_height);
+		std::cout<<" height = "<<graphs_profiles[i].h<<std::endl;
+		
+		//se houver mascara carrega caminho da mascara
+		if(graphs_profiles[i].masked){
+			pch = strtok(NULL,",");
+			strcpy(tempmsk,pch);	
+			std::cout<<" tempmsk = "<<tempmsk<<std::endl;
+		}
 		pch = strtok(NULL,"\n\0");
-		strcpy(t_width,pch);
-		graphs_profiles[i].h = atoi(t_width);
-
+		strcpy(temp,pch);
+		std::cout<<" tempo = "<<temp<<std::endl;
 		pch = strtok(NULL,",");
 		
-		graphInitObjects(&graphs_profiles[i], temp);
+		
+		graphInitObjects(&graphs_profiles[i], temp,tempmsk);
 	}
 	player1.graph = graphs_profiles[PLAYER1];
 	ground.graph = graphs_profiles[GROUND];
@@ -236,10 +255,9 @@ bool atualizaObjetos (game_object_type &ref){
 	// Imprime todos aqueles que estão dentro do range da tela
 	for (int i = left_obstacles_index; i <= right_obstacles_index; ++i){
 		float obj_x = world_obstacles[i].body.pos.x -  ref.body.pos.x + PLAYER_FIX_POS;
-		print(vetor2d_type{obj_x,world_obstacles[i].body.pos.y}, &world_obstacles[i].graph);
+		print(vetor2d_type{obj_x,world_obstacles[i].body.pos.y}, &world_obstacles[i].graph, OR_PUT);
 	
 	}
-	print(vetor2d_type{ref_x, ref.body.pos.y},&graphs_profiles[PLAYERS_MASK], AND_PUT);
 	print(vetor2d_type{ref_x, ref.body.pos.y},&ref.graph, OR_PUT);
 }
 
