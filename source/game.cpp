@@ -240,7 +240,7 @@ bool atualizaObjetos (game_object_type &ref){
 	
 	}
 	
-	print(vetor2d_type{ref_x, ref.body.pos.y},&ref.graph);
+	print(vetor2d_type{ref_x, ref.body.pos.y},&ref.graph, OR_PUT);
 }
 
 /**

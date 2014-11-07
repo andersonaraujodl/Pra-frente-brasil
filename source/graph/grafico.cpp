@@ -7,18 +7,20 @@
 
 using namespace std;
 
+
 /**
  *  @brief Brief
  *  
- *  @param [in] pos Parameter_Description
- *  @param [in] obj Parameter_Description
+ *  @param [in] pos  Parameter_Description
+ *  @param [in] obj  Parameter_Description
+ *  @param [in] mode Parameter_Description
  *  @return Return_Description
  *  
  *  @details Details
  */
-void print(vetor2d_type pos, graph_data_type *obj){
+void print(vetor2d_type pos, graph_data_type *obj, int mode){
 	float ref_y = pos.y + obj->h;
-	putimage(pos.x, TO_GROUND_LEVEL(ref_y), obj->img, COPY_PUT);
+	putimage(pos.x, TO_GROUND_LEVEL(ref_y), obj->img, mode);
 	
 }
 
@@ -44,10 +46,14 @@ void erase(){
  *  
  *  @details Details
  */
-void graphInitObjects(graph_data_type *objeto, const char* caminho){//puxar arquivo com caminho e tamanhos das imagens 
+void graphInitObjects(graph_data_type *objeto, const char* caminho){
 	unsigned size;
 	int left, top, right, bottom;
 	setbkcolor(BGCOLOR);
+	
+	int page = getactivepage();
+	setactivepage(2);
+	
 	cleardevice();
 	left = (SCREEN_W/2)-(objeto->w/2);
 	top = (SCREEN_H/2)-(objeto->h/2);
@@ -61,7 +67,7 @@ void graphInitObjects(graph_data_type *objeto, const char* caminho){//puxar arqu
 	
 	cleardevice();
 	
-	
+	setvisualpage(page);
 }
 
 /**

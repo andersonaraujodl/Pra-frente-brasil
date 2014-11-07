@@ -27,8 +27,8 @@ CommandLine=
 Folders=bgi,graph,h,physics
 IncludeVersionInfo=0
 SupportXPThemes=0
-CompilerSet=4
-CompilerSettings=000000e100000000001000000
+CompilerSet=3
+CompilerSettings=00000001c0000000000000000
 UnitCount=9
 
 [VersionInfo]
