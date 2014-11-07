@@ -297,7 +297,11 @@ int singleStep (float dt){
 	if(player1.body.speed.modulo())
 		return 0;     //singleStep
 	else
-		if(kbhit()) return 1;
+		if(kbhit()) {
+		getch();
+		return 1;
+		}
+		return 0;
 }
 /**
 *	@brief Testa o contato do player com o chão 
