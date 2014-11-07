@@ -16,6 +16,11 @@
 #define MASK_BIT(x) (long int)( 1 << x)
 
 
+
+#ifndef M_PI
+	#define M_PI		3.14159265358979323846
+#endif
+
 /**
  *  Vetor2D básico
  */
@@ -64,6 +69,8 @@ typedef struct {
 */
 typedef struct{
 	void *img; /**< Imagem que será impressa*/
+	void *msk; /**< Imagem que será usada como mascara*/
+	bool masked;
 	float h; /**< Altura da imagem*/
 	float w; /**< Largura da imagem*/
 }graph_data_type;
@@ -102,6 +109,7 @@ enum{
 	MTST,
 	GROUND,
 	PLAYER1,
+	PLAYER2,
 	NUM_OBJECTS_DEFINE
 
 };
@@ -109,7 +117,7 @@ enum{
 /**
  *  Quantidade de Objetos - o player
  */
-#define NUM_BLOCKS (NUM_OBJECTS_DEFINE -3)
+#define NUM_BLOCKS (NUM_OBJECTS_DEFINE -4)
 
 
 

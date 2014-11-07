@@ -2,6 +2,7 @@
 #define _GRAFICOS_H__
 
 #include "../h/types.h"
+#include "../bgi/graphics.h"
 //definições das  propriedades de tela
 #define SCREEN_W 1024
 #define SCREEN_H 600
@@ -14,8 +15,10 @@
 	
 // Protótipo das funções ------------------------------
 void updateScreen();
-void print(vetor2d_type pos, graph_data_type *obj);
+void print(vetor2d_type pos, graph_data_type *obj, int mode = COPY_PUT);
 void erase();
-void graphInitObjects(graph_data_type *objeto, const char* caminho);
+void graphInitObjects(graph_data_type *objeto, const char* caminho, const char* caminhomsk="");
+void printDirection(vetor2d_type pos,float angulo, float forca);
+void printTxt(char *texto, vetor2d_type pos);
 
 #endif
