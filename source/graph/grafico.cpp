@@ -42,6 +42,15 @@ void graphInitObjects(graph_data_type *objeto, const char* caminho){//puxar arqu
 	
 }
 
+void printDirection(vetor2d_type pos,float angulo, float forca){
+	vetor2d_type temp = {pos.x, pos.y };
+	temp.setVector (forca/4, angulo);
+	setwritemode(XOR_PUT);
+	setlinestyle(0,0,3);
+	setcolor(YELLOW);
+	line(pos.x, TO_GROUND_LEVEL(pos.y), pos.x+temp.x, TO_GROUND_LEVEL(pos.y)-temp.y);
+}
+
 void updateScreen(){
 	int page = getactivepage();
 	setvisualpage(page);
