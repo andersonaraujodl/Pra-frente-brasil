@@ -18,7 +18,7 @@ typedef struct game_state_type{
 #define DOWN 80
 #define SPACE (int)' '
 #define ESC 27
-
+#define TARGET_FRAME_RATE (1.0/60.0)
 // Protótipos Públicos ==================================
 void keyCapture();
 

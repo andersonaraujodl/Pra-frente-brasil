@@ -146,8 +146,15 @@ int initGame (float dt){
 	return 1;
 }
 
+void endGame (void){
+	
+	for(int i = 0; i <NUM_OBJECTS_DEFINE; ++i){
+	delete graphs_profiles[i].img;
+	}
+}
+
 int showMenu (float dt){
-	std::cout<<"showMenu"<<std::endl;
+
 	print(vetor2d_type{SCREEN_W/2, SCREEN_H/2}, &player1.graph);
 	if(kbhit()) return 1;
 	
@@ -155,30 +162,22 @@ int showMenu (float dt){
 }
 
 void initObstacles (void){
-	static int minPos = SCREEN_W;
+
 	for(int i = 0; i < MAX_OBSTACLES;++i){
-		unsigned int obj_profile;
-		// Coloca cada objeto subdividindo cada espaço em dezenas, deixando aleatório a casa das unidades.
-		// O primeiro objeto é colocado apartir da primeira dezena e assim por diante (1x, 2x, 3x, ...)
-		//world_obstacles[i].body.pos.x = ((rand() % 100) + ( (i+1) * 1000));
+
+		// Randomiza qual o perfil (tipo) de obstáculo ele será, Igreja, nuvem....
+		unsigned int obj_profile = (rand() % NUM_BLOCKS);
+		world_obstacles[i].collision_mask = MASK_BIT(obj_profile);
+		world_obstacles[i].graph = graphs_profiles[obj_profile]; // Aponta para qual o bitmap que pertence aquele perfil
 		
 		//partindo da posição minima para deixar fora da tela, a posição de cada obstaculo varia 100px,
 		//a partir do primeiro objeto colocado a posicao minima vira a posição do objeto anterior
 		//e a ele é somado a largura desse mesmo objeto objeto anterior, de forma a evitar a sobreposição
-		world_obstacles[i].body.pos.x = (rand() % 100) + minPos + ((obj_profile)?graphs_profiles[obj_profile].w : 0);
-		minPos = world_obstacles[i].body.pos.x;
+		world_obstacles[i].body.pos.x = ((rand() % 600) + 50) + (i ? world_obstacles[i-1].graph.w + world_obstacles[i-1].body.pos.x: SCREEN_W);
 		// A priori todos os objetos estarão no chão
 		world_obstacles[i].body.pos.y = 0;
-		
-		// Randomiza qual o perfil (tipo) de obstáculo ele será, Igreja, nuvem....
-		obj_profile = (rand() % NUM_BLOCKS);
-		std::cout<<"obj_profile = "<<obj_profile<<std::endl;
-		world_obstacles[i].collision_mask = obj_profile;
-		world_obstacles[i].graph = graphs_profiles[obj_profile]; // Aponta para qual o bitmap que pertence aquele perfil
 
 	}
-	
-	minPos = SCREEN_W;
 }
 
 void loadMultiGame (void){

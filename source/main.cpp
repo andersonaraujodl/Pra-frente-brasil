@@ -27,15 +27,15 @@ int main(int argc, char** argv) {
 	initwindow(SCREEN_W,SCREEN_H);
 	
 	while(ret >= 0){
-		//if(kbhit()) keyCapture();
+
 		
-		ret = game_states->func((float)1/30);
+		ret = game_states->func(TARGET_FRAME_RATE);
 		
 		
 		game_states = game_states->states[ret];
 		
 		updateScreen();
-		delay(1000/30);
+		delay(TARGET_FRAME_RATE * 1000.0);
 	}
 
 	while(!kbhit()); // espera até alguma tecla	se pressiona
