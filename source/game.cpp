@@ -381,8 +381,13 @@ int singleStep (float dt){
 	if(player1.body.speed.modulo())
 		return 0;     //singleStep
 	else if(kbhit()) {
-			getch();
-			return 1;
+		#ifdef ON_DEBUG
+		switch(getch()){
+			
+			
+		}
+		#elif
+		return 1;
 	}
 		return 0;
 }

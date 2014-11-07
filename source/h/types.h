@@ -118,6 +118,13 @@ enum{
  */
 #define NUM_BLOCKS (NUM_OBJECTS_DEFINE -5)
 
+#define ON_DEBUG
+
+void debugTrace (char *msg){
+#ifdef ON_DEBUG
+	std::cout << "debugTrace: " << msg << std::endl;
+#endif	
+}
 
 
 
