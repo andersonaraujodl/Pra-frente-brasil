@@ -21,6 +21,7 @@ typedef struct game_state_type{
 
 // Protótipos Públicos ==================================
 void keyCapture();
+void resetGround();
 
 
 // Variáveis públicas ===================================
