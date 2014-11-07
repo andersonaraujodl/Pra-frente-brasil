@@ -219,9 +219,8 @@ int showMenu (float dt){
 		player2.body.speed.y *= -1;
 	}
 	
-	print(player1.body.pos,&graphs_profiles[PLAYERS_MASK], AND_PUT);
+	
 	print(player1.body.pos,&player1.graph, OR_PUT);
-	print(player2.body.pos,&graphs_profiles[PLAYERS_MASK], AND_PUT);
 	print(player2.body.pos,&player2.graph, OR_PUT);
 	// -------------------------------------------
 
