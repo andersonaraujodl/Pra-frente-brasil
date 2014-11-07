@@ -104,3 +104,9 @@ void updateScreen(){
 	setactivepage(page);
 	erase();
 }
+
+
+void printTxt(char *texto, vetor2d_type pos){
+	setcolor(WHITE);
+	outtextxy(pos.x, pos.y,texto);	
+}

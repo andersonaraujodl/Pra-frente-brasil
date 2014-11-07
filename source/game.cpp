@@ -34,6 +34,7 @@ typedef struct{
 
 // Protótipos Privados ==========================================
 int initGame (float dt);
+int initMenu (float dt);
 int showMenu (float dt);
 int loadSingleGame (float dt);
 int preLancamento (float dt);
@@ -53,9 +54,18 @@ game_state_type load_state ={
 	initGame,
 	(game_state_type*[]){
 		&load_state,		 // return 0
-		&menu_state		 	 // return 1
+		&load_menu_state	 // return 1
 	}
 };
+
+game_state_type load_menu_state ={
+	initMenu,
+	(game_state_type*[]){
+		&load_menu_state, // return 0
+		&menu_state       // return 1
+	}
+};
+
 game_state_type menu_state ={
 	showMenu,
 	(game_state_type*[]){
@@ -71,9 +81,8 @@ game_state_type load_single ={
 	loadSingleGame,
 	(game_state_type*[]){
 		&load_single,	 // return 0
-		&pre_lancamento // return 1
+		&pre_lancamento  // return 1
 	},
-	1
 };
 
 game_state_type pre_lancamento ={
@@ -82,16 +91,14 @@ game_state_type pre_lancamento ={
 		&pre_lancamento,	// return 0
 		&step_single 		// return 1
 	},
-	1
 };
 
 game_state_type step_single ={
 	singleStep,
 	(game_state_type*[]){
 		&step_single,	 // return 0
-		&load_single  // return 1
+		&load_single     // return 1
 	},
-	1
 };
 
 game_state_type *game_states =  &load_state;
@@ -135,7 +142,9 @@ int initGame (float dt){
 		
 		graphInitObjects(&graphs_profiles[i], temp);
 	}
+	
 	player1.graph = graphs_profiles[PLAYER1];
+	player2.graph = graphs_profiles[PLAYER2];
 	ground.graph = graphs_profiles[GROUND];
 	ground.body.pos.x = 0;
 	ground.body.pos.y = -10 ;
@@ -155,6 +164,18 @@ void endGame (void){
 	}
 }
 
+
+int initMenu (float dt){
+	
+	// Pura graça -------------------------------
+	player1.body.pos.y = (SCREEN_H*3)/4;
+	player1.body.pos.x = (SCREEN_W/6);
+	player2.body.pos.setVector((SCREEN_W*5)/6,0);
+	player2.body.speed.setVector(750,90);
+	// ------------------------------------------
+	return 1;
+}
+
 /**
  *  @brief Brief
  *  
@@ -164,11 +185,30 @@ void endGame (void){
  *  @details Details
  */
 int showMenu (float dt){
+	
+	// Pura graça -------------------------------
+	lancamento(&player1,dt);
+	lancamento(&player2,dt);
+	// Verifica se atingiu o chão
+	if(player1.body.pos.y<=0){
+		player1.body.pos.y=0;
+		player1.body.speed.y *= -1;
+	}
+	// Verifica se atingiu o chão
+	if(player2.body.pos.y<=0){
+		player2.body.pos.y=0;
+		player2.body.speed.y *= -1;
+	}
+	
+	print(player1.body.pos,&graphs_profiles[PLAYERS_MASK], AND_PUT);
+	print(player1.body.pos,&player1.graph, OR_PUT);
+	print(player2.body.pos,&graphs_profiles[PLAYERS_MASK], AND_PUT);
+	print(player2.body.pos,&player2.graph, OR_PUT);
+	// -------------------------------------------
 
-	print(vetor2d_type{SCREEN_W/2, SCREEN_H/2}, &player1.graph);
 	if(kbhit()) return 1;
 	
-	return 1;
+	return 0;
 }
 
 /**
@@ -263,6 +303,10 @@ int loadSingleGame (float dt){
 	ground_offset = 0;
 	left_obstacles_index = 0;
 	right_obstacles_index = 0;
+	
+	// Limpa qualquer tecla que esteja em buffer do teclado.
+	getch();
+	fflush(stdin);
 
 	return 1; // next state = preLancamento
 }
@@ -326,6 +370,13 @@ int singleStep (float dt){
 	floorCheck(&player1);
 	groundStep( &player1, &ground, dt);
 	atualizaObjetos(player1);
+	
+	
+	
+
+	char  texto [100];
+	sprintf(texto,"Distancia:\n %d metros",(int)(player1.body.pos.x - PLAYER_INIT_X)/50);
+	printTxt(texto, {SCREEN_W-150, 20});
 	
 	if(player1.body.speed.modulo())
 		return 0;     //singleStep
