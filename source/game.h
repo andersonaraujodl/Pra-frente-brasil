@@ -9,7 +9,6 @@ typedef struct game_state_type{
 
 	int (*func)(float dt);
 	game_state_type **states;
-	int num_states;
 }game_state_type;
 
 
@@ -24,6 +23,7 @@ typedef struct game_state_type{
 
 // Variáveis públicas ===================================
 extern game_state_type *game_states;
+extern game_state_type load_menu_state;
 extern game_state_type menu_state;
 extern game_state_type pre_lancamento;
 extern game_state_type step_single;
