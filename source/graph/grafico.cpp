@@ -21,7 +21,7 @@ using namespace std;
 void print(vetor2d_type pos, graph_data_type *obj, int mode){
 	float ref_y = pos.y + obj->h;
 	
-	if(obj->masked) putimage(pos.x, TO_GROUND_LEVEL(ref_y), obj->msk, AND_PUT);
+	if(obj->msk) putimage(pos.x, TO_GROUND_LEVEL(ref_y), obj->msk, AND_PUT);
 	
 	putimage(pos.x, TO_GROUND_LEVEL(ref_y), obj->img, mode);
 	
@@ -69,7 +69,7 @@ void graphInitObjects(graph_data_type *objeto, const char* caminho, const char* 
 	getimage(left, top, right, bottom, objeto->img);
 	cleardevice();
 	
-	if(objeto->masked){
+	if(strcmp(caminhomsk," ")){
 		readimagefile(caminhomsk,left, top, right, bottom );
 		size= imagesize(left, top,right,bottom);
 		objeto->msk = new int[size];

@@ -127,16 +127,11 @@ int initGame (float dt){
 	pch = strtok(data,",");//carrega o primeiro booleano
 	
 	for(int i = 0; i <NUM_OBJECTS_DEFINE; ++i){
-		static char temp[200],tempmsk[200], t_width[4], t_height[5],t_bool[1];
+		static char temp[200],tempmsk[200], t_width[4], t_height[5];
 		std::cout<<" ciclo = "<<i<<std::endl;
-		
-		//carrega valor booleano de masked	
-		strcpy(t_bool,pch);
-		graphs_profiles[i].masked = atoi(t_bool);
-		std::cout<<" masked = "<<graphs_profiles[i].masked<<std::endl;
+
 		
 		//carrega valor da largura
-		pch = strtok(NULL,",");
 		strcpy(t_width,pch);
 		graphs_profiles[i].w = atoi(t_width);
 		std::cout<<" width = "<<graphs_profiles[i].w<<std::endl;
@@ -147,12 +142,12 @@ int initGame (float dt){
 		graphs_profiles[i].h = atoi(t_height);
 		std::cout<<" height = "<<graphs_profiles[i].h<<std::endl;
 		
-		//se houver mascara carrega caminho da mascara
-		if(graphs_profiles[i].masked){
-			pch = strtok(NULL,",");
-			strcpy(tempmsk,pch);	
-			std::cout<<" tempmsk = "<<tempmsk<<std::endl;
-		}
+		//carrega caminho da mascara
+
+		pch = strtok(NULL,",");
+		strcpy(tempmsk,pch);	
+		std::cout<<" tempmsk = "<<tempmsk<<std::endl;
+
 		pch = strtok(NULL,"\n\0");
 		strcpy(temp,pch);
 		std::cout<<" tempo = "<<temp<<std::endl;
