@@ -41,6 +41,7 @@ int preLancamento (float dt);
 int singleStep (float dt);
 void floorCheck(game_object_type *player);
 void groundStep(game_object_type *objeto, game_object_type *ground, float dt);
+int singleEnd(float dt);
 
 
 //Variáveis privadas ============================================
@@ -49,6 +50,8 @@ game_object_type world_obstacles[MAX_OBSTACLES];
 graph_data_type graphs_profiles[NUM_OBJECTS_DEFINE];
 unsigned int left_obstacles_index = 0,right_obstacles_index = 0;
 int  ground_offset;
+int total_score = 0; 
+int total_rounds = 5;
 
 game_state_type load_state ={
 	initGame,
@@ -92,12 +95,19 @@ game_state_type pre_lancamento ={
 		&step_single 		// return 1
 	},
 };
-
+game_state_type end_single ={
+	singleEnd,
+	(game_state_type*[]){
+		&end_single,	 // return 0
+		&load_single,	 // return 1
+		&load_menu_state // return 2
+	},
+};
 game_state_type step_single ={
 	singleStep,
 	(game_state_type*[]){
 		&step_single,	 // return 0
-		&load_single     // return 1
+		&end_single     // return 1
 	},
 };
 
@@ -181,6 +191,10 @@ void endGame (void){
 
 int initMenu (float dt){
 	
+	if(kbhit()){
+		getch();
+		fflush(stdin);
+	}
 	// Pura graça -------------------------------
 	player1.body.pos.y = (SCREEN_H*3)/4;
 	player1.body.pos.x = (SCREEN_W/6);
@@ -388,15 +402,53 @@ int singleStep (float dt){
 
 	char  texto [100];
 	sprintf(texto,"Distancia:\n %d metros",(int)(player1.body.pos.x - PLAYER_INIT_X)/50);
-	printTxt(texto, {SCREEN_W-150, 20});
+	setcolor(COLOR(255,255,255));
+	fontSize(1);
+	printTxt(texto, vetor2d_type{SCREEN_W-(textwidth(texto)+20), 20});
 	
 	if(player1.body.speed.modulo())
 		return 0;     //singleStep
-	else if(kbhit()) {
-			getch();
-			return 1;
+	if(kbhit()){
+		getch();
+		fflush(stdin);
 	}
-		return 0;
+
+	total_score+= (int)(player1.body.pos.x - PLAYER_INIT_X)/50;
+	total_rounds--;
+	return 1;
+}
+
+int singleEnd(float dt){
+	char *texto ="TENTE NOVAMENTE", score[50];
+	int ret = 1;
+	groundStep( &player1, &ground, dt);
+	atualizaObjetos(player1);
+	
+	sprintf(score,"Você percorreu\n %d metros em %d rodadas.",(int)total_score,5-total_rounds);
+	
+	setcolor(COLOR(255,255,255));
+	fontSize(2);
+	printTxt(score, vetor2d_type{(SCREEN_W/2)-(textwidth(score)/2), SCREEN_H/2-(textheight(score)+20)});
+	if(total_rounds<=0){
+	
+		setcolor(COLOR(255,0,0));
+		texto ="GAME OVER";
+		ret=2;
+	}
+	fontSize(5);
+	printTxt(texto, vetor2d_type{(SCREEN_W/2)-(textwidth(texto)/2), SCREEN_H/2});
+
+	if(kbhit()){
+		if(ret == 2){
+			total_score = 0;
+			total_rounds =5;
+		}
+		
+		 return ret;
+		 
+	}
+	
+	return 0;
 }
 /**
 *	@brief Testa o contato do player com o chão 
