@@ -4,7 +4,7 @@
 #include "../h/types.h"
 #include "../bgi/graphics.h"
 //definições das  propriedades de tela
-#define SCREEN_W 1024
+#define SCREEN_W 1280
 #define SCREEN_H 600
 #define SCREEN_CENTER SCREEN_W/2
 #define PLAYER_SPOT SCREEN_W/3

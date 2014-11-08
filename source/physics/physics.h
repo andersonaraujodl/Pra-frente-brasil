@@ -9,7 +9,7 @@
 
 // Protótipos ======================================================
 void lancamento(game_object_type *p, float dt);
-void colisao (game_object_type *c, game_object_type *p);
+bool colide (game_object_type &c, game_object_type &p);
 void atrito (game_object_type *a, float coefatrito, float dt);
 // =================================================================
 

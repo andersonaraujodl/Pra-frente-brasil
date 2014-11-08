@@ -8,7 +8,7 @@
 #define __TYPES_H__
 
 #include <math.h>
-
+#include <iostream>
 /**
 * Macro para facilitar as contas utilizando o @ref NUM_OBJECTS_DEFINE.
 * Exemplo: if(player.collision_mask & MASK_BIT(MST)){...}
@@ -84,6 +84,11 @@ typedef struct
 	physics_data_type body; /**< Propriedades físicas*/
 	graph_data_type graph; /**< Propriedades gráficas*/
 	long int collision_mask; /**< Máscara para a análise de colisões entre objetos*/
+	
+	vetor2d_type bottomLeft() {return this->body.pos;}
+	vetor2d_type topRight() { return vetor2d_type{this->body.pos.x + this->graph.w,this->body.pos.y + this->graph.h};}
+	
+	
 }game_object_type;
 
 /**
@@ -106,7 +111,10 @@ enum{
 	BANCO,
 	INDUSTRIA,
 	RURALISTAS,
-	MTST,
+	
+	
+	MTST, // Deixar esse por último dos blocks
+	
 	GROUND,
 	PLAYER1,
 	PLAYER2,
@@ -117,17 +125,8 @@ enum{
 /**
  *  Quantidade de Objetos - o player
  */
-#define NUM_BLOCKS (NUM_OBJECTS_DEFINE -4)
+#define NUM_BLOCKS (MTST +1)
 
-#define ON_DEBUG
-
-void debugTrace (char *msg){
-#ifdef ON_DEBUG
-	std::cout << "debugTrace: " << msg << std::endl;
-#endif	
-}
-
-
-
+#define ON_DEBUG 0
 
 #endif

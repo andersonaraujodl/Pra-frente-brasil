@@ -28,9 +28,16 @@ void lancamento(game_object_type *p, float dt){
  * @param c Corpo 1
  * @param p Corpo 2
  */
-void colisao (game_object_type *c, game_object_type *p){
+bool colide (game_object_type &c,game_object_type &p){
+	
+	if(c.bottomLeft().x > p.topRight().x || c.topRight().x < p.bottomLeft().x)
+		return false;
+		
+	if(c.bottomLeft().y > p.topRight().y || c.topRight().y < p.bottomLeft().y)
+		return false;
+		
+	return true;	
 }
-
 
 //função atrito
 void atrito (game_object_type *a, float coefatrito, float dt){

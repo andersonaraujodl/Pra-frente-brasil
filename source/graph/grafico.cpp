@@ -77,7 +77,7 @@ void graphInitObjects(graph_data_type *objeto, const char* caminho, const char* 
 		cleardevice();	
 	}
 	
-	setvisualpage(page);
+	setactivepage(page);
 }
 
 /**

@@ -13,9 +13,13 @@ typedef struct game_state_type{
 
 
 // defines públicos =====================================
-#define UP 72
-#define DOWN 80
-#define SPACE (int)' '
+#define UP 		72
+#define DOWN 	80
+#define LEFT   	75
+#define RIGHT  	77
+#define SPACE 	(int)' '
+#define PWUP_1	'A'
+#define PWUP_2	'S'
 #define ESC 27
 #define TARGET_FRAME_RATE (1.0/60.0)
 // Protótipos Públicos ==================================

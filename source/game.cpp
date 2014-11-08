@@ -23,6 +23,9 @@
 #define PLAYER_INIT_Y 0  /**< Posição incial do player em y*/
 #define RESOURCES_ROOT "../resources/data/img_data.cvs"
 
+#define ATRITO 20
+#define BOUNCE 0.7
+
 
 // typedefs privados ===========================================
 typedef struct{
@@ -103,6 +106,12 @@ game_state_type step_single ={
 
 game_state_type *game_states =  &load_state;
 
+static void debugTrace (char *msg){
+#if ON_DEBUG
+	std::cout << "debugTrace: " << msg << std::endl;
+#endif	
+};
+
 /**
  *  @brief Inicia os recursos que serão utilzados no game
  *  
@@ -163,6 +172,9 @@ int initGame (float dt){
 	}
 	
 	player1.graph = graphs_profiles[PLAYER1];
+	#if ON_DEBUG
+	player1.collision_mask |= MASK_BIT(CONGRESSO) | MASK_BIT(LGBT) | MASK_BIT(BANCO);
+	#endif
 	player2.graph = graphs_profiles[PLAYER2];
 	ground.graph = graphs_profiles[GROUND];
 	ground.body.pos.x = 0;
@@ -211,14 +223,13 @@ int showMenu (float dt){
 	// Verifica se atingiu o chão
 	if(player1.body.pos.y<=0){
 		player1.body.pos.y=0;
-		player1.body.speed.y *= -1;
+		player1.body.speed.y *= -0.99;
 	}
 	// Verifica se atingiu o chão
 	if(player2.body.pos.y<=0){
 		player2.body.pos.y=0;
-		player2.body.speed.y *= -1;
+		player2.body.speed.y *= -0.99;
 	}
-	
 	
 	print(player1.body.pos,&player1.graph, OR_PUT);
 	print(player2.body.pos,&player2.graph, OR_PUT);
@@ -269,6 +280,30 @@ void connectToServer (void){
 
 
 /**
+ *  @brief Acha quais são os objetos de fronteira em relação ao objeto referência
+ *  
+ *  @param [in] ref   Objeto de referência
+ *  @param [out] left  Objeto mais a esquerda
+ *  @param [out] right Objeto mais a direita
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
+bool setObstaclesRange (const game_object_type &ref,int &left, int &right){
+	
+	// Enquanto o objeto.pos.x mais a esquerda for menor que o canto mais a esquerda da tela
+	while((world_obstacles[left].body.pos.x + world_obstacles[left].graph.w) < ref.body.pos.x - PLAYER_FIX_POS){
+		if(++left == MAX_OBSTACLES)
+			return false;// impede que estoure o buffer
+	}
+	// Enquanto o objeto mais a direita (+1) for menor que o canto direito da tela
+	while(world_obstacles[right+1].body.pos.x < ref.body.pos.x +(SCREEN_W - PLAYER_FIX_POS)){
+		if(++right == MAX_OBSTACLES)
+			return false; // Impede que estoure o buffer
+	}
+}
+
+/**
  *  @brief Brief
  *  
  *  @param [in] ref Parameter_Description
@@ -276,27 +311,17 @@ void connectToServer (void){
  *  
  *  @details Details
  */
-bool atualizaObjetos (game_object_type &ref){
+bool atualizaObjetos (game_object_type &ref,const int &left_index,const int &right_index){
+	
+
+	// Imprime todos aqueles que estão dentro do range da tela
+	for (int i = left_index; i <= right_index; ++i){
+		float obj_x = world_obstacles[i].body.pos.x -  ref.body.pos.x + PLAYER_FIX_POS;
+		print(vetor2d_type{obj_x,world_obstacles[i].body.pos.y}, &world_obstacles[i].graph,OR_PUT);
+	
+	}
 	
 	float ref_x = (ref.body.pos.x < PLAYER_FIX_POS) ? ref.body.pos.x: PLAYER_FIX_POS;
-	
-	// Enquanto o objeto.pos.x mais a esquerda for menor que o canto mais a esquerda da tela
-	while((world_obstacles[left_obstacles_index].body.pos.x + world_obstacles[left_obstacles_index].graph.w) < ref.body.pos.x - PLAYER_FIX_POS){
-		if(++left_obstacles_index == MAX_OBSTACLES)
-			return false;// impede que estoure o buffer
-	}
-	// Enquanto o objeto mais a direita (+1) for menor que o canto direito da tela
-	while(world_obstacles[right_obstacles_index+1].body.pos.x < ref.body.pos.x +(SCREEN_W - PLAYER_FIX_POS)){
-		if(++right_obstacles_index == MAX_OBSTACLES)
-			return false; // Impede que estoure o buffer
-	}
-	
-	// Imprime todos aqueles que estão dentro do range da tela
-	for (int i = left_obstacles_index; i <= right_obstacles_index; ++i){
-		float obj_x = world_obstacles[i].body.pos.x -  ref.body.pos.x + PLAYER_FIX_POS;
-		print(vetor2d_type{obj_x,world_obstacles[i].body.pos.y}, &world_obstacles[i].graph, OR_PUT);
-	
-	}
 	print(vetor2d_type{ref_x, ref.body.pos.y},&ref.graph, OR_PUT);
 }
 
@@ -340,6 +365,7 @@ int preLancamento (float dt){
 	static int forca = 2000;
 	static int angulo =0;
 	
+	
 	if(kbhit()){
 		key = (int)getch();
 		
@@ -370,7 +396,7 @@ int preLancamento (float dt){
 	
 	
 	groundStep( &player1, &ground,dt);	
-	atualizaObjetos(player1);
+	atualizaObjetos(player1,0,0);
 	printDirection(vetor2d_type{player1.body.pos.x+(player1.graph.w/2) ,player1.body.pos.y+(player1.graph.h/2)}, angulo,300);
 
 	return 0; // preLancamento
@@ -383,14 +409,35 @@ int preLancamento (float dt){
 */
 int singleStep (float dt){
 	
+	static int left_index = 0;
+	static int right_index = 0;
+	static int last_colide = -1;
+	
 	lancamento(&player1,dt);
 	floorCheck(&player1);
 	groundStep( &player1, &ground, dt);
-	atualizaObjetos(player1);
 	
 	
+	setObstaclesRange(player1,left_index,right_index);
+	atualizaObjetos(player1,left_index,right_index);
 	
-
+	for(int i = left_index; i <= right_index;++i){
+		if(last_colide != i){
+			if(colide(player1,world_obstacles[i])){
+				last_colide = i;
+				if(player1.collision_mask & world_obstacles[i].collision_mask){
+					player1.body.speed.x *= 1.50;
+					player1.body.speed.y*= 1.50;
+				}
+				else{
+					player1.body.speed.x *=0.50;
+					player1.body.speed.y*= 0.50;
+				}
+			}
+		}
+	}
+		
+	
 	char  texto [100];
 	sprintf(texto,"Distancia:\n %d metros",(int)(player1.body.pos.x - PLAYER_INIT_X)/50);
 	printTxt(texto, {SCREEN_W-150, 20});
@@ -398,13 +445,26 @@ int singleStep (float dt){
 	if(player1.body.speed.modulo())
 		return 0;     //singleStep
 	else if(kbhit()) {
-		#ifdef ON_DEBUG
+		#if ON_DEBUG
 		switch(getch()){
-			
-			
+			case RIGHT:
+				player1.body.pos.x +=50;
+			break;
+			case LEFT:
+				player1.body.pos.x -=50;
+			break;
+			case SPACE:
+				left_index = 0; 
+				right_index = 0;
+				last_colide - -1;
+				return 1;
 		}
-		#elif
+		#else
+		left_index = 0; 
+		right_index = 0;
+		last_colide = -1;
 		return 1;
+		#endif
 	}
 		return 0;
 }
@@ -418,8 +478,8 @@ void floorCheck(game_object_type *player){
 	if(player->body.pos.y<=0){
 			player->body.pos.y=0;
 						
-			player->body.speed.y = -0.5*player->body.speed.y;
-			atrito(player, 5, 0.1);
+			player->body.speed.y = -BOUNCE*player->body.speed.y;
+			atrito(player, ATRITO, TARGET_FRAME_RATE);
 			
 			if(player->body.speed.modulo() < 17)
 				player->body.speed.setVector(0,0);
