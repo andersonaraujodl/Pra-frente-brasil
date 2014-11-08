@@ -44,6 +44,7 @@ int preLancamento (float dt);
 int singleStep (float dt);
 void floorCheck(game_object_type *player);
 void groundStep(game_object_type *objeto, game_object_type *ground, float dt);
+int singleEnd(float dt);
 
 
 //Variáveis privadas ============================================
@@ -52,6 +53,8 @@ game_object_type world_obstacles[MAX_OBSTACLES];
 graph_data_type graphs_profiles[NUM_OBJECTS_DEFINE];
 unsigned int left_obstacles_index = 0,right_obstacles_index = 0;
 int  ground_offset;
+int total_score = 0; 
+int total_rounds = 5;
 
 game_state_type load_state ={
 	initGame,
@@ -95,12 +98,19 @@ game_state_type pre_lancamento ={
 		&step_single 		// return 1
 	},
 };
-
+game_state_type end_single ={
+	singleEnd,
+	(game_state_type*[]){
+		&end_single,	 // return 0
+		&load_single,	 // return 1
+		&load_menu_state // return 2
+	},
+};
 game_state_type step_single ={
 	singleStep,
 	(game_state_type*[]){
 		&step_single,	 // return 0
-		&load_single     // return 1
+		&end_single     // return 1
 	},
 };
 
@@ -136,16 +146,11 @@ int initGame (float dt){
 	pch = strtok(data,",");//carrega o primeiro booleano
 	
 	for(int i = 0; i <NUM_OBJECTS_DEFINE; ++i){
-		static char temp[200],tempmsk[200], t_width[4], t_height[5],t_bool[1];
+		static char temp[200],tempmsk[200], t_width[4], t_height[5];
 		std::cout<<" ciclo = "<<i<<std::endl;
-		
-		//carrega valor booleano de masked	
-		strcpy(t_bool,pch);
-		graphs_profiles[i].masked = atoi(t_bool);
-		std::cout<<" masked = "<<graphs_profiles[i].masked<<std::endl;
+
 		
 		//carrega valor da largura
-		pch = strtok(NULL,",");
 		strcpy(t_width,pch);
 		graphs_profiles[i].w = atoi(t_width);
 		std::cout<<" width = "<<graphs_profiles[i].w<<std::endl;
@@ -156,12 +161,12 @@ int initGame (float dt){
 		graphs_profiles[i].h = atoi(t_height);
 		std::cout<<" height = "<<graphs_profiles[i].h<<std::endl;
 		
-		//se houver mascara carrega caminho da mascara
-		if(graphs_profiles[i].masked){
-			pch = strtok(NULL,",");
-			strcpy(tempmsk,pch);	
-			std::cout<<" tempmsk = "<<tempmsk<<std::endl;
-		}
+		//carrega caminho da mascara
+
+		pch = strtok(NULL,",");
+		strcpy(tempmsk,pch);	
+		std::cout<<" tempmsk = "<<tempmsk<<std::endl;
+
 		pch = strtok(NULL,"\n\0");
 		strcpy(temp,pch);
 		std::cout<<" tempo = "<<temp<<std::endl;
@@ -198,6 +203,10 @@ void endGame (void){
 
 int initMenu (float dt){
 	
+	if(kbhit()){
+		getch();
+		fflush(stdin);
+	}
 	// Pura graça -------------------------------
 	player1.body.pos.y = (SCREEN_H*3)/4;
 	player1.body.pos.x = (SCREEN_W/6);
@@ -440,33 +449,66 @@ int singleStep (float dt){
 	
 	char  texto [100];
 	sprintf(texto,"Distancia:\n %d metros",(int)(player1.body.pos.x - PLAYER_INIT_X)/50);
-	printTxt(texto, {SCREEN_W-150, 20});
+	setcolor(COLOR(255,255,255));
+	fontSize(1);
+	printTxt(texto, vetor2d_type{SCREEN_W-(textwidth(texto)+20), 20});
 	
 	if(player1.body.speed.modulo())
 		return 0;     //singleStep
-	else if(kbhit()) {
-		#if ON_DEBUG
-		switch(getch()){
-			case RIGHT:
-				player1.body.pos.x +=50;
-			break;
-			case LEFT:
-				player1.body.pos.x -=50;
-			break;
-			case SPACE:
-				left_index = 0; 
-				right_index = 0;
-				last_colide - -1;
-				return 1;
-		}
-		#else
-		left_index = 0; 
-		right_index = 0;
-		last_colide = -1;
-		return 1;
-		#endif
+
+	if(kbhit()){
+		getch();
+		fflush(stdin);
 	}
-		return 0;
+	
+	left_index = 0; 
+	right_index = 0;
+	last_colide = -1;
+
+	total_score+= (int)(player1.body.pos.x - PLAYER_INIT_X)/50;
+	total_rounds--;
+	return 1;
+}
+
+
+int singleEnd(float dt){
+	char *texto ="TENTE NOVAMENTE", score[50];
+	int ret = 1;
+	 int left_index = 0;
+	static int right_index = 0;
+	
+	groundStep( &player1, &ground, dt);
+	
+	setObstaclesRange(player1,left_index,right_index);
+	atualizaObjetos(player1,left_index,right_index);
+	
+	sprintf(score,"Você percorreu\n %d metros em %d rodadas.",(int)total_score,5-total_rounds);
+	
+	setcolor(COLOR(255,255,255));
+	fontSize(2);
+	printTxt(score, vetor2d_type{(SCREEN_W/2)-(textwidth(score)/2), SCREEN_H/2-(textheight(score)+20)});
+	if(total_rounds<=0){
+	
+		setcolor(COLOR(255,0,0));
+		texto ="GAME OVER";
+		ret=2;
+	}
+	fontSize(5);
+	printTxt(texto, vetor2d_type{(SCREEN_W/2)-(textwidth(texto)/2), SCREEN_H/2});
+
+	if(kbhit()){
+		if(ret == 2){
+			total_score = 0;
+			total_rounds =5;
+		}
+		
+		left_index = 0;
+		right_index = 0;
+		return ret;
+		 
+	}
+	
+	return 0;
 }
 /**
 *	@brief Testa o contato do player com o chão 

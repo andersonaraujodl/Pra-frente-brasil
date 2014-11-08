@@ -20,5 +20,6 @@ void erase();
 void graphInitObjects(graph_data_type *objeto, const char* caminho, const char* caminhomsk="");
 void printDirection(vetor2d_type pos,float angulo, float forca);
 void printTxt(char *texto, vetor2d_type pos);
+void fontSize(int char_size=1);
 
 #endif
