@@ -118,6 +118,8 @@ enum{
 	GROUND,
 	PLAYER1,
 	PLAYER2,
+	RED_AURA,
+	GREEN_AURA,
 	NUM_OBJECTS_DEFINE
 
 };
@@ -127,6 +129,6 @@ enum{
  */
 #define NUM_BLOCKS (MTST +1)
 
-#define ON_DEBUG 0
+#define ON_DEBUG 1
 
 #endif

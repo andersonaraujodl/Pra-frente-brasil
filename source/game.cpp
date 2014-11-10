@@ -49,6 +49,7 @@ int singleEnd(float dt);
 
 //Variáveis privadas ============================================
 game_object_type player1,player2, ground;
+game_object_type green_aura, red_aura;
 game_object_type world_obstacles[MAX_OBSTACLES];
 graph_data_type graphs_profiles[NUM_OBJECTS_DEFINE];
 unsigned int left_obstacles_index = 0,right_obstacles_index = 0;
@@ -177,15 +178,19 @@ int initGame (float dt){
 	}
 	
 	player1.graph = graphs_profiles[PLAYER1];
-	#if ON_DEBUG
+	//#if ON_DEBUG
 	player1.collision_mask |= MASK_BIT(CONGRESSO) | MASK_BIT(LGBT) | MASK_BIT(BANCO);
-	#endif
+	//#endif
 	player2.graph = graphs_profiles[PLAYER2];
 	ground.graph = graphs_profiles[GROUND];
 	ground.body.pos.x = 0;
 	ground.body.pos.y = -10 ;
 	ground.body.speed.x = 0;
 	ground.body.speed.y = 0;
+	
+	
+	green_aura.graph = graphs_profiles[GREEN_AURA];
+	red_aura.graph = graphs_profiles[RED_AURA];
 	
 	return 1;
 }
@@ -421,6 +426,8 @@ int singleStep (float dt){
 	static int left_index = 0;
 	static int right_index = 0;
 	static int last_colide = -1;
+	static int red_aura_frames = 0;
+	static int green_aura_frames = 0;
 	
 	lancamento(&player1,dt);
 	floorCheck(&player1);
@@ -430,17 +437,33 @@ int singleStep (float dt){
 	setObstaclesRange(player1,left_index,right_index);
 	atualizaObjetos(player1,left_index,right_index);
 	
+	if(green_aura_frames){
+		--green_aura_frames;
+		print(vetor2d_type{PLAYER_FIX_POS - ((green_aura.graph.w - player1.graph.w)/2),player1.body.pos.y - ((green_aura.graph.h - player1.graph.h)/2)},&green_aura.graph,OR_PUT);
+	}
+	
+	if(red_aura_frames){
+		--red_aura_frames;
+		print(vetor2d_type{PLAYER_FIX_POS - ((red_aura.graph.w - player1.graph.w)/2),player1.body.pos.y  - ((red_aura.graph.h - player1.graph.h)/2)},&red_aura.graph,OR_PUT);
+	}
+	
 	for(int i = left_index; i <= right_index;++i){
 		if(last_colide != i){
 			if(colide(player1,world_obstacles[i])){
 				last_colide = i;
 				if(player1.collision_mask & world_obstacles[i].collision_mask){
-					player1.body.speed.x *= 1.50;
-					player1.body.speed.y*= 1.50;
+					player1.body.speed.x *= 2.0;
+					player1.body.speed.y*= 2.0;
+					
+					green_aura_frames = 30;
+					red_aura_frames = 0;
 				}
 				else{
 					player1.body.speed.x *=0.50;
 					player1.body.speed.y*= 0.50;
+					
+					red_aura_frames = 30;
+					green_aura_frames = 0;
 				}
 			}
 		}
@@ -474,7 +497,7 @@ int singleStep (float dt){
 int singleEnd(float dt){
 	char *texto ="TENTE NOVAMENTE", score[50];
 	int ret = 1;
-	 int left_index = 0;
+	int left_index = 0;
 	static int right_index = 0;
 	
 	groundStep( &player1, &ground, dt);
