@@ -12,8 +12,8 @@
 200,10, ,../resources/imagens/ground.gif
 55,55,../resources/imagens/players_mask.gif,../resources/imagens/player1.gif
 55,55,../resources/imagens/players_mask.gif,../resources/imagens/player2.gif
-63,63,../resources/imagens/hit_MASK.gif,../resources/imagens/hit_ruim.gif
-63,63,../resources/imagens/hit_MASK.gif,../resources/imagens/hit_bom.gif
+90,90,../resources/imagens/hit_MASK.gif,../resources/imagens/hit_ruim.gif
+90,90,../resources/imagens/hit_MASK.gif,../resources/imagens/hit_bom.gif
 400,50, ,../resources/imagens/menu.gif
 400,50, ,../resources/imagens/menu.gif
 400,50, ,../resources/imagens/menu.gif
