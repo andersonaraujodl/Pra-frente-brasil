@@ -120,6 +120,10 @@ enum{
 	PLAYER2,
 	RED_AURA,
 	GREEN_AURA,
+	MENU_OPTION_1,
+	MENU_OPTION_2,
+	MENU_OPTION_3,
+	MENU_OPTION_4,
 	NUM_OBJECTS_DEFINE
 
 };
@@ -128,7 +132,7 @@ enum{
  *  Quantidade de Objetos - o player
  */
 #define NUM_BLOCKS (MTST +1)
-
-#define ON_DEBUG 1
+#define NUM_OPTIONS_MENU 4
+#define ON_DEBUG
 
 #endif

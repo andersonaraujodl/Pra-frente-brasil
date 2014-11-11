@@ -37,8 +37,8 @@ int main(int argc, char** argv) {
 		updateScreen();
 		delay(TARGET_FRAME_RATE * 1000.0);
 	}
-
-	while(!kbhit()); // espera até alguma tecla	se pressiona
+	
+	endGame();
 	closegraph(); // fecha janela gráfica
 	return 0;
 }

@@ -50,6 +50,7 @@ int singleEnd(float dt);
 //Variáveis privadas ============================================
 game_object_type player1,player2, ground;
 game_object_type green_aura, red_aura;
+game_object_type menu_options[NUM_OPTIONS_MENU];
 game_object_type world_obstacles[MAX_OBSTACLES];
 graph_data_type graphs_profiles[NUM_OBJECTS_DEFINE];
 unsigned int left_obstacles_index = 0,right_obstacles_index = 0;
@@ -118,7 +119,7 @@ game_state_type step_single ={
 game_state_type *game_states =  &load_state;
 
 static void debugTrace (char *msg){
-#if ON_DEBUG
+#ifdef ON_DEBUG
 	std::cout << "debugTrace: " << msg << std::endl;
 #endif	
 };
@@ -178,15 +179,22 @@ int initGame (float dt){
 	}
 	
 	player1.graph = graphs_profiles[PLAYER1];
-	//#if ON_DEBUG
+#ifdef ON_DEBUG
 	player1.collision_mask |= MASK_BIT(CONGRESSO) | MASK_BIT(LGBT) | MASK_BIT(BANCO);
-	//#endif
+#endif
 	player2.graph = graphs_profiles[PLAYER2];
 	ground.graph = graphs_profiles[GROUND];
 	ground.body.pos.x = 0;
 	ground.body.pos.y = -10 ;
 	ground.body.speed.x = 0;
 	ground.body.speed.y = 0;
+	
+	for(int i = 0; i < NUM_OPTIONS_MENU; ++i){
+		menu_options[i].graph = graphs_profiles[MENU_OPTION_1 + i];
+		
+		vetor2d_type menu_pos{(SCREEN_W - menu_options[i].graph.w)/2,(SCREEN_H/(NUM_OPTIONS_MENU +2)) * ( NUM_OPTIONS_MENU -1 - i)};
+		menu_options[i].body.pos =	menu_pos;
+	}
 	
 	
 	green_aura.graph = graphs_profiles[GREEN_AURA];
@@ -248,6 +256,32 @@ int showMenu (float dt){
 	print(player1.body.pos,&player1.graph, OR_PUT);
 	print(player2.body.pos,&player2.graph, OR_PUT);
 	// -------------------------------------------
+	
+	
+	for(int i = 0; i < NUM_OPTIONS_MENU; ++i)
+		print(menu_options[i].body.pos,&menu_options[i].graph);
+
+	
+	HWND hwnd;
+	POINT mose_pos;
+	for(int i = 0; i < NUM_OPTIONS_MENU; ++i){
+		if(GetKeyState(VK_LBUTTON)&0x80){ //clique do mouse
+			if (GetCursorPos(&mose_pos)){ //retorna uma estrutura que contém a posição atual do cursor
+				debugTrace("GetCursorPos");
+				if (ScreenToClient(hwnd, &mose_pos)){
+					
+					debugTrace("ScreenToClient");
+					if((mose_pos.x < menu_options[i].bottomLeft().x) || (mose_pos.x > (menu_options[i].topRight().x))) continue;
+					
+					if((mose_pos.x < menu_options[i].bottomLeft().y) || (mose_pos.x > menu_options[i].bottomLeft().y)) continue;
+					
+					if( i == (NUM_OPTIONS_MENU - 1)) return (-1); // Exit
+					
+					return i + 1;
+				}
+			}
+		}
+	}
 
 	if(kbhit()) return 1;
 	
