@@ -24,9 +24,9 @@
 #define RESOURCES_ROOT "../resources/data/img_data.cvs"
 
 #define ATRITO 20
-#define BOUNCE 0.7
+#define BOUNCE 0.5
 #define SPEED_LIM_X 2500
-#define SPEED_LIM_Y 2s500
+#define SPEED_LIM_Y 2500
 
 // typedefs privados ===========================================
 typedef struct{
@@ -56,6 +56,8 @@ game_object_type world_obstacles[MAX_OBSTACLES];
 graph_data_type graphs_profiles[NUM_OBJECTS_DEFINE];
 unsigned int left_obstacles_index = 0,right_obstacles_index = 0;
 float  ground_offset;
+float obstacles_weight[NUM_BLOCKS],max_obstacles_per_type[NUM_BLOCKS]; 
+int total_obstacles = 0;
 int total_score = 0; 
 int total_rounds = 5;
 /**
@@ -178,29 +180,28 @@ int initGame (float dt){
 	
 	for(int i = 0; i <NUM_OBJECTS_DEFINE; ++i){
 		static char temp[200],tempmsk[200], t_width[4], t_height[5];
-		std::cout<<" ciclo = "<<i<<std::endl;
+		
 
 		
 		//carrega valor da largura
 		strcpy(t_width,pch);
 		graphs_profiles[i].w = atoi(t_width);
-		std::cout<<" width = "<<graphs_profiles[i].w<<std::endl;
+	
 
 		//carrega valor da altura
 		pch = strtok(NULL,",");
 		strcpy(t_height,pch);
 		graphs_profiles[i].h = atoi(t_height);
-		std::cout<<" height = "<<graphs_profiles[i].h<<std::endl;
 		
 		//carrega caminho da mascara
 
 		pch = strtok(NULL,",");
 		strcpy(tempmsk,pch);	
-		std::cout<<" tempmsk = "<<tempmsk<<std::endl;
+	
 
 		pch = strtok(NULL,"\n\0");
 		strcpy(temp,pch);
-		std::cout<<" tempo = "<<temp<<std::endl;
+		
 		pch = strtok(NULL,",");
 		
 		// Carrega e captura a imagem na memória
@@ -232,6 +233,10 @@ int initGame (float dt){
 	// Feedback visuais de colisão
 	green_aura.graph = graphs_profiles[GREEN_AURA];
 	red_aura.graph = graphs_profiles[RED_AURA];
+	
+	//carrega lista de pesos dos objetos
+	for(int i = 0; i < NUM_BLOCKS; i++) obstacles_weight[i] = 1;
+	
 	
 	return 1;
 }
@@ -359,24 +364,48 @@ int showMenu (float dt){
  *  @details Details
  */
 void initObstacles (void){
-
-	for(int i = 0; i < MAX_OBSTACLES;++i){
+	//carrega lista de números máximos de cada objeto
+	for(int i = 0; i < NUM_BLOCKS; i++){
+		
+		if(i == CONGRESSO)
+			max_obstacles_per_type[i] =1;
+		else
+	 		max_obstacles_per_type[i] = (MAX_OBSTACLES/NUM_BLOCKS) *obstacles_weight[i];
+	 		
+		total_obstacles+=max_obstacles_per_type[i];
+	}
+	
+	//testa se o total de obstaculos previstos ultrapassa o numero maximo do sistema
+	if(total_obstacles> MAX_OBSTACLES)
+		total_obstacles= MAX_OBSTACLES;
+	//	
+	int obstacles_defined = 0;
+	while(obstacles_defined < total_obstacles){
 
 		// Randomiza qual o perfil (tipo) de obstáculo ele será, Igreja, nuvem....
 		unsigned int obj_profile = (rand() % NUM_BLOCKS);
-		world_obstacles[i].collision_mask = MASK_BIT(obj_profile);
-		world_obstacles[i].graph = graphs_profiles[obj_profile]; // Aponta para qual o bitmap que pertence aquele perfil
 		
-		//partindo da posição minima para deixar fora da tela, a posição de cada obstaculo varia 100px,
-		//a partir do primeiro objeto colocado a posicao minima vira a posição do objeto anterior
-		//e a ele é somado a largura desse mesmo objeto objeto anterior, de forma a evitar a sobreposição
-		world_obstacles[i].body.pos.x = ((rand() % 600) + 50) + ((i != 0) ? world_obstacles[i-1].graph.w + world_obstacles[i-1].body.pos.x: SCREEN_W - 50);
+		//checa se o profile selecionado já alcançou o número limite previsto 
+		//se sim, sorteia novamente
+		//se não, segue com o procedimento de carregar ele na lista
+		if(max_obstacles_per_type[obj_profile]>0){
 		
-		if(obj_profile == NUVEM_POLUICAO)
-			world_obstacles[i].body.pos.y = ((rand() % 300) + 50);
-		else
-			world_obstacles[i].body.pos.y = 0;
-
+				world_obstacles[obstacles_defined].collision_mask = MASK_BIT(obj_profile);
+				world_obstacles[obstacles_defined].graph = graphs_profiles[obj_profile]; // Aponta para qual o bitmap que pertence aquele perfil
+				
+				//partindo da posição minima para deixar fora da tela, a posição de cada obstaculo varia 100px,
+				//a partir do primeiro objeto colocado a posicao minima vira a posição do objeto anterior
+				//e a ele é somado a largura desse mesmo objeto objeto anterior, de forma a evitar a sobreposição
+				world_obstacles[obstacles_defined].body.pos.x = ((rand() % 600) + 50) + ((obstacles_defined != 0) ? world_obstacles[obstacles_defined-1].graph.w + world_obstacles[obstacles_defined-1].body.pos.x: SCREEN_W - 50);
+				
+				if(obj_profile == NUVEM_POLUICAO)
+					world_obstacles[obstacles_defined].body.pos.y = ((rand() % 300) + 50);
+				else
+					world_obstacles[obstacles_defined].body.pos.y = 0;
+				
+				max_obstacles_per_type[obj_profile]--;
+				++obstacles_defined;
+		}
 	}
 }
 
@@ -461,7 +490,7 @@ int loadSingleGame (float dt){
 	player1.body.pos.y = PLAYER_INIT_Y;
 	
 	player1.body.speed.setVector(0,0);
-	
+	total_obstacles = 0;
 
 	initObstacles();
 	
@@ -595,8 +624,7 @@ int singleStep (float dt){
 	setcolor(COLOR(255,255,255));
 	fontSize(1);
 	printTxt(texto, vetor2d_type{SCREEN_W-(textwidth(texto)+20), 20});
-	std::cout<<"velocidade em X "<<player1.body.speed.x<<std::endl;
-	std::cout<<"velocidade em Y "<<player1.body.speed.y<<std::endl;
+	
 	if(player1.body.speed.modulo())
 		return 0;     //singleStep
 
@@ -648,6 +676,7 @@ int singleEnd(float dt){
 	printTxt(texto, vetor2d_type{(SCREEN_W/2)-(textwidth(texto)/2), SCREEN_H/2});
 
 	if(kbhit()){
+		
 		if(ret == 2){
 			total_score = 0;
 			total_rounds =5;
@@ -655,6 +684,7 @@ int singleEnd(float dt){
 		
 		left_index = 0;
 		right_index = 0;
+		std::cout<<"apertou tecla ao fim. E o valor de ret é "<<ret<<std::endl;
 		return ret;
 		 
 	}
