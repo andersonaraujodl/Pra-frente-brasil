@@ -25,7 +25,8 @@
 
 #define ATRITO 20
 #define BOUNCE 0.7
-
+#define SPEED_LIM_X 2500
+#define SPEED_LIM_Y 2s500
 
 // typedefs privados ===========================================
 typedef struct{
@@ -54,7 +55,7 @@ game_object_type menu_options[NUM_OPTIONS_MENU];
 game_object_type world_obstacles[MAX_OBSTACLES];
 graph_data_type graphs_profiles[NUM_OBJECTS_DEFINE];
 unsigned int left_obstacles_index = 0,right_obstacles_index = 0;
-int  ground_offset;
+float  ground_offset;
 int total_score = 0; 
 int total_rounds = 5;
 /**
@@ -137,7 +138,8 @@ game_state_type step_single ={
 game_state_type termina_programa ={
 	showCredits,
 	(game_state_type*[]){
-		&termina_programa
+		&termina_programa,
+		&load_menu_state
 	}
 };
 /**
@@ -223,7 +225,7 @@ int initGame (float dt){
 	for(int i = 0; i < NUM_OPTIONS_MENU; ++i){
 		menu_options[i].graph = graphs_profiles[MENU_OPTION_1 + i];
 		
-		vetor2d_type menu_pos{(SCREEN_W - menu_options[i].graph.w)/2,(SCREEN_H/(NUM_OPTIONS_MENU +2)) * ( NUM_OPTIONS_MENU -1 - i)};
+		vetor2d_type menu_pos{(SCREEN_W - menu_options[i].graph.w)/2,(SCREEN_H/(NUM_OPTIONS_MENU +3)) * ( NUM_OPTIONS_MENU -1 - i)};
 		menu_options[i].body.pos =	menu_pos;
 	}
 	
@@ -316,7 +318,7 @@ int showMenu (float dt){
 		player2.body.pos.y=0;
 		player2.body.speed.y *= -0.99;
 	}
-	
+	print(vetor2d_type{0,-10},&graphs_profiles[LOGOTIPO], COPY_PUT);
 	print(player1.body.pos,&player1.graph, OR_PUT);
 	print(player2.body.pos,&player2.graph, OR_PUT);
 	// -------------------------------------------
@@ -577,14 +579,24 @@ int singleStep (float dt){
 			}
 		}
 	}
-		
 	
+	//limitador de velocidade
+	if(player1.body.speed.y> SPEED_LIM_Y)
+		player1.body.speed.y =SPEED_LIM_Y;	
+	if(player1.body.speed.y< -SPEED_LIM_Y)
+		player1.body.speed.y = -SPEED_LIM_Y;
+	if(player1.body.speed.x> SPEED_LIM_X)
+		player1.body.speed.x =SPEED_LIM_X;	
+	if(player1.body.speed.x< -SPEED_LIM_X)
+		player1.body.speed.x = -SPEED_LIM_X;
+
 	char  texto [100];
 	sprintf(texto,"Distancia:\n %d metros",(int)(player1.body.pos.x - PLAYER_INIT_X)/50);
 	setcolor(COLOR(255,255,255));
 	fontSize(1);
 	printTxt(texto, vetor2d_type{SCREEN_W-(textwidth(texto)+20), 20});
-	
+	std::cout<<"velocidade em X "<<player1.body.speed.x<<std::endl;
+	std::cout<<"velocidade em Y "<<player1.body.speed.y<<std::endl;
 	if(player1.body.speed.modulo())
 		return 0;     //singleStep
 
