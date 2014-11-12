@@ -45,7 +45,7 @@ int singleStep (float dt);
 void floorCheck(game_object_type *player);
 void groundStep(game_object_type *objeto, game_object_type *ground, float dt);
 int singleEnd(float dt);
-
+int showCredits (float dt);
 
 //Variáveis privadas ============================================
 game_object_type player1,player2, ground;
@@ -57,7 +57,9 @@ unsigned int left_obstacles_index = 0,right_obstacles_index = 0;
 int  ground_offset;
 int total_score = 0; 
 int total_rounds = 5;
-
+/**
+*  
+*/
 game_state_type load_state ={
 	initGame,
 	(game_state_type*[]){
@@ -65,7 +67,9 @@ game_state_type load_state ={
 		&load_menu_state	 // return 1
 	}
 };
-
+/**
+*  
+*/
 game_state_type load_menu_state ={
 	initMenu,
 	(game_state_type*[]){
@@ -73,26 +77,32 @@ game_state_type load_menu_state ={
 		&menu_state       // return 1
 	}
 };
-
+/**
+*  
+*/
 game_state_type menu_state ={
 	showMenu,
 	(game_state_type*[]){
 		&menu_state,		 // return 0
-		&load_single/*, 	 // return 1
-		conectaServer,		 // return 2	
-		aguardaClient,		 // return 3
-		&terminaPrograma*/ // return 4
+		&load_single, 	 // return 1
+		&termina_programa,		 // return 2	
+		&termina_programa,		 // return 3
+		&termina_programa // return 4
 	}
 };
-
+/**
+*  
+*/
 game_state_type load_single ={
 	loadSingleGame,
 	(game_state_type*[]){
 		&load_single,	 // return 0
 		&pre_lancamento  // return 1
-	},
+	}
 };
-
+/**
+*  
+*/
 game_state_type pre_lancamento ={
 	preLancamento,
 	(game_state_type*[]){
@@ -100,22 +110,39 @@ game_state_type pre_lancamento ={
 		&step_single 		// return 1
 	},
 };
+/**
+*  
+*/
 game_state_type end_single ={
 	singleEnd,
 	(game_state_type*[]){
 		&end_single,	 // return 0
 		&load_single,	 // return 1
 		&load_menu_state // return 2
-	},
+	}
 };
+/**
+*  
+*/
 game_state_type step_single ={
 	singleStep,
 	(game_state_type*[]){
 		&step_single,	 // return 0
 		&end_single     // return 1
-	},
+	}
 };
-
+/**
+*  
+*/
+game_state_type termina_programa ={
+	showCredits,
+	(game_state_type*[]){
+		&termina_programa
+	}
+};
+/**
+*  
+*/
 game_state_type *game_states =  &load_state;
 
 static void debugTrace (char *msg){
@@ -174,21 +201,25 @@ int initGame (float dt){
 		std::cout<<" tempo = "<<temp<<std::endl;
 		pch = strtok(NULL,",");
 		
-		
+		// Carrega e captura a imagem na memória
 		graphInitObjects(&graphs_profiles[i], temp,tempmsk);
 	}
-	
+	// Inicializa o gráfico do player1
 	player1.graph = graphs_profiles[PLAYER1];
 #ifdef ON_DEBUG
-	player1.collision_mask |= MASK_BIT(CONGRESSO) | MASK_BIT(LGBT) | MASK_BIT(BANCO);
+	player1.collision_mask |=0xFFFFFFFF;// MASK_BIT(CONGRESSO) | MASK_BIT(LGBT) | MASK_BIT(BANCO);
 #endif
+	// Inicializa o gráfico do player2
 	player2.graph = graphs_profiles[PLAYER2];
+	
+	// Parametros do ground
 	ground.graph = graphs_profiles[GROUND];
 	ground.body.pos.x = 0;
 	ground.body.pos.y = -10 ;
 	ground.body.speed.x = 0;
 	ground.body.speed.y = 0;
 	
+	// Itens do menu
 	for(int i = 0; i < NUM_OPTIONS_MENU; ++i){
 		menu_options[i].graph = graphs_profiles[MENU_OPTION_1 + i];
 		
@@ -196,11 +227,37 @@ int initGame (float dt){
 		menu_options[i].body.pos =	menu_pos;
 	}
 	
-	
+	// Feedback visuais de colisão
 	green_aura.graph = graphs_profiles[GREEN_AURA];
 	red_aura.graph = graphs_profiles[RED_AURA];
 	
 	return 1;
+}
+
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] dt Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
+int showCredits (float dt){
+	
+	setcolor(COLOR(255,255,255));
+	fontSize(2);
+	printTxt("Obrigado por jogar!", vetor2d_type{(SCREEN_W/2)-(textwidth("Obrigado por jogar!")/2), SCREEN_H/2-(textheight("Obrigado por jogar!")+20)});
+	
+	printTxt("Anderson Araújo", vetor2d_type{(SCREEN_W/2)-(textwidth("Anderson Araújo")/2), SCREEN_H/2-(textheight("Anderson Araújo"))});
+	printTxt("Carol Fernandes", vetor2d_type{(SCREEN_W/2)-(textwidth("Carol Fernandes")/2), SCREEN_H/2-(textheight("Carol Fernandes")-20)});
+	printTxt("Diego Ortiz", vetor2d_type{(SCREEN_W/2)-(textwidth("Diego Ortiz")/2), SCREEN_H/2-(textheight("Diego Ortiz")-40)});
+	printTxt("Lucas Pina", vetor2d_type{(SCREEN_W/2)-(textwidth("Lucas Pina")/2), SCREEN_H/2-(textheight("Lucas Pina")-60)});
+	printTxt("Marcelo Pietragala", vetor2d_type{(SCREEN_W/2)-(textwidth("Marcelo Pietragala")/2), SCREEN_H/2-(textheight("Marcelo Pietragala")-80)});
+	
+	if(kbhit())
+		return -1;
+		
+	return 0;
 }
 
 /**
@@ -213,7 +270,14 @@ void endGame (void){
 	}
 }
 
-
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] dt Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
 int initMenu (float dt){
 	
 	if(kbhit()){
@@ -261,30 +325,27 @@ int showMenu (float dt){
 	for(int i = 0; i < NUM_OPTIONS_MENU; ++i)
 		print(menu_options[i].body.pos,&menu_options[i].graph);
 
-	
-	HWND hwnd;
-	POINT mose_pos;
 	for(int i = 0; i < NUM_OPTIONS_MENU; ++i){
 		if(GetKeyState(VK_LBUTTON)&0x80){ //clique do mouse
-			if (GetCursorPos(&mose_pos)){ //retorna uma estrutura que contém a posição atual do cursor
-				debugTrace("GetCursorPos");
-				if (ScreenToClient(hwnd, &mose_pos)){
+			POINT mouse_pos;
+			if (GetCursorPos(&mouse_pos)){ //retorna uma estrutura que contém a posição atual do cursor
+				char debug[50];
+								
+				HWND hwnd = GetForegroundWindow(); 
+				if (ScreenToClient(hwnd, &mouse_pos)){
 					
-					debugTrace("ScreenToClient");
-					if((mose_pos.x < menu_options[i].bottomLeft().x) || (mose_pos.x > (menu_options[i].topRight().x))) continue;
-					
-					if((mose_pos.x < menu_options[i].bottomLeft().y) || (mose_pos.x > menu_options[i].bottomLeft().y)) continue;
-					
-					if( i == (NUM_OPTIONS_MENU - 1)) return (-1); // Exit
-					
+					// Passa o y para as coordenadas de nossos objetos
+					mouse_pos.y = SCREEN_H - mouse_pos.y;
+					// Verifica os limites de x
+					if((mouse_pos.x < (int)menu_options[i].bottomLeft().x) || (mouse_pos.x > (int)(menu_options[i].topRight().x))) continue;
+					// Verifica os limites de y
+					if((mouse_pos.y < (int)menu_options[i].bottomLeft().y) || (mouse_pos.y > (int)menu_options[i].topRight().y)) continue;
+					// Retorna a opção do menu			
 					return i + 1;
 				}
 			}
 		}
-	}
-
-	if(kbhit()) return 1;
-	
+	}	
 	return 0;
 }
 
@@ -317,15 +378,27 @@ void initObstacles (void){
 	}
 }
 
+/**
+ *  @brief Brief
+ *  
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
 void loadMultiGame (void){
 
 }
 
-
+/**
+ *  @brief Brief
+ *  
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
 void connectToServer (void){
 
 }
-
 
 /**
  *  @brief Acha quais são os objetos de fronteira em relação ao objeto referência
@@ -395,7 +468,8 @@ int loadSingleGame (float dt){
 	right_obstacles_index = 0;
 	
 	// Limpa qualquer tecla que esteja em buffer do teclado.
-	getch();
+	if(kbhit())
+		getch();
 	fflush(stdin);
 
 	return 1; // next state = preLancamento
@@ -449,6 +523,7 @@ int preLancamento (float dt){
 
 	return 0; // preLancamento
 }
+
 /**
 *	@brief Estado no qual o jogo está rodando. 
 *
@@ -527,7 +602,14 @@ int singleStep (float dt){
 	return 1;
 }
 
-
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] dt Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
 int singleEnd(float dt){
 	char *texto ="TENTE NOVAMENTE", score[50];
 	int ret = 1;
@@ -567,6 +649,7 @@ int singleEnd(float dt){
 	
 	return 0;
 }
+
 /**
 *	@brief Testa o contato do player com o chão 
 *
@@ -584,6 +667,7 @@ void floorCheck(game_object_type *player){
 				player->body.speed.setVector(0,0);
 		}
 }
+
 /**
 *	@brief Função que calcula o deslocamento do chão em funão da posição do player1 
 *

@@ -32,5 +32,6 @@ extern game_state_type menu_state;
 extern game_state_type pre_lancamento;
 extern game_state_type step_single;
 extern game_state_type load_single;
+extern game_state_type termina_programa;
 
 #endif

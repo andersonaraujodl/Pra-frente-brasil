@@ -28,7 +28,7 @@ Folders=bgi,graph,h,physics
 IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=3
-CompilerSettings=00000001c0000000000000000
+CompilerSettings=00000001c0000000001000000
 UnitCount=9
 
 [VersionInfo]
