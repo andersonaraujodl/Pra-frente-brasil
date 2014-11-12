@@ -14,7 +14,8 @@
 55,55,../resources/imagens/players_mask.gif,../resources/imagens/player2.gif
 90,90,../resources/imagens/hit_MASK.gif,../resources/imagens/hit_ruim.gif
 90,90,../resources/imagens/hit_MASK.gif,../resources/imagens/hit_bom.gif
-400,50, ,../resources/imagens/menu.gif
-400,50, ,../resources/imagens/menu.gif
-400,50, ,../resources/imagens/menu.gif
-400,50, ,../resources/imagens/menu.gif
+1280,600, ,../resources/imagens/menu_tela.gif
+306,62, ,../resources/imagens/mnu_single.gif
+306,62, ,../resources/imagens/mnu_connect_server.gif
+306,62, ,../resources/imagens/mnu_host_game.gif
+306,62, ,../resources/imagens/mnu_exit.gif
