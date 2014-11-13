@@ -1,94 +1,176 @@
-#include <iostream>
-#include <graphics.h>
-#include <math.h>
 #include "grafico.h"
+#include "../bgi/graphics.h"
+#include<iostream>
 
 
-void drawGraph(graph_data_type *graph_obj, int *left, int *top, int *right, int *bottom);
+#define TO_GROUND_LEVEL(y) ((SCREEN_H-10)- y)
 
-void print(graph_data_type *objeto){
+
+
+using namespace std;
+
+
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] pos  Parameter_Description
+ *  @param [in] obj  Parameter_Description
+ *  @param [in] mode Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
+void print(vetor2d_type pos, graph_data_type *obj, int mode){
+	float ref_y = pos.y + obj->h;
 	
-	putimage(objeto->pos.x-20, objeto->pos.y-20, objeto->img, COPY_PUT);
+	if(obj->msk) putimage(pos.x, TO_GROUND_LEVEL(ref_y), obj->msk, AND_PUT);
+	
+	putimage(pos.x, TO_GROUND_LEVEL(ref_y), obj->img, mode);
 	
 }
 
-void erase(graph_data_type *objeto){
-	setcolor(BGCOLOR);
-	setfillstyle(1,BGCOLOR);
-	bar(0,0,SCREEN_W, SCREEN_H-10);
-	//fillellipse(objeto->pos.x, objeto->pos.y, objeto->w*2, objeto->h*2);
+/**
+ *  @brief Brief
+ *  
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
+void erase(){
+	cleardevice();
 	setbkcolor(BGCOLOR);
 	
 }
-void clear(){
-	cleardevice();
-}
 
-void printBG(graph_data_type *objeto, graph_data_type *background, vetor2d_type screenmax){
-	if(objeto->pos.x>= PLAYER_SPOT)
-		background->pos.x = background->pos.x-objeto->vel.x;
-		
-	if(background->pos.x <=(float)-200)
-		background->pos.x = background->pos.x + 200;
-	
-	for(int i =0; i<=(screenmax.x/background->w)+1;i++){
-		int posground=i*background->w+background->pos.x;
-		putimage(posground, background->pos.y, background->img, COPY_PUT);
-	}	
-}
-
-void initObjects(graph_data_type *graph_obj){
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] objeto  Parameter_Description
+ *  @param [in] caminho Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
+void graphInitObjects(graph_data_type *objeto, const char* caminho, const char* caminhomsk){
 	unsigned size;
 	int left, top, right, bottom;
+	setbkcolor(BGCOLOR);
 	
-	
-	drawGraph(graph_obj, &left, &top, &right, &bottom);
-	
-	size= imagesize(left, top,right,bottom);
-	graph_obj->img = new int[size];
-	getimage(left, top, right, bottom, graph_obj->img);
-	
+	int page = getactivepage();
+	setactivepage(2);
 	
 	cleardevice();
+	left = (SCREEN_W/2)-(objeto->w/2);
+	top = (SCREEN_H/2)-(objeto->h/2);
+	right = (SCREEN_W/2)+(objeto->w/2);
+	bottom = (SCREEN_H/2)+(objeto->h/2);	
 	
+	readimagefile(caminho,left, top, right, bottom );
+	size= imagesize(left, top,right,bottom);
+	objeto->img = new int[size];
+	getimage(left, top, right, bottom, objeto->img);
+	cleardevice();
 	
+	if(strcmp(caminhomsk," ")){
+		readimagefile(caminhomsk,left, top, right, bottom );
+		size= imagesize(left, top,right,bottom);
+		objeto->msk = new int[size];
+		getimage(left, top, right, bottom, objeto->msk);
+		cleardevice();	
+	}
+	
+	setactivepage(page);
 }
 
-//função que vai desenhar o objeto a ser transformado em bitmap
-void drawGraph(graph_data_type *graph_obj, int *left, int *top, int *right, int *bottom){
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] pos    Parameter_Description
+ *  @param [in] angulo Parameter_Description
+ *  @param [in] forca  Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
+void printDirection(vetor2d_type pos,float angulo, float forca){
+	vetor2d_type temp = {pos.x, pos.y };
+	temp.setVector (forca/4, angulo);
+	setwritemode(XOR_PUT);
+	setlinestyle(0,0,3);
+	setcolor(YELLOW);
+	line(pos.x, TO_GROUND_LEVEL(pos.y), pos.x+temp.x, TO_GROUND_LEVEL(pos.y)-temp.y);
+}
+
+/**
+ *  @brief Brief
+ *  
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
+void updateScreen(){
+	int page = getactivepage();
+	setvisualpage(page);
 	
-	setbkcolor(BGCOLOR);
-	cleardevice();
-	if(graph_obj->type == PLAYER){
+	page = page ? 0:1;
+	setactivepage(page);
+	erase();
+}
+
+void fontSize(int char_size){
+		settextstyle(4,HORIZ_DIR, char_size);
+}
+void printTxt(char *texto, vetor2d_type pos){ 
+	outtextxy(pos.x, pos.y,texto);	
+}
+
+
+void drawProgressBar(float value, vetor2d_type pos){
+	float r = 0, g = 0, b = 255;
+	int fase = 0, fases = 4;
 	
-		setcolor(WHITE);
-		setfillstyle(1,WHITE);
-		fillellipse(SCREEN_W/2, SCREEN_H/2, graph_obj->w ,graph_obj->h);
-		*left = (SCREEN_W/2)-(graph_obj->w);
-		*top = (SCREEN_H/2)-(graph_obj->h);
-		*right = (SCREEN_W/2)+(graph_obj->w);
-		*bottom = (SCREEN_H/2)+(graph_obj->h);
 	
-	} else if(graph_obj->type == BACKGROUND){
-		setcolor(BLUE);
-		setfillstyle(1,BLUE);
-		bar((SCREEN_W/2)-(graph_obj->w/2), (SCREEN_H/2)-(graph_obj->h/2),(SCREEN_W/2)+(graph_obj->w/2),(SCREEN_H/2)+(graph_obj->h/2));
-		setcolor(CYAN);
-		setfillstyle(1,CYAN);
-		bar(SCREEN_W/2,(SCREEN_H/2)-(graph_obj->h/2),(SCREEN_W/2)+(graph_obj->w/2),(SCREEN_H/2)+(graph_obj->h/2));
-		*left = (SCREEN_W/2)-(graph_obj->w/2);
-		*top = (SCREEN_H/2)-(graph_obj->h/2);
-		*right = (SCREEN_W/2)+(graph_obj->w/2);
-		*bottom = (SCREEN_H/2)+(graph_obj->h/2);
-		
-	} else if(graph_obj->type == ITENS){
-		setcolor(GREEN);
-		setfillstyle(1,GREEN);
-		fillellipse(SCREEN_W/2, SCREEN_H/2, graph_obj->w ,graph_obj->h);
-		*left = (SCREEN_W/2)-(graph_obj->w);
-		*top = (SCREEN_H/2)-(graph_obj->h);
-		*right = (SCREEN_W/2)+(graph_obj->w);
-		*bottom = (SCREEN_H/2)+(graph_obj->h);
+	float step = 255/((BAR_MAX_HEIGHT/BAR_UNIT)/fases);
+	setwritemode(COPY_PUT);
+
+	for(int i = 0; i <= value/BAR_UNIT; ++i  ){
+		switch(fase){
+			
+			case 0:
+				g = g + step;
+				if(g>255){
+					g=255;
+					fase =1;
+				} 
+				break; 
+				
+			case 1:
+				b = b - step;
+				if(b<0){
+					b=0;
+					fase =2;
+				} 
+				break; 
+			case 2:
+				r = r+step;
+				if(r>255){
+					r=255;
+					fase =3;
+				} 
+				break; 
+			
+			case 3:
+				g = g-step;
+				if(g<0){
+					r=0;
+					fase =4;
+				} 
+				break; 
+			case 4:
+				break; 		
+						
+		}
+		setfillstyle(1,COLOR(r,g,b));
+		bar(pos.x, TO_GROUND_LEVEL(i*BAR_UNIT+pos.y), pos.x+BAR_WIDTH, TO_GROUND_LEVEL(i*BAR_UNIT+pos.y+BAR_UNIT));
 	}
 }
-

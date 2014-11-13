@@ -8,7 +8,7 @@
 #define __TYPES_H__
 
 #include <math.h>
-
+#include <iostream>
 /**
 * Macro para facilitar as contas utilizando o @ref NUM_OBJECTS_DEFINE.
 * Exemplo: if(player.collision_mask & MASK_BIT(MST)){...}
@@ -16,10 +16,15 @@
 #define MASK_BIT(x) (long int)( 1 << x)
 
 
+
+#ifndef M_PI
+	#define M_PI		3.14159265358979323846
+#endif
+
 /**
  *  Vetor2D básico
  */
-typedef struct{
+typedef struct vetor2d_type{
 	float x; /**< Decomposição x do vetor*/
 	float y; /**< Decomposição y do vetor*/
 	
@@ -44,9 +49,9 @@ typedef struct{
 		y = sin(angle)*modulo;
 	}
 	
-	void sum(vetor2d_type &vec){
-		x+= vec.x;
-		y+= vec.y;
+	void sum(vetor2d_type *vec){
+		x+= vec->x;
+		y+= vec->y;
 	};
 }vetor2d_type;
 
@@ -64,6 +69,8 @@ typedef struct {
 */
 typedef struct{
 	void *img; /**< Imagem que será impressa*/
+	void *msk; /**< Imagem que será usada como mascara*/
+	bool masked;
 	float h; /**< Altura da imagem*/
 	float w; /**< Largura da imagem*/
 }graph_data_type;
@@ -77,6 +84,11 @@ typedef struct
 	physics_data_type body; /**< Propriedades físicas*/
 	graph_data_type graph; /**< Propriedades gráficas*/
 	long int collision_mask; /**< Máscara para a análise de colisões entre objetos*/
+	
+	vetor2d_type bottomLeft() {return this->body.pos;}
+	vetor2d_type topRight() { return vetor2d_type{this->body.pos.x + this->graph.w,this->body.pos.y + this->graph.h};}
+	
+	
 }game_object_type;
 
 /**
@@ -85,27 +97,43 @@ typedef struct
 * @todo Definir os bloqueios finais
 */
 enum{
+/*	MIDIA,
+	CLASSE_MEDIA,
+	MONTADORAS,
+*/
+	FEMINISTAS,
+	LEGALIZACAO,
+	CONGRESSO,
+	SAUDE,
 	NUVEM_POLUICAO,
 	IGREJA,
 	LGBT,
-	MIDIA,
 	BANCO,
-	COMUNIDADES,
-	CLASSE_MEDIA,
+	INDUSTRIA,
 	RURALISTAS,
-	MST,
-	MONTADORAS,
-	PLAYER,
+	
+	
+	MTST, // Deixar esse por último dos blocks
+	
+	GROUND,
+	PLAYER1,
+	PLAYER2,
+	RED_AURA,
+	GREEN_AURA,
+	LOGOTIPO,
+	MENU_OPTION_1,
+	MENU_OPTION_2,
+	MENU_OPTION_3,
+	MENU_OPTION_4,
 	NUM_OBJECTS_DEFINE
+
 };
 
 /**
  *  Quantidade de Objetos - o player
  */
-#define NUM_BLOCKS NUM_OBJECTS_DEFINE -1
-
-
-
-
+#define NUM_BLOCKS (MTST +1)
+#define NUM_OPTIONS_MENU 4
+#define ON_DEBUG
 
 #endif
