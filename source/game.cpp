@@ -47,6 +47,7 @@ void floorCheck(game_object_type *player);
 void groundStep(game_object_type *objeto, game_object_type *ground, float dt);
 int singleEnd(float dt);
 int showCredits (float dt);
+float variaForca(float valor);
 
 //Variáveis privadas ============================================
 game_object_type player1,player2, ground;
@@ -517,7 +518,9 @@ int preLancamento (float dt){
 	int key;
 	static int forca = 2000;
 	static int angulo =0;
+	static float fatorF = 0.1; 
 	
+	fatorF = variaForca(fatorF);
 	
 	if(kbhit()){
 		key = (int)getch();
@@ -525,7 +528,7 @@ int preLancamento (float dt){
 		switch(key){
 			
 			case SPACE:
-				player1.body.speed.setVector(forca,angulo);
+				player1.body.speed.setVector(forca*fatorF,angulo);
 				
 				angulo =0;
 				forca = 2000;
@@ -547,7 +550,7 @@ int preLancamento (float dt){
 		
 	}
 	
-	
+	drawProgressBar(fatorF*BAR_MAX_HEIGHT, vetor2d_type {(player1.body.pos.x +player1.graph.w/2)-(BAR_WIDTH/2) ,-80}); // desenha barra de força
 	groundStep( &player1, &ground,dt);	
 	atualizaObjetos(player1,0,0);
 	printDirection(vetor2d_type{player1.body.pos.x+(player1.graph.w/2) ,player1.body.pos.y+(player1.graph.h/2)}, angulo,300);
@@ -730,4 +733,21 @@ void groundStep(game_object_type *objeto, game_object_type *ground, float dt){
 		int posground=i*ground->graph.w+ ground_offset;
 		print(vetor2d_type{posground, ground->body.pos.y}, &ground->graph);
 	}	
+}
+
+float variaForca(float valor){
+	static float incremento = 0.02;
+
+		valor  = valor + incremento;
+		if(valor>1){
+			valor = 1;
+			incremento = -incremento;
+		}
+		if(valor<0.1){
+			valor = 0.1;
+			incremento = -incremento;
+		}	
+
+	return valor;	
+	
 }

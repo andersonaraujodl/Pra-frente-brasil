@@ -5,6 +5,8 @@
 
 #define TO_GROUND_LEVEL(y) ((SCREEN_H-10)- y)
 
+
+
 using namespace std;
 
 
@@ -120,4 +122,55 @@ void fontSize(int char_size){
 }
 void printTxt(char *texto, vetor2d_type pos){ 
 	outtextxy(pos.x, pos.y,texto);	
+}
+
+
+void drawProgressBar(float value, vetor2d_type pos){
+	float r = 0, g = 0, b = 255;
+	int fase = 0, fases = 4;
+	
+	
+	float step = 255/((BAR_MAX_HEIGHT/BAR_UNIT)/fases);
+	setwritemode(COPY_PUT);
+
+	for(int i = 0; i <= value/BAR_UNIT; ++i  ){
+		switch(fase){
+			
+			case 0:
+				g = g + step;
+				if(g>255){
+					g=255;
+					fase =1;
+				} 
+				break; 
+				
+			case 1:
+				b = b - step;
+				if(b<0){
+					b=0;
+					fase =2;
+				} 
+				break; 
+			case 2:
+				r = r+step;
+				if(r>255){
+					r=255;
+					fase =3;
+				} 
+				break; 
+			
+			case 3:
+				g = g-step;
+				if(g<0){
+					r=0;
+					fase =4;
+				} 
+				break; 
+			case 4:
+				break; 		
+						
+		}
+		setfillstyle(1,COLOR(r,g,b));
+		bar(pos.x, TO_GROUND_LEVEL(i*BAR_UNIT+pos.y), pos.x+BAR_WIDTH, TO_GROUND_LEVEL(i*BAR_UNIT+pos.y+BAR_UNIT));
+	}
 }

@@ -9,6 +9,9 @@
 #define SCREEN_CENTER SCREEN_W/2
 #define PLAYER_SPOT SCREEN_W/3
 #define BGCOLOR COLOR(131,169,196)
+#define BAR_MAX_HEIGHT 200
+#define BAR_WIDTH 20
+#define BAR_UNIT 1
 
 //definições de IDs pros objetos gráficos utilizados para definir o que deve ser desenhado no initobj
 //pode ser útil também na hora de cálcular as posições dos ítens
@@ -21,5 +24,6 @@ void graphInitObjects(graph_data_type *objeto, const char* caminho, const char* 
 void printDirection(vetor2d_type pos,float angulo, float forca);
 void printTxt(char *texto, vetor2d_type pos);
 void fontSize(int char_size=1);
+void drawProgressBar(float value, vetor2d_type pos);
 
 #endif
