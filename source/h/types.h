@@ -125,6 +125,8 @@ enum{
 	MENU_OPTION_2,
 	MENU_OPTION_3,
 	MENU_OPTION_4,
+	
+	//imagens antes do NUM_OBJECTS_DEFINE
 	NUM_OBJECTS_DEFINE
 
 };

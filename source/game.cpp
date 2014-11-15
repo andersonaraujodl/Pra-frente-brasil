@@ -57,7 +57,8 @@ game_object_type world_obstacles[MAX_OBSTACLES];
 graph_data_type graphs_profiles[NUM_OBJECTS_DEFINE];
 unsigned int left_obstacles_index = 0,right_obstacles_index = 0;
 float  ground_offset;
-float obstacles_weight[NUM_BLOCKS],max_obstacles_per_type[NUM_BLOCKS]; 
+float obstacles_weight[NUM_BLOCKS];
+
 int total_obstacles = 0;
 int total_score = 0; 
 int total_rounds = 5;
@@ -365,6 +366,8 @@ int showMenu (float dt){
  *  @details Details
  */
 void initObstacles (void){
+	
+	float max_obstacles_per_type[NUM_BLOCKS]; 
 	//carrega lista de números máximos de cada objeto
 	for(int i = 0; i < NUM_BLOCKS; i++){
 		
@@ -397,7 +400,7 @@ void initObstacles (void){
 				//partindo da posição minima para deixar fora da tela, a posição de cada obstaculo varia 100px,
 				//a partir do primeiro objeto colocado a posicao minima vira a posição do objeto anterior
 				//e a ele é somado a largura desse mesmo objeto objeto anterior, de forma a evitar a sobreposição
-				world_obstacles[obstacles_defined].body.pos.x = ((rand() % 600) + 50) + ((obstacles_defined != 0) ? world_obstacles[obstacles_defined-1].graph.w + world_obstacles[obstacles_defined-1].body.pos.x: SCREEN_W - 50);
+				world_obstacles[obstacles_defined].body.pos.x = ((rand() % 600) + 50*((int)obstacles_defined/10))+((obstacles_defined != 0) ? world_obstacles[obstacles_defined-1].graph.w + world_obstacles[obstacles_defined-1].body.pos.x: SCREEN_W - 50);
 				
 				if(obj_profile == NUVEM_POLUICAO)
 					world_obstacles[obstacles_defined].body.pos.y = ((rand() % 300) + 50);
