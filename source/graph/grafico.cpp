@@ -171,7 +171,7 @@ void drawProgressBar(float value, vetor2d_type pos){
 				g = g + step;
 				if(g>255){
 					g=255;
-					++fase;
+					fase =1;
 				} 
 				break; 
 				
@@ -179,14 +179,14 @@ void drawProgressBar(float value, vetor2d_type pos){
 				b = b - step;
 				if(b<0){
 					b=0;
-					++fase;
+					fase =2;
 				} 
 				break; 
 			case 2:
 				r = r+step;
 				if(r>255){
 					r=255;
-					++fase;
+					fase =3;
 				} 
 				break; 
 			
@@ -194,10 +194,11 @@ void drawProgressBar(float value, vetor2d_type pos){
 				g = g-step;
 				if(g<0){
 					r=0;
-					++fase;
+					fase =4;
 				} 
 				break; 
- 		
+			case 4:
+				break; 		
 						
 		}
 		setfillstyle(1,COLOR(r,g,b));

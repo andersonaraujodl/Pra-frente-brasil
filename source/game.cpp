@@ -25,7 +25,7 @@
 
 #define ATRITO 50
 #define BOUNCE 0.5
-#define SPEED_LIM_X 2000
+#define SPEED_LIM_X 2500
 #define SPEED_LIM_Y 2500
 
 // typedefs privados ===========================================
@@ -60,8 +60,7 @@ game_object_type world_obstacles[MAX_OBSTACLES];
 graph_data_type graphs_profiles[NUM_OBJECTS_DEFINE];
 unsigned int left_obstacles_index = 0,right_obstacles_index = 0;
 float  ground_offset;
-float obstacles_weight[NUM_BLOCKS];
-
+float obstacles_weight[NUM_BLOCKS],max_obstacles_per_type[NUM_BLOCKS]; 
 int total_obstacles = 0;
 int total_score = 0; 
 int total_rounds = 5;
@@ -497,8 +496,6 @@ int showLoja (float dt){
  *  @details Details
  */
 void initObstacles (void){
-	
-	float max_obstacles_per_type[NUM_BLOCKS]; 
 	//carrega lista de números máximos de cada objeto
 	for(int i = 0; i < NUM_BLOCKS; i++){
 		
@@ -531,7 +528,7 @@ void initObstacles (void){
 				//partindo da posição minima para deixar fora da tela, a posição de cada obstaculo varia 100px,
 				//a partir do primeiro objeto colocado a posicao minima vira a posição do objeto anterior
 				//e a ele é somado a largura desse mesmo objeto objeto anterior, de forma a evitar a sobreposição
-				world_obstacles[obstacles_defined].body.pos.x = ((rand() % 600) + 50*((int)obstacles_defined/10))+((obstacles_defined != 0) ? world_obstacles[obstacles_defined-1].graph.w + world_obstacles[obstacles_defined-1].body.pos.x: SCREEN_W - 50);
+				world_obstacles[obstacles_defined].body.pos.x = ((rand() % 600) + 50) + ((obstacles_defined != 0) ? world_obstacles[obstacles_defined-1].graph.w + world_obstacles[obstacles_defined-1].body.pos.x: SCREEN_W - 50);
 				
 				if(obj_profile == NUVEM_POLUICAO)
 					world_obstacles[obstacles_defined].body.pos.y = ((rand() % 300) + 50);
@@ -580,19 +577,15 @@ bool setObstaclesRange (const game_object_type &ref,int &left, int &right){
 	
 	// Enquanto o objeto.pos.x mais a esquerda for menor que o canto mais a esquerda da tela
 	while((world_obstacles[left].body.pos.x + world_obstacles[left].graph.w) < ref.body.pos.x - PLAYER_FIX_POS){
-		if(++left == total_obstacles){
-			
+		if(++left == total_obstacles)
 			left = total_obstacles-1;
 			return false;// impede que estoure o buffer
-		}
 	}
 	// Enquanto o objeto mais a direita (+1) for menor que o canto direito da tela
 	while(world_obstacles[right+1].body.pos.x < ref.body.pos.x +(SCREEN_W - PLAYER_FIX_POS)){
-		if(++right == total_obstacles){
-		
+		if(++right == total_obstacles)
 			right = total_obstacles-1;
 			return false; // Impede que estoure o buffer
-		}
 	}
 }
 
@@ -719,7 +712,7 @@ int singleStep (float dt){
 	
 	setObstaclesRange(player1,left_index,right_index);
 	atualizaObjetos(player1,left_index,right_index);
-	
+	std::cout<<"right_index "<<right_index<<" / "<<total_obstacles<<std::endl;
 	if(green_aura_frames){
 		--green_aura_frames;
 		print(vetor2d_type{PLAYER_FIX_POS - ((green_aura.graph.w - player1.graph.w)/2),player1.body.pos.y - ((green_aura.graph.h - player1.graph.h)/2)},&green_aura.graph);
@@ -828,6 +821,7 @@ int singleEnd(float dt){
 		
 		left_index = 0;
 		right_index = 0;
+		std::cout<<"apertou tecla ao fim. E o valor de ret é "<<ret<<std::endl;
 		return ret;
 		 
 	}
