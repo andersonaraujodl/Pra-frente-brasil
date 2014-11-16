@@ -40,6 +40,7 @@ typedef struct{
 int initGame (float dt);
 int initMenu (float dt);
 int showMenu (float dt);
+int showLoja (float dt);
 int loadSingleGame (float dt);
 int preLancamento (float dt);
 int singleStep (float dt);
@@ -48,10 +49,12 @@ void groundStep(game_object_type *objeto, game_object_type *ground, float dt);
 int singleEnd(float dt);
 int showCredits (float dt);
 float variaForca(float valor);
+int initLoja (float dt);
 
 //Variáveis privadas ============================================
 game_object_type player1,player2, ground;
 game_object_type green_aura, red_aura;
+game_object_type loja_options[NUM_LOJA_MENU];
 game_object_type menu_options[NUM_OPTIONS_MENU];
 game_object_type world_obstacles[MAX_OBSTACLES];
 graph_data_type graphs_profiles[NUM_OBJECTS_DEFINE];
@@ -118,14 +121,35 @@ game_state_type pre_lancamento ={
 /**
 *  
 */
+game_state_type loja_state ={
+	showLoja,
+	(game_state_type*[]){
+		&loja_state,	 // return 0
+		&load_single	 // return 1
+	}
+};
+/**
+*  
+*/
+game_state_type load_loja ={
+	initLoja,
+	(game_state_type*[]){
+		&load_loja,	 // return 0
+		&loja_state	 // return 1
+	}
+};
+
+
 game_state_type end_single ={
 	singleEnd,
 	(game_state_type*[]){
 		&end_single,	 // return 0
-		&load_single,	 // return 1
+		&load_loja,	 // return 1
 		&load_menu_state // return 2
 	}
 };
+
+
 /**
 *  
 */
@@ -169,7 +193,7 @@ int initGame (float dt){
 	ifstream file(RESOURCES_ROOT);
 	
 	char data[3000];
-	int pos =0;
+	int pos =0, coluna, j=0, linha;
 	while(file.good()){
 		data[pos] = file.get();
 		pos++;
@@ -232,6 +256,28 @@ int initGame (float dt){
 		menu_options[i].body.pos =	menu_pos;
 	}
 	
+	//Itens da loja
+	for(int i = 0; i < NUM_LOJA_MENU; ++i){
+		loja_options[i].graph = graphs_profiles[LOJA_OPTION_1 + i];
+		
+		if (i == NUM_LOJA_MENU-1){
+			coluna = graphs_profiles[LOJA_OPTION_1 + i].w *2 +200;
+			linha = (500)-(graphs_profiles[LOJA_OPTION_1 + i].h +10);}
+		else
+		if (i%2 == 0){
+			coluna = 20;
+			linha = (500)-(graphs_profiles[LOJA_OPTION_1 + i].h +10)*j;
+			j++;
+		}
+		else
+			coluna = graphs_profiles[LOJA_OPTION_1 + i].w +100;
+			
+		
+		vetor2d_type loja_pos{coluna,linha};
+		loja_options[i].body.pos =	loja_pos;
+	}
+
+	
 	// Feedback visuais de colisão
 	green_aura.graph = graphs_profiles[GREEN_AURA];
 	red_aura.graph = graphs_profiles[RED_AURA];
@@ -259,7 +305,7 @@ int showCredits (float dt){
 	
 	printTxt("Anderson Araújo", vetor2d_type{(SCREEN_W/2)-(textwidth("Anderson Araújo")/2), SCREEN_H/2-(textheight("Anderson Araújo"))});
 	printTxt("Carol Fernandes", vetor2d_type{(SCREEN_W/2)-(textwidth("Carol Fernandes")/2), SCREEN_H/2-(textheight("Carol Fernandes")-20)});
-	printTxt("Diego Ortiz", vetor2d_type{(SCREEN_W/2)-(textwidth("Diego Ortiz")/2), SCREEN_H/2-(textheight("Diego Ortiz")-40)});
+	printTxt("Diego Hortiz", vetor2d_type{(SCREEN_W/2)-(textwidth("Diego Hortiz")/2), SCREEN_H/2-(textheight("Diego Hortiz")-40)});
 	printTxt("Lucas Pina", vetor2d_type{(SCREEN_W/2)-(textwidth("Lucas Pina")/2), SCREEN_H/2-(textheight("Lucas Pina")-60)});
 	printTxt("Marcelo Pietragala", vetor2d_type{(SCREEN_W/2)-(textwidth("Marcelo Pietragala")/2), SCREEN_H/2-(textheight("Marcelo Pietragala")-80)});
 	
@@ -325,9 +371,9 @@ int showMenu (float dt){
 		player2.body.pos.y=0;
 		player2.body.speed.y *= -0.99;
 	}
-	print(vetor2d_type{0,-10},&graphs_profiles[LOGOTIPO], COPY_PUT);
-	print(player1.body.pos,&player1.graph, OR_PUT);
-	print(player2.body.pos,&player2.graph, OR_PUT);
+	print(vetor2d_type{0,-10},&graphs_profiles[LOGOTIPO]);
+	print(player1.body.pos,&player1.graph);
+	print(player2.body.pos,&player2.graph);
 	// -------------------------------------------
 	
 	
@@ -357,6 +403,91 @@ int showMenu (float dt){
 	}	
 	return 0;
 }
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] dt Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
+int initLoja (float dt){
+	
+	if(kbhit()){
+		getch();
+		fflush(stdin);
+	}
+
+	return 1;
+}
+int showLoja (float dt){
+	int i, prim_select, segun_select, a=0;
+	char texto[50];
+	for(i=0;i < NUM_LOJA_MENU;i++)
+        print(loja_options[i].body.pos,&loja_options[i].graph);
+
+	for(int i = 0; i <= NUM_LOJA_MENU; ++i){
+		if(GetKeyState(VK_LBUTTON)&0x80){ //clique do mouse
+			POINT mouse_pos;
+			
+			if (GetCursorPos(&mouse_pos)){ //retorna uma estrutura que contém a posição atual do cursor
+				char debug[50];
+				HWND hwnd = GetForegroundWindow(); 
+				if (ScreenToClient(hwnd, &mouse_pos)){
+					
+					// Passa o y para as coordenadas de nossos objetos
+					//mouse_pos.y = SCREEN_H - mouse_pos.y;
+					mouse_pos.y = SCREEN_H - mouse_pos.y;
+					// Verifica os limites de x
+					if((mouse_pos.x < (int)loja_options[i].bottomLeft().x) || (mouse_pos.x > (int)loja_options[i].topRight().x)) continue;
+					// Verifica os limites de y
+					if((mouse_pos.y < (int)loja_options[i].bottomLeft().y) || (mouse_pos.y > (int)loja_options[i].topRight().y)) continue;
+					// Retorna a opção do menu			
+					//loja_options[i].body.pos.y = 600;
+					//return 1;
+					
+					if(i == 12){ 
+						if (prim_select < 12 && segun_select < 12){ return 1;    // se tiver 2 itens selecionados vai para o jogo
+						sprintf(texto,"Propostas selecionadas: %d  %d",prim_select,segun_select);
+                        outtextxy(900, 400,texto);}
+					}
+					else
+					if(prim_select == 12 && segun_select != i){   //verifica se item não está selecionado e seleciona como primeiro
+						prim_select = i;
+						//loja_options[i].body.pos.y = 1000;
+						setfillstyle(1, GREEN); //define a cor de preenchimento do retângul
+                        setcolor (GREEN); //define a cor da borda do retêngulo
+                        rectangle(loja_options[i].body.pos.x-2, loja_options[i].body.pos.y-2, loja_options[i].body.pos.x=loja_options[i].graph.w+3, loja_options[i].body.pos.y+loja_options[i].graph.h+3); //desenha retângulo
+//						print(menu_loja_selected[i].body.pos,&menu_loja_selected[i].graph);
+					}
+					else if(prim_select == i){   //verifica se item está selecionado como primeiro e tira a seleção
+						prim_select = 12;
+						setfillstyle(1, YELLOW); //define a cor de preenchimento do retângul
+                        setcolor (YELLOW); //define a cor da borda do retêngulo
+                        rectangle(loja_options[i].body.pos.x-2, loja_options[i].body.pos.y-2, loja_options[i].body.pos.x=loja_options[i].graph.w+3, loja_options[i].body.pos.y+loja_options[i].graph.h+3); //desenha retângulo
+//						print(menu_loja[i].body.pos,&menu_loja[i].graph);
+					}
+					else if(prim_select != 12 && segun_select == 12){   //verifica se item não está selecionado e seleciona como segundo
+						segun_select = i;
+						setfillstyle(1, GREEN); //define a cor de preenchimento do retângul
+                        setcolor (GREEN); //define a cor da borda do retêngulo
+                        rectangle(loja_options[i].body.pos.x-2, loja_options[i].body.pos.y-2, loja_options[i].body.pos.x=loja_options[i].graph.w+3, loja_options[i].body.pos.y+loja_options[i].graph.h+3); //desenha retângulo
+//						print(menu_loja_selected[i].body.pos,&menu_loja_selected[i].graph);
+					}
+					else if(segun_select == i){   //verifica se item está selecionado como segundo e tira a seleção
+						segun_select = 12;
+						setfillstyle(1, YELLOW); //define a cor de preenchimento do retângul
+                        setcolor (YELLOW); //define a cor da borda do retêngulo
+                        rectangle(loja_options[i].body.pos.x-2, loja_options[i].body.pos.y-2, loja_options[i].body.pos.x=loja_options[i].graph.w+3, loja_options[i].body.pos.y+loja_options[i].graph.h+3); //desenha retângulo
+//						print(menu_loja[i].body.pos,&menu_loja[i].graph);
+					}
+				}
+			}
+		}
+	}
+	delay(100);
+	return 0;
+} 
 
 /**
  *  @brief Brief
@@ -479,12 +610,12 @@ bool atualizaObjetos (game_object_type &ref,const int &left_index,const int &rig
 	// Imprime todos aqueles que estão dentro do range da tela
 	for (int i = left_index; i <= right_index; ++i){
 		float obj_x = world_obstacles[i].body.pos.x -  ref.body.pos.x + PLAYER_FIX_POS;
-		print(vetor2d_type{obj_x,world_obstacles[i].body.pos.y}, &world_obstacles[i].graph,OR_PUT);
+		print(vetor2d_type{obj_x,world_obstacles[i].body.pos.y}, &world_obstacles[i].graph);
 	
 	}
 	
 	float ref_x = (ref.body.pos.x < PLAYER_FIX_POS) ? ref.body.pos.x: PLAYER_FIX_POS;
-	print(vetor2d_type{ref_x, ref.body.pos.y},&ref.graph, OR_PUT);
+	print(vetor2d_type{ref_x, ref.body.pos.y},&ref.graph);
 }
 
 /**
@@ -591,12 +722,12 @@ int singleStep (float dt){
 	
 	if(green_aura_frames){
 		--green_aura_frames;
-		print(vetor2d_type{PLAYER_FIX_POS - ((green_aura.graph.w - player1.graph.w)/2),player1.body.pos.y - ((green_aura.graph.h - player1.graph.h)/2)},&green_aura.graph,OR_PUT);
+		print(vetor2d_type{PLAYER_FIX_POS - ((green_aura.graph.w - player1.graph.w)/2),player1.body.pos.y - ((green_aura.graph.h - player1.graph.h)/2)},&green_aura.graph);
 	}
 	
 	if(red_aura_frames){
 		--red_aura_frames;
-		print(vetor2d_type{PLAYER_FIX_POS - ((red_aura.graph.w - player1.graph.w)/2),player1.body.pos.y  - ((red_aura.graph.h - player1.graph.h)/2)},&red_aura.graph,OR_PUT);
+		print(vetor2d_type{PLAYER_FIX_POS - ((red_aura.graph.w - player1.graph.w)/2),player1.body.pos.y  - ((red_aura.graph.h - player1.graph.h)/2)},&red_aura.graph);
 	}
 
 	

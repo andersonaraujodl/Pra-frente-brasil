@@ -11,7 +11,7 @@ using namespace std;
 
 
 /**
- *  @brief Brief
+ *  @brief Imprime na tela imagem contida no graph_dta_type passado.
  *  
  *  @param [in] pos  Parameter_Description
  *  @param [in] obj  Parameter_Description
@@ -20,10 +20,14 @@ using namespace std;
  *  
  *  @details Details
  */
-void print(vetor2d_type pos, graph_data_type *obj, int mode){
+void print(vetor2d_type pos, graph_data_type *obj){
+	int mode = COPY_PUT;
 	float ref_y = pos.y + obj->h;
 	
-	if(obj->msk) putimage(pos.x, TO_GROUND_LEVEL(ref_y), obj->msk, AND_PUT);
+	if(obj->msk){
+	 	putimage(pos.x, TO_GROUND_LEVEL(ref_y), obj->msk, AND_PUT);
+	 	mode = OR_PUT;
+	 }
 	
 	putimage(pos.x, TO_GROUND_LEVEL(ref_y), obj->img, mode);
 	
@@ -117,14 +121,41 @@ void updateScreen(){
 	erase();
 }
 
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] objeto  Parameter_Description
+ *  @param [in] caminho Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
 void fontSize(int char_size){
 		settextstyle(4,HORIZ_DIR, char_size);
 }
+
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] objeto  Parameter_Description
+ *  @param [in] caminho Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
 void printTxt(char *texto, vetor2d_type pos){ 
 	outtextxy(pos.x, pos.y,texto);	
 }
 
-
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] objeto  Parameter_Description
+ *  @param [in] caminho Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
 void drawProgressBar(float value, vetor2d_type pos){
 	float r = 0, g = 0, b = 255;
 	int fase = 0, fases = 4;
