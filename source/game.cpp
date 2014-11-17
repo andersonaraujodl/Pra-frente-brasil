@@ -442,10 +442,10 @@ int showLoja (float dt){
 					// Verifica os limites de y
 					if((mouse_pos.y < (int)loja_options[i].bottomLeft().y) || (mouse_pos.y > (int)loja_options[i].topRight().y)) continue;
 					// Retorna a opção do menu			
-					//loja_options[i].body.pos.y = 600;
-					//return 1;
+					loja_options[i].body.pos.y = 0;
+					return 1;
 					
-					if(i == 12){ 
+					/*if(i == 12){ 
 						if (prim_select < 12 && segun_select < 12){ return 1;    // se tiver 2 itens selecionados vai para o jogo
 						sprintf(texto,"Propostas selecionadas: %d  %d",prim_select,segun_select);
                         outtextxy(900, 400,texto);}
@@ -478,7 +478,7 @@ int showLoja (float dt){
 						setfillstyle(1, YELLOW); //define a cor de preenchimento do retângul
                         setcolor (YELLOW); //define a cor da borda do retêngulo
                         rectangle(loja_options[i].body.pos.x-2, loja_options[i].body.pos.y-2, loja_options[i].body.pos.x=loja_options[i].graph.w+3, loja_options[i].body.pos.y+loja_options[i].graph.h+3); //desenha retângulo
-//						print(menu_loja[i].body.pos,&menu_loja[i].graph);
+//						print(menu_loja[i].body.pos,&menu_loja[i].graph);*/
 					}
 				}
 			}
