@@ -50,6 +50,7 @@ int singleEnd(float dt);
 int showCredits (float dt);
 float variaForca(float valor);
 int initLoja (float dt);
+void resetGame();
 
 //Variáveis privadas ============================================
 game_object_type player1,player2, ground;
@@ -64,6 +65,7 @@ float obstacles_weight[NUM_BLOCKS],max_obstacles_per_type[NUM_BLOCKS];
 int total_obstacles = 0;
 int total_score = 0; 
 int total_rounds = 5;
+float profile_collision_bonus[NUM_BLOCKS];
 /**
 *  
 */
@@ -234,9 +236,12 @@ int initGame (float dt){
 	}
 	// Inicializa o gráfico do player1
 	player1.graph = graphs_profiles[PLAYER1];
-#ifdef ON_DEBUG
-	player1.collision_mask |=0xFFFFFFFF;// MASK_BIT(CONGRESSO) | MASK_BIT(LGBT) | MASK_BIT(BANCO);
-#endif
+	
+	for(int i = 0; i < NUM_BLOCKS;++i){
+		profile_collision_bonus[i] = 0.0;
+	
+	}
+	
 	// Inicializa o gráfico do player2
 	player2.graph = graphs_profiles[PLAYER2];
 	
@@ -522,7 +527,7 @@ void initObstacles (void){
 		//se não, segue com o procedimento de carregar ele na lista
 		if(max_obstacles_per_type[obj_profile]>0){
 		
-				world_obstacles[obstacles_defined].collision_mask = MASK_BIT(obj_profile);
+				world_obstacles[obstacles_defined].profile = obj_profile;
 				world_obstacles[obstacles_defined].graph = graphs_profiles[obj_profile]; // Aponta para qual o bitmap que pertence aquele perfil
 				
 				//partindo da posição minima para deixar fora da tela, a posição de cada obstaculo varia 100px,
@@ -628,6 +633,16 @@ int loadSingleGame (float dt){
 
 	initObstacles();
 	
+	
+	
+	// LIXO A SER RETIRADO
+	for(int i = 0; i < NUM_BLOCKS;++i){
+		profile_collision_bonus[i] = (float)(rand()%10)/10;
+		if(i%2) profile_collision_bonus[i] = -profile_collision_bonus[i];
+	}
+	
+	
+	
 	ground_offset = 0;
 	left_obstacles_index = 0;
 	right_obstacles_index = 0;
@@ -728,16 +743,16 @@ int singleStep (float dt){
 		if(last_colide != i){
 			if(colide(player1,world_obstacles[i])){
 				last_colide = i;
-				if(player1.collision_mask & world_obstacles[i].collision_mask){
-					player1.body.speed.x *= 2.0;
-					player1.body.speed.y*= 2.0;
+				if(profile_collision_bonus[world_obstacles[i].profile]>0){
+					player1.body.speed.x *= 1 + profile_collision_bonus[world_obstacles[i].profile];
+					player1.body.speed.y*= 1 + profile_collision_bonus[world_obstacles[i].profile];
 					
 					green_aura_frames = 30;
 					red_aura_frames = 0;
 				}
-				else{
-					player1.body.speed.x *=0.50;
-					player1.body.speed.y*= 0.50;
+				else if(profile_collision_bonus[world_obstacles[i].profile]<=0){
+					player1.body.speed.x *= 0.9 + profile_collision_bonus[world_obstacles[i].profile];
+					player1.body.speed.y*= 0.9 + profile_collision_bonus[world_obstacles[i].profile];
 					
 					red_aura_frames = 30;
 					green_aura_frames = 0;
@@ -883,5 +898,18 @@ float variaForca(float valor){
 		}	
 
 	return valor;	
+	
+}
+
+void resetGame(){
+total_obstacles = 0;
+total_score = 0; 
+total_rounds = 5;	
+left_obstacles_index = 0;
+right_obstacles_index = 0;
+player1.body.pos.x = PLAYER_INIT_X;
+player1.body.pos.y = PLAYER_INIT_Y;	
+player1.body.speed.setVector(0,0);
+ground_offset = 0;
 	
 }
