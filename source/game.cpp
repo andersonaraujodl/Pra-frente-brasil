@@ -25,8 +25,8 @@
 
 #define ATRITO 50
 #define BOUNCE 0.5
-#define SPEED_LIM_X 2500
-#define SPEED_LIM_Y 2500
+#define SPEED_LIM_X 2000
+#define SPEED_LIM_Y 2000
 
 // typedefs privados ===========================================
 typedef struct{
@@ -530,7 +530,7 @@ void initObstacles (void){
 				//e a ele é somado a largura desse mesmo objeto objeto anterior, de forma a evitar a sobreposição
 				world_obstacles[obstacles_defined].body.pos.x = ((rand() % 600) + 50) + ((obstacles_defined != 0) ? world_obstacles[obstacles_defined-1].graph.w + world_obstacles[obstacles_defined-1].body.pos.x: SCREEN_W - 50);
 				
-				if(obj_profile == NUVEM_POLUICAO)
+				if(obj_profile == NUVEM_POLUICAO || obj_profile== EUA)
 					world_obstacles[obstacles_defined].body.pos.y = ((rand() % 300) + 50);
 				else
 					world_obstacles[obstacles_defined].body.pos.y = 0;
