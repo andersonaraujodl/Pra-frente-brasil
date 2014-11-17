@@ -111,6 +111,8 @@ enum{
 	BANCO,
 	INDUSTRIA,
 	RURALISTAS,
+	EUA,
+	MILITARES,
 	
 	MTST, // Deixar esse por último dos blocks
 	
