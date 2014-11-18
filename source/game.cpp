@@ -192,9 +192,9 @@ int initGame (float dt){
 	// FAZER LOAD DO ARQUIVO COM OS NOMES DAS IMAGENS ==========
 	using namespace std;	
 	ifstream file(RESOURCES_ROOT);
-	
+	int pos =0;
 	char data[3000];
-	int pos =0, coluna, j=0, linha;
+	
 	while(file.good()){
 		data[pos] = file.get();
 		pos++;
@@ -260,26 +260,7 @@ int initGame (float dt){
 		menu_options[i].body.pos =	menu_pos;
 	}
 	
-	//Itens da loja
-	for(int i = 0; i < NUM_LOJA_MENU; ++i){
-		loja_options[i].graph = graphs_profiles[LOJA_OPTION_1 + i];
-		
-		if (i == NUM_LOJA_MENU-1){
-			coluna = graphs_profiles[LOJA_OPTION_1 + i].w *2 +200;
-			linha = (500)-(graphs_profiles[LOJA_OPTION_1 + i].h +10);}
-		else
-		if (i%2 == 0){
-			coluna = 20;
-			linha = (500)-(graphs_profiles[LOJA_OPTION_1 + i].h +10)*j;
-			j++;
-		}
-		else
-			coluna = graphs_profiles[LOJA_OPTION_1 + i].w +100;
-			
-		
-		vetor2d_type loja_pos{coluna,linha};
-		loja_options[i].body.pos =	loja_pos;
-	}
+
 
 	
 	// Feedback visuais de colisão
@@ -417,6 +398,29 @@ int showMenu (float dt){
  */
 int initLoja (float dt){
 	
+	int coluna, j=0, linha;
+	
+		//Itens da loja
+	for(int i = 0; i < NUM_LOJA_MENU; ++i){
+		loja_options[i].graph = graphs_profiles[LOJA_OPTION_1 + i];
+		
+		if (i == NUM_LOJA_MENU-1){
+			coluna = graphs_profiles[LOJA_OPTION_1 + i].w *2 +200;
+			linha = (500)-(graphs_profiles[LOJA_OPTION_1 + i].h +10);}
+		else
+		if (i%2 == 0){
+			coluna = 20;
+			linha = (500)-(graphs_profiles[LOJA_OPTION_1 + i].h +10)*j;
+			j++;
+		}
+		else
+			coluna = graphs_profiles[LOJA_OPTION_1 + i].w +100;
+			
+		
+		vetor2d_type loja_pos{coluna,linha};
+		loja_options[i].body.pos =	loja_pos;
+	}
+	
 	if(kbhit()){
 		getch();
 		fflush(stdin);
@@ -425,8 +429,25 @@ int initLoja (float dt){
 	return 1;
 }
 int showLoja (float dt){
+	
+	
 	int i, prim_select, segun_select, a=0;
 	char texto[50];
+	float bonus[NUM_LOJA_MENU-1][NUM_BLOCKS] = {{0.1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{0.2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{0.3,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{0.4,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{0.5,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{0.6,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{0.7,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{0.8,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{0.9,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{1.1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{1.2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}
+												};
+												
+												
 	for(i=0;i < NUM_LOJA_MENU;i++)
         print(loja_options[i].body.pos,&loja_options[i].graph);
 
@@ -447,44 +468,15 @@ int showLoja (float dt){
 					// Verifica os limites de y
 					if((mouse_pos.y < (int)loja_options[i].bottomLeft().y) || (mouse_pos.y > (int)loja_options[i].topRight().y)) continue;
 					// Retorna a opção do menu			
-					//loja_options[i].body.pos.y = 600;
-					//return 1;
+					loja_options[i].body.pos.y = -100;
+					//carrega em profile_collision_bonus os valores selecionados
+					for(int u = 0; u <NUM_BLOCKS ; ++u){
+						 profile_collision_bonus[u] = profile_collision_bonus[u]+bonus[i][u];
+					}	
 					
-					if(i == 12){ 
-						if (prim_select < 12 && segun_select < 12){ return 1;    // se tiver 2 itens selecionados vai para o jogo
-						sprintf(texto,"Propostas selecionadas: %d  %d",prim_select,segun_select);
-                        outtextxy(900, 400,texto);}
-					}
-					else
-					if(prim_select == 12 && segun_select != i){   //verifica se item não está selecionado e seleciona como primeiro
-						prim_select = i;
-						//loja_options[i].body.pos.y = 1000;
-						setfillstyle(1, GREEN); //define a cor de preenchimento do retângul
-                        setcolor (GREEN); //define a cor da borda do retêngulo
-                        rectangle(loja_options[i].body.pos.x-2, loja_options[i].body.pos.y-2, loja_options[i].body.pos.x=loja_options[i].graph.w+3, loja_options[i].body.pos.y+loja_options[i].graph.h+3); //desenha retângulo
-//						print(menu_loja_selected[i].body.pos,&menu_loja_selected[i].graph);
-					}
-					else if(prim_select == i){   //verifica se item está selecionado como primeiro e tira a seleção
-						prim_select = 12;
-						setfillstyle(1, YELLOW); //define a cor de preenchimento do retângul
-                        setcolor (YELLOW); //define a cor da borda do retêngulo
-                        rectangle(loja_options[i].body.pos.x-2, loja_options[i].body.pos.y-2, loja_options[i].body.pos.x=loja_options[i].graph.w+3, loja_options[i].body.pos.y+loja_options[i].graph.h+3); //desenha retângulo
-//						print(menu_loja[i].body.pos,&menu_loja[i].graph);
-					}
-					else if(prim_select != 12 && segun_select == 12){   //verifica se item não está selecionado e seleciona como segundo
-						segun_select = i;
-						setfillstyle(1, GREEN); //define a cor de preenchimento do retângul
-                        setcolor (GREEN); //define a cor da borda do retêngulo
-                        rectangle(loja_options[i].body.pos.x-2, loja_options[i].body.pos.y-2, loja_options[i].body.pos.x=loja_options[i].graph.w+3, loja_options[i].body.pos.y+loja_options[i].graph.h+3); //desenha retângulo
-//						print(menu_loja_selected[i].body.pos,&menu_loja_selected[i].graph);
-					}
-					else if(segun_select == i){   //verifica se item está selecionado como segundo e tira a seleção
-						segun_select = 12;
-						setfillstyle(1, YELLOW); //define a cor de preenchimento do retângul
-                        setcolor (YELLOW); //define a cor da borda do retêngulo
-                        rectangle(loja_options[i].body.pos.x-2, loja_options[i].body.pos.y-2, loja_options[i].body.pos.x=loja_options[i].graph.w+3, loja_options[i].body.pos.y+loja_options[i].graph.h+3); //desenha retângulo
-//						print(menu_loja[i].body.pos,&menu_loja[i].graph);
-					}
+					return 1;
+					
+					
 				}
 			}
 		}
