@@ -643,14 +643,15 @@ int loadSingleGame (float dt){
 	initObstacles();
 	
 	
-	
+#ifdef ON_DEBUG	
+
 /*	// LIXO A SER RETIRADO
 	for(int i = 0; i < NUM_BLOCKS;++i){
 		profile_collision_bonus[i] = (float)(rand()%10)/10;
 		if(i%2) profile_collision_bonus[i] = -profile_collision_bonus[i];
 	}
 */	
-	
+#endif	
 	
 	ground_offset = 0;
 	left_obstacles_index = 0;
@@ -737,6 +738,11 @@ int singleStep (float dt){
 	setObstaclesRange(player1,left_index,right_index);
 	atualizaObjetos(player1,left_index,right_index);
 
+<<<<<<< .mine
+
+=======
+
+>>>>>>> .theirs
 	if(green_aura_frames){
 		--green_aura_frames;
 		print(vetor2d_type{PLAYER_FIX_POS - ((green_aura.graph.w - player1.graph.w)/2),player1.body.pos.y - ((green_aura.graph.h - player1.graph.h)/2)},&green_aura.graph);
@@ -749,7 +755,7 @@ int singleStep (float dt){
 
 	
 	for(int i = left_index; i <= right_index;++i){
-		if(last_colide != i){
+		if(last_colide < i){ // Maior pois o player nunca anda para trás
 			if(colide(player1,world_obstacles[i])){
 				last_colide = i;
 				if(profile_collision_bonus[world_obstacles[i].profile]>0){
@@ -766,6 +772,7 @@ int singleStep (float dt){
 					red_aura_frames = 30;
 					green_aura_frames = 0;
 				}
+				break; // Afinal só colide um por vez
 			}
 		}
 	}
@@ -846,6 +853,11 @@ int singleEnd(float dt){
 		left_index = 0;
 		right_index = 0;
 
+<<<<<<< .mine
+
+=======
+
+>>>>>>> .theirs
 		return ret;
 		 
 	}
@@ -911,6 +923,7 @@ float variaForca(float valor){
 }
 
 void resetGame(){
+<<<<<<< .mine
 	total_obstacles = 0;
 	total_score = 0; 
 	total_rounds = 5;	
@@ -921,4 +934,16 @@ void resetGame(){
 	player1.body.speed.setVector(0,0);
 	ground_offset = 0;
 	
+=======
+	total_obstacles = 0;
+	total_score = 0; 
+	total_rounds = 5;	
+	left_obstacles_index = 0;
+	right_obstacles_index = 0;
+	player1.body.pos.x = PLAYER_INIT_X;
+	player1.body.pos.y = PLAYER_INIT_Y;	
+	player1.body.speed.setVector(0,0);
+	ground_offset = 0;
+
+>>>>>>> .theirs
 }
