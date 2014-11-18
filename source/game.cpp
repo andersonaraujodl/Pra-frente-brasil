@@ -430,21 +430,32 @@ int initLoja (float dt){
 }
 int showLoja (float dt){
 	
-	
-	int i, prim_select, segun_select, a=0;
+	static int selected = 0;
+	int i, a=0;
 	char texto[50];
-	float bonus[NUM_LOJA_MENU-1][NUM_BLOCKS] = {{0.1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{0.2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{0.3,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{0.4,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{0.5,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{0.6,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{0.7,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{0.8,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{0.9,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{1.1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{1.2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}
+	float bonus[NUM_LOJA_MENU-1][NUM_BLOCKS] = {{0.3,	0.0,	0.0,	0.0,	0.0,	-0.3,	0.3,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+												{0.0,	0.3,	0.0,	0.0,	0.0,	-0.3,	0.0,	0.0,	0.0,	0.1,	0.0,	-0.3,	0.0,	0.1,	0.0},
+												{0.0,	-0.3,	0.0,	0.0,	0.0,	0.2,	0.0,	0.0,	0.0,	0.0,	0.0,	-0.3,	0.0,	0.0,	0.0},
+												{0.0,	0.0,	0.0,	0.0,	-0.1,	0.0,	0.0,	0.0,	-0.1,	-0.3,	-0.1,	0.0,	0.0,	0.3,	0.3},
+												{0.0,	0.0,	0.0,	0.0,	0.2,	0.0,	0.0,	0.1,	0.1,	0.3,	0.1,	0.0,	0.0,	-0.3,	-0.3},
+												{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	-0.2,	-0.2,	0.0,	0.0,	0.0,	0.0,	0.3},
+												{0.0,	0.0,	-0.3,	0.0,	0.0,	0.0,	0.0,	-0.3,	-0.3,	-0.1,	0.0,	-0.1,	0.0,	0.0,	0.0},
+												{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.2,	0.2,	0.2,	-0.1,	0.0,	0.0,	0.0,	0.0},
+												{0.3,	0.1,	-0.1,	0.0,	0.0,	0.0,	0.3,	0.0,	0.0,	-0.1,	0.0,	-0.3,	-0.2,	0.3,	0.3},
+												{0.0,	0.0,	0.0,	0.3,	-0.1,	0.0,	0.0,	0.0,	-0.3,	-0.3,	0.0,	0.0,	0.0,	0.3,	0.0},
+												{0.3,	0.0,	-0.2,	0.3,	0.0,	-0.3,	0.3,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+												{0.1,	0.1,	0.0,	0.0,	0.0,	0.1,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.1,	0.1},
+												{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+												{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+												{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+												{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+												{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+												{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+												{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+												{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+												{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+												{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+												{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0}
 												};
 												
 												
@@ -468,13 +479,19 @@ int showLoja (float dt){
 					// Verifica os limites de y
 					if((mouse_pos.y < (int)loja_options[i].bottomLeft().y) || (mouse_pos.y > (int)loja_options[i].topRight().y)) continue;
 					// Retorna a opção do menu			
-					loja_options[i].body.pos.y = -100;
-					//carrega em profile_collision_bonus os valores selecionados
-					for(int u = 0; u <NUM_BLOCKS ; ++u){
-						 profile_collision_bonus[u] = profile_collision_bonus[u]+bonus[i][u];
-					}	
-					
-					return 1;
+					if(i == LOJA_OK - LOJA_OPTION_1) {
+						selected = 0;
+						return 1;
+					}
+					if(selected <2){
+						++selected;					
+						loja_options[i].body.pos.y = -100;
+						//carrega em profile_collision_bonus os valores selecionados
+						for(int u = 0; u <NUM_BLOCKS ; ++u){
+							 profile_collision_bonus[u] = profile_collision_bonus[u]+bonus[i][u];
+						}	
+					}
+				
 					
 					
 				}
@@ -627,13 +644,14 @@ int loadSingleGame (float dt){
 	
 	
 #ifdef ON_DEBUG	
-	// LIXO A SER RETIRADO
+
+/*	// LIXO A SER RETIRADO
 	for(int i = 0; i < NUM_BLOCKS;++i){
 		profile_collision_bonus[i] = (float)(rand()%10)/10;
 		if(i%2) profile_collision_bonus[i] = -profile_collision_bonus[i];
 	}
-#endif
-	
+*/	
+#endif	
 	
 	ground_offset = 0;
 	left_obstacles_index = 0;
@@ -719,6 +737,12 @@ int singleStep (float dt){
 	
 	setObstaclesRange(player1,left_index,right_index);
 	atualizaObjetos(player1,left_index,right_index);
+
+<<<<<<< .mine
+
+=======
+
+>>>>>>> .theirs
 	if(green_aura_frames){
 		--green_aura_frames;
 		print(vetor2d_type{PLAYER_FIX_POS - ((green_aura.graph.w - player1.graph.w)/2),player1.body.pos.y - ((green_aura.graph.h - player1.graph.h)/2)},&green_aura.graph);
@@ -828,6 +852,12 @@ int singleEnd(float dt){
 		
 		left_index = 0;
 		right_index = 0;
+
+<<<<<<< .mine
+
+=======
+
+>>>>>>> .theirs
 		return ret;
 		 
 	}
@@ -893,6 +923,7 @@ float variaForca(float valor){
 }
 
 void resetGame(){
+<<<<<<< .mine
 	total_obstacles = 0;
 	total_score = 0; 
 	total_rounds = 5;	
@@ -902,4 +933,17 @@ void resetGame(){
 	player1.body.pos.y = PLAYER_INIT_Y;	
 	player1.body.speed.setVector(0,0);
 	ground_offset = 0;
+	
+=======
+	total_obstacles = 0;
+	total_score = 0; 
+	total_rounds = 5;	
+	left_obstacles_index = 0;
+	right_obstacles_index = 0;
+	player1.body.pos.x = PLAYER_INIT_X;
+	player1.body.pos.y = PLAYER_INIT_Y;	
+	player1.body.speed.setVector(0,0);
+	ground_offset = 0;
+
+>>>>>>> .theirs
 }
