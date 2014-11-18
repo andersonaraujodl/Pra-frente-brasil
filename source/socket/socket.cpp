@@ -40,10 +40,19 @@ int startClient (char *server_ip,short server_port){
 	other_addr.sin_family = AF_INET;
 	other_addr.sin_addr.s_addr = inet_addr(server_ip);
 	other_addr.cliAddr.sin_port = htons(server_port);
-	
-	
 }
 
+int waitClient (void){
+	int num_b;
+	packet_type pack;
+	if(num_b = recvfrom(m_socket,(char*)&pack,sizeof(packet_type),0,(struct sockaddr *)&other_addr,&sz)){
+		if(!strcmp(pack.buffer,"REQ CONECT")){
+			strcpy(pack.buffer,"CONNECT OK");
+			sendPacket(pack);
+		}
+	}
+
+}
 /**
  *  @brief Brief
  *  
@@ -65,8 +74,8 @@ int startServer(short server_port){
  *  @details Details
  */
 int getPacket (packet_type *pack){
-	return recvfrom(m_socket,(char *)pack,(sizeof(packet_type) + pack->buff_size),
-					0, (struct sockaddr *) &si_other, &slen);
+	int sz = sizeof(other_addr);
+	return recvfrom(m_socket,(char *)pack,(sizeof(packet_type)),0,(struct sockaddr *)&other_addr,&sz );
 }
 
 /**
