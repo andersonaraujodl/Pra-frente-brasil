@@ -83,7 +83,7 @@ typedef struct
 {
 	physics_data_type body; /**< Propriedades físicas*/
 	graph_data_type graph; /**< Propriedades gráficas*/
-	long int collision_mask; /**< Máscara para a análise de colisões entre objetos*/
+	int profile; /**< Máscara para a análise de colisões entre objetos*/
 	
 	vetor2d_type bottomLeft() {return this->body.pos;}
 	vetor2d_type topRight() { return vetor2d_type{this->body.pos.x + this->graph.w,this->body.pos.y + this->graph.h};}
@@ -111,7 +111,8 @@ enum{
 	BANCO,
 	INDUSTRIA,
 	RURALISTAS,
-	
+	EUA,
+	MILITARES,
 	
 	MTST, // Deixar esse por último dos blocks
 	
@@ -125,6 +126,20 @@ enum{
 	MENU_OPTION_2,
 	MENU_OPTION_3,
 	MENU_OPTION_4,
+	LOJA_OPTION_1,
+	LOJA_OPTION_2,
+	LOJA_OPTION_3,
+	LOJA_OPTION_4,
+	LOJA_OPTION_5,
+	LOJA_OPTION_6,
+	LOJA_OPTION_7,
+	LOJA_OPTION_8,
+	LOJA_OPTION_9,
+	LOJA_OPTION_10,
+	LOJA_OPTION_11,
+	LOJA_OPTION_12,
+	LOJA_OK,	
+	//imagens antes do NUM_OBJECTS_DEFINE
 	NUM_OBJECTS_DEFINE
 
 };
@@ -134,6 +149,7 @@ enum{
  */
 #define NUM_BLOCKS (MTST +1)
 #define NUM_OPTIONS_MENU 4
+#define NUM_LOJA_MENU 13
 #define ON_DEBUG
 
 #endif

@@ -13,7 +13,6 @@
 // Types Públicos ==========================================
 
 typedef struct{
-	int socket;
 	int port;
 	sockaddr_in address;
 }socket_type;

@@ -25,8 +25,8 @@
 
 #define ATRITO 50
 #define BOUNCE 0.5
-#define SPEED_LIM_X 2500
-#define SPEED_LIM_Y 2500
+#define SPEED_LIM_X 2000
+#define SPEED_LIM_Y 2000
 
 // typedefs privados ===========================================
 typedef struct{
@@ -40,6 +40,7 @@ typedef struct{
 int initGame (float dt);
 int initMenu (float dt);
 int showMenu (float dt);
+int showLoja (float dt);
 int loadSingleGame (float dt);
 int preLancamento (float dt);
 int singleStep (float dt);
@@ -48,10 +49,13 @@ void groundStep(game_object_type *objeto, game_object_type *ground, float dt);
 int singleEnd(float dt);
 int showCredits (float dt);
 float variaForca(float valor);
+int initLoja (float dt);
+void resetGame();
 
 //Variáveis privadas ============================================
 game_object_type player1,player2, ground;
 game_object_type green_aura, red_aura;
+game_object_type loja_options[NUM_LOJA_MENU];
 game_object_type menu_options[NUM_OPTIONS_MENU];
 game_object_type world_obstacles[MAX_OBSTACLES];
 graph_data_type graphs_profiles[NUM_OBJECTS_DEFINE];
@@ -61,6 +65,7 @@ float obstacles_weight[NUM_BLOCKS],max_obstacles_per_type[NUM_BLOCKS];
 int total_obstacles = 0;
 int total_score = 0; 
 int total_rounds = 5;
+float profile_collision_bonus[NUM_BLOCKS];
 /**
 *  
 */
@@ -117,14 +122,35 @@ game_state_type pre_lancamento ={
 /**
 *  
 */
+game_state_type loja_state ={
+	showLoja,
+	(game_state_type*[]){
+		&loja_state,	 // return 0
+		&load_single	 // return 1
+	}
+};
+/**
+*  
+*/
+game_state_type load_loja ={
+	initLoja,
+	(game_state_type*[]){
+		&load_loja,	 // return 0
+		&loja_state	 // return 1
+	}
+};
+
+
 game_state_type end_single ={
 	singleEnd,
 	(game_state_type*[]){
 		&end_single,	 // return 0
-		&load_single,	 // return 1
+		&load_loja,	 // return 1
 		&load_menu_state // return 2
 	}
 };
+
+
 /**
 *  
 */
@@ -166,9 +192,9 @@ int initGame (float dt){
 	// FAZER LOAD DO ARQUIVO COM OS NOMES DAS IMAGENS ==========
 	using namespace std;	
 	ifstream file(RESOURCES_ROOT);
-	
-	char data[3000];
 	int pos =0;
+	char data[3000];
+	
 	while(file.good()){
 		data[pos] = file.get();
 		pos++;
@@ -210,9 +236,12 @@ int initGame (float dt){
 	}
 	// Inicializa o gráfico do player1
 	player1.graph = graphs_profiles[PLAYER1];
-#ifdef ON_DEBUG
-	player1.collision_mask |=0xFFFFFFFF;// MASK_BIT(CONGRESSO) | MASK_BIT(LGBT) | MASK_BIT(BANCO);
-#endif
+	
+	for(int i = 0; i < NUM_BLOCKS;++i){
+		profile_collision_bonus[i] = 0.0;
+	
+	}
+	
 	// Inicializa o gráfico do player2
 	player2.graph = graphs_profiles[PLAYER2];
 	
@@ -230,6 +259,9 @@ int initGame (float dt){
 		vetor2d_type menu_pos{(SCREEN_W - menu_options[i].graph.w)/2,(SCREEN_H/(NUM_OPTIONS_MENU +3)) * ( NUM_OPTIONS_MENU -1 - i)};
 		menu_options[i].body.pos =	menu_pos;
 	}
+	
+
+
 	
 	// Feedback visuais de colisão
 	green_aura.graph = graphs_profiles[GREEN_AURA];
@@ -258,7 +290,7 @@ int showCredits (float dt){
 	
 	printTxt("Anderson Araújo", vetor2d_type{(SCREEN_W/2)-(textwidth("Anderson Araújo")/2), SCREEN_H/2-(textheight("Anderson Araújo"))});
 	printTxt("Carol Fernandes", vetor2d_type{(SCREEN_W/2)-(textwidth("Carol Fernandes")/2), SCREEN_H/2-(textheight("Carol Fernandes")-20)});
-	printTxt("Diego Ortiz", vetor2d_type{(SCREEN_W/2)-(textwidth("Diego Ortiz")/2), SCREEN_H/2-(textheight("Diego Ortiz")-40)});
+	printTxt("Diego Hortiz", vetor2d_type{(SCREEN_W/2)-(textwidth("Diego Hortiz")/2), SCREEN_H/2-(textheight("Diego Hortiz")-40)});
 	printTxt("Lucas Pina", vetor2d_type{(SCREEN_W/2)-(textwidth("Lucas Pina")/2), SCREEN_H/2-(textheight("Lucas Pina")-60)});
 	printTxt("Marcelo Pietragala", vetor2d_type{(SCREEN_W/2)-(textwidth("Marcelo Pietragala")/2), SCREEN_H/2-(textheight("Marcelo Pietragala")-80)});
 	
@@ -324,9 +356,9 @@ int showMenu (float dt){
 		player2.body.pos.y=0;
 		player2.body.speed.y *= -0.99;
 	}
-	print(vetor2d_type{0,-10},&graphs_profiles[LOGOTIPO], COPY_PUT);
-	print(player1.body.pos,&player1.graph, OR_PUT);
-	print(player2.body.pos,&player2.graph, OR_PUT);
+	print(vetor2d_type{0,-10},&graphs_profiles[LOGOTIPO]);
+	print(player1.body.pos,&player1.graph);
+	print(player2.body.pos,&player2.graph);
 	// -------------------------------------------
 	
 	
@@ -356,6 +388,102 @@ int showMenu (float dt){
 	}	
 	return 0;
 }
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] dt Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
+int initLoja (float dt){
+	
+	int coluna, j=0, linha;
+	
+		//Itens da loja
+	for(int i = 0; i < NUM_LOJA_MENU; ++i){
+		loja_options[i].graph = graphs_profiles[LOJA_OPTION_1 + i];
+		
+		if (i == NUM_LOJA_MENU-1){
+			coluna = graphs_profiles[LOJA_OPTION_1 + i].w *2 +200;
+			linha = (500)-(graphs_profiles[LOJA_OPTION_1 + i].h +10);}
+		else
+		if (i%2 == 0){
+			coluna = 20;
+			linha = (500)-(graphs_profiles[LOJA_OPTION_1 + i].h +10)*j;
+			j++;
+		}
+		else
+			coluna = graphs_profiles[LOJA_OPTION_1 + i].w +100;
+			
+		
+		vetor2d_type loja_pos{coluna,linha};
+		loja_options[i].body.pos =	loja_pos;
+	}
+	
+	if(kbhit()){
+		getch();
+		fflush(stdin);
+	}
+
+	return 1;
+}
+int showLoja (float dt){
+	
+	
+	int i, prim_select, segun_select, a=0;
+	char texto[50];
+	float bonus[NUM_LOJA_MENU-1][NUM_BLOCKS] = {{0.1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{0.2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{0.3,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{0.4,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{0.5,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{0.6,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{0.7,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{0.8,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{0.9,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{1.1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
+												{1.2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}
+												};
+												
+												
+	for(i=0;i < NUM_LOJA_MENU;i++)
+        print(loja_options[i].body.pos,&loja_options[i].graph);
+
+	for(int i = 0; i <= NUM_LOJA_MENU; ++i){
+		if(GetKeyState(VK_LBUTTON)&0x80){ //clique do mouse
+			POINT mouse_pos;
+			
+			if (GetCursorPos(&mouse_pos)){ //retorna uma estrutura que contém a posição atual do cursor
+				char debug[50];
+				HWND hwnd = GetForegroundWindow(); 
+				if (ScreenToClient(hwnd, &mouse_pos)){
+					
+					// Passa o y para as coordenadas de nossos objetos
+					//mouse_pos.y = SCREEN_H - mouse_pos.y;
+					mouse_pos.y = SCREEN_H - mouse_pos.y;
+					// Verifica os limites de x
+					if((mouse_pos.x < (int)loja_options[i].bottomLeft().x) || (mouse_pos.x > (int)loja_options[i].topRight().x)) continue;
+					// Verifica os limites de y
+					if((mouse_pos.y < (int)loja_options[i].bottomLeft().y) || (mouse_pos.y > (int)loja_options[i].topRight().y)) continue;
+					// Retorna a opção do menu			
+					loja_options[i].body.pos.y = -100;
+					//carrega em profile_collision_bonus os valores selecionados
+					for(int u = 0; u <NUM_BLOCKS ; ++u){
+						 profile_collision_bonus[u] = profile_collision_bonus[u]+bonus[i][u];
+					}	
+					
+					return 1;
+					
+					
+				}
+			}
+		}
+	}
+	delay(100);
+	return 0;
+} 
 
 /**
  *  @brief Brief
@@ -391,7 +519,7 @@ void initObstacles (void){
 		//se não, segue com o procedimento de carregar ele na lista
 		if(max_obstacles_per_type[obj_profile]>0){
 		
-				world_obstacles[obstacles_defined].collision_mask = MASK_BIT(obj_profile);
+				world_obstacles[obstacles_defined].profile = obj_profile;
 				world_obstacles[obstacles_defined].graph = graphs_profiles[obj_profile]; // Aponta para qual o bitmap que pertence aquele perfil
 				
 				//partindo da posição minima para deixar fora da tela, a posição de cada obstaculo varia 100px,
@@ -399,7 +527,7 @@ void initObstacles (void){
 				//e a ele é somado a largura desse mesmo objeto objeto anterior, de forma a evitar a sobreposição
 				world_obstacles[obstacles_defined].body.pos.x = ((rand() % 600) + 50) + ((obstacles_defined != 0) ? world_obstacles[obstacles_defined-1].graph.w + world_obstacles[obstacles_defined-1].body.pos.x: SCREEN_W - 50);
 				
-				if(obj_profile == NUVEM_POLUICAO)
+				if(obj_profile == NUVEM_POLUICAO || obj_profile== EUA)
 					world_obstacles[obstacles_defined].body.pos.y = ((rand() % 300) + 50);
 				else
 					world_obstacles[obstacles_defined].body.pos.y = 0;
@@ -472,12 +600,12 @@ bool atualizaObjetos (game_object_type &ref,const int &left_index,const int &rig
 	// Imprime todos aqueles que estão dentro do range da tela
 	for (int i = left_index; i <= right_index; ++i){
 		float obj_x = world_obstacles[i].body.pos.x -  ref.body.pos.x + PLAYER_FIX_POS;
-		print(vetor2d_type{obj_x,world_obstacles[i].body.pos.y}, &world_obstacles[i].graph,OR_PUT);
+		print(vetor2d_type{obj_x,world_obstacles[i].body.pos.y}, &world_obstacles[i].graph);
 	
 	}
 	
 	float ref_x = (ref.body.pos.x < PLAYER_FIX_POS) ? ref.body.pos.x: PLAYER_FIX_POS;
-	print(vetor2d_type{ref_x, ref.body.pos.y},&ref.graph, OR_PUT);
+	print(vetor2d_type{ref_x, ref.body.pos.y},&ref.graph);
 }
 
 /**
@@ -496,6 +624,16 @@ int loadSingleGame (float dt){
 	total_obstacles = 0;
 
 	initObstacles();
+	
+	
+#ifdef ON_DEBUG	
+	// LIXO A SER RETIRADO
+	for(int i = 0; i < NUM_BLOCKS;++i){
+		profile_collision_bonus[i] = (float)(rand()%10)/10;
+		if(i%2) profile_collision_bonus[i] = -profile_collision_bonus[i];
+	}
+#endif
+	
 	
 	ground_offset = 0;
 	left_obstacles_index = 0;
@@ -581,36 +719,36 @@ int singleStep (float dt){
 	
 	setObstaclesRange(player1,left_index,right_index);
 	atualizaObjetos(player1,left_index,right_index);
-	std::cout<<"right_index "<<right_index<<" / "<<total_obstacles<<std::endl;
 	if(green_aura_frames){
 		--green_aura_frames;
-		print(vetor2d_type{PLAYER_FIX_POS - ((green_aura.graph.w - player1.graph.w)/2),player1.body.pos.y - ((green_aura.graph.h - player1.graph.h)/2)},&green_aura.graph,OR_PUT);
+		print(vetor2d_type{PLAYER_FIX_POS - ((green_aura.graph.w - player1.graph.w)/2),player1.body.pos.y - ((green_aura.graph.h - player1.graph.h)/2)},&green_aura.graph);
 	}
 	
 	if(red_aura_frames){
 		--red_aura_frames;
-		print(vetor2d_type{PLAYER_FIX_POS - ((red_aura.graph.w - player1.graph.w)/2),player1.body.pos.y  - ((red_aura.graph.h - player1.graph.h)/2)},&red_aura.graph,OR_PUT);
+		print(vetor2d_type{PLAYER_FIX_POS - ((red_aura.graph.w - player1.graph.w)/2),player1.body.pos.y  - ((red_aura.graph.h - player1.graph.h)/2)},&red_aura.graph);
 	}
 
 	
 	for(int i = left_index; i <= right_index;++i){
-		if(last_colide != i){
+		if(last_colide < i){ // Maior pois o player nunca anda para trás
 			if(colide(player1,world_obstacles[i])){
 				last_colide = i;
-				if(player1.collision_mask & world_obstacles[i].collision_mask){
-					player1.body.speed.x *= 2.0;
-					player1.body.speed.y*= 2.0;
+				if(profile_collision_bonus[world_obstacles[i].profile]>0){
+					player1.body.speed.x *= 1 + profile_collision_bonus[world_obstacles[i].profile];
+					player1.body.speed.y*= 1 + profile_collision_bonus[world_obstacles[i].profile];
 					
 					green_aura_frames = 30;
 					red_aura_frames = 0;
 				}
-				else{
-					player1.body.speed.x *=0.50;
-					player1.body.speed.y*= 0.50;
+				else if(profile_collision_bonus[world_obstacles[i].profile]<=0){
+					player1.body.speed.x *= 0.9 + profile_collision_bonus[world_obstacles[i].profile];
+					player1.body.speed.y*= 0.9 + profile_collision_bonus[world_obstacles[i].profile];
 					
 					red_aura_frames = 30;
 					green_aura_frames = 0;
 				}
+				break; // Afinal só colide um por vez
 			}
 		}
 	}
@@ -690,7 +828,6 @@ int singleEnd(float dt){
 		
 		left_index = 0;
 		right_index = 0;
-		std::cout<<"apertou tecla ao fim. E o valor de ret é "<<ret<<std::endl;
 		return ret;
 		 
 	}
@@ -753,4 +890,16 @@ float variaForca(float valor){
 
 	return valor;	
 	
+}
+
+void resetGame(){
+	total_obstacles = 0;
+	total_score = 0; 
+	total_rounds = 5;	
+	left_obstacles_index = 0;
+	right_obstacles_index = 0;
+	player1.body.pos.x = PLAYER_INIT_X;
+	player1.body.pos.y = PLAYER_INIT_Y;	
+	player1.body.speed.setVector(0,0);
+	ground_offset = 0;
 }
