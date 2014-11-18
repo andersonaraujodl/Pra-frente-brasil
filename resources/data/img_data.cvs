@@ -10,6 +10,8 @@
 104,57,../resources/imagens/ruralistas_MASK.gif,../resources/imagens/ruralistas.gif
 168,180,../resources/imagens/eua_MASK.gif,../resources/imagens/eua.gif
 152,77,../resources/imagens/militares_MASK.gif,../resources/imagens/militares.gif
+157,350,../resources/imagens/comunicacao_MASK.gif,../resources/imagens/comunicacao.gif
+287,100,../resources/imagens/mob_ecologia_MASK.gif,../resources/imagens/mob_ecologia.gif	
 165,57,../resources/imagens/mob_mtst_MASK.gif,../resources/imagens/mob_mtst.gif
 200,10, ,../resources/imagens/ground.gif
 55,55,../resources/imagens/players_mask.gif,../resources/imagens/player1.gif
@@ -21,6 +23,17 @@
 306,62, ,../resources/imagens/mnu_connect_server.gif
 306,62, ,../resources/imagens/mnu_host_game.gif
 306,62, ,../resources/imagens/mnu_exit.gif
+306,62, ,../resources/imagens/mnu_host_game.gif
+306,62, ,../resources/imagens/mnu_host_game.gif
+306,62, ,../resources/imagens/mnu_host_game.gif
+306,62, ,../resources/imagens/mnu_host_game.gif
+306,62, ,../resources/imagens/mnu_host_game.gif
+306,62, ,../resources/imagens/mnu_host_game.gif
+306,62, ,../resources/imagens/mnu_host_game.gif
+306,62, ,../resources/imagens/mnu_host_game.gif
+306,62, ,../resources/imagens/mnu_host_game.gif
+306,62, ,../resources/imagens/mnu_host_game.gif
+306,62, ,../resources/imagens/mnu_host_game.gif
 306,62, ,../resources/imagens/mnu_host_game.gif
 306,62, ,../resources/imagens/mnu_host_game.gif
 306,62, ,../resources/imagens/mnu_host_game.gif
