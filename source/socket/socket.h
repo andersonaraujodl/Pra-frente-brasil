@@ -9,6 +9,8 @@
 
 #ifndef __SOCKET_H__
 #define __SOCKET_H__
+// Defines públicos ========================================
+#define SOCK_BUFF_LEN 512
 
 // Types Públicos ==========================================
 
@@ -17,10 +19,12 @@ typedef struct{
 	sockaddr_in address;
 }socket_type;
 
-typedef struct{
-	unsigned char pack_count;
-	unsigned int buff_size;
-	char *buffer;
+typedef union{
+	struct{
+		unsigned int pack_count;
+		unsigned int buff_size;
+	};
+	char buff[SOCK_BUFF_LEN +8];
 }packet_type;
 // ==========================================================
 #endif
