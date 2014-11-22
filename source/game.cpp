@@ -27,6 +27,7 @@
 #define BOUNCE 0.5
 #define SPEED_LIM_X 2000
 #define SPEED_LIM_Y 2000
+#define MAX_BONUS 0.2
 
 // typedefs privados ===========================================
 typedef struct{
@@ -51,6 +52,7 @@ int showCredits (float dt);
 float variaForca(float valor);
 int initLoja (float dt);
 void resetGame();
+void resetLoja();
 
 //Variáveis privadas ============================================
 game_object_type player1,player2, ground;
@@ -193,7 +195,7 @@ int initGame (float dt){
 	using namespace std;	
 	ifstream file(RESOURCES_ROOT);
 	int pos =0;
-	char data[3000];
+	char data[8000];
 	
 	while(file.good()){
 		data[pos] = file.get();
@@ -206,7 +208,7 @@ int initGame (float dt){
 	pch = strtok(data,",");//carrega o primeiro booleano
 	
 	for(int i = 0; i <NUM_OBJECTS_DEFINE; ++i){
-		static char temp[200],tempmsk[200], t_width[4], t_height[5];
+		static char temp[300],tempmsk[300], t_width[4], t_height[5];
 		
 
 		
@@ -237,6 +239,8 @@ int initGame (float dt){
 	// Inicializa o gráfico do player1
 	player1.graph = graphs_profiles[PLAYER1];
 	
+	
+	//inicializa o fator inicial de bonus
 	for(int i = 0; i < NUM_BLOCKS;++i)	profile_collision_bonus[i] = 0.0;
 	
 
@@ -402,6 +406,7 @@ int initLoja (float dt){
 	
 	for(int i = 0; i < NUM_BLOCKS;++i)	profile_collision_bonus[i] = 0.0;// reseta o bonus
 	
+				
 
 	
 	if(kbhit()){
@@ -429,7 +434,6 @@ int showLoja (float dt){
 														{0.0,	0.0,	0.0,	0.3,	-0.1,	0.0,	0.0,	0.0,	-0.3,	-0.3,	0.0,	0.0,	0.0,	0.3,	0.0},
 														{0.3,	0.0,	-0.2,	0.3,	0.0,	-0.3,	0.3,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
 														{0.1,	0.1,	0.0,	0.0,	0.0,	0.1,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.1,	0.1},
-														{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
 														{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
 														{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
 														{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
@@ -475,12 +479,22 @@ int showLoja (float dt){
 						selected = 0;
 						return 1;
 					}
+					if(i == LOJA_RESET - LOJA_OPTION_1) {
+						resetLoja();
+						selected = 0;
+						return 0;
+					}
 					if(selected <2){
 						++selected;					
 						moving_object = &loja_options[i];
 						//carrega em profile_collision_bonus os valores selecionados
 						for(int u = 0; u <NUM_BLOCKS ; ++u){
-							 profile_collision_bonus[u] = profile_collision_bonus[u]+bonus[i][u];
+							profile_collision_bonus[u] = profile_collision_bonus[u]+bonus[i][u]*MAX_BONUS;
+							if(u == NUVEM_POLUICAO) profile_collision_bonus[u] = -1* MAX_BONUS;
+							
+							obstacles_weight[u] = obstacles_weight[u]-bonus[i][u];
+							
+							
 						}	
 					}
 				
@@ -635,15 +649,7 @@ int loadSingleGame (float dt){
 	initObstacles();
 	
 	
-#ifdef ON_DEBUG	
 
-/*	// LIXO A SER RETIRADO
-	for(int i = 0; i < NUM_BLOCKS;++i){
-		profile_collision_bonus[i] = (float)(rand()%10)/10;
-		if(i%2) profile_collision_bonus[i] = -profile_collision_bonus[i];
-	}
-*/	
-#endif	
 	
 	ground_offset = 0;
 	left_obstacles_index = 0;
@@ -919,27 +925,32 @@ void resetGame(){
 	player1.body.pos.y = PLAYER_INIT_Y;	
 	player1.body.speed.setVector(0,0);
 	ground_offset = 0;
-	
-			//Itens da loja
+	resetLoja();	
+
+
+}
+
+void resetLoja(){
+	//Itens da loja
 	int coluna, linha, j=0;
 	for(int i = 0; i < NUM_LOJA_MENU; ++i){
 		loja_options[i].graph = graphs_profiles[LOJA_OPTION_1 + i];
 		
-		if (i == NUM_LOJA_MENU-1){
-			coluna = graphs_profiles[LOJA_OPTION_1 + i].w *2 +200;
+		if (i == NUM_LOJA_MENU-2){
+			coluna = SCREEN_W -graphs_profiles[LOJA_OPTION_1 + i].w -20;
 			linha = (500)-(graphs_profiles[LOJA_OPTION_1 + i].h +10);}
-		else
-		if (i%2 == 0){
+		else if (i == NUM_LOJA_MENU-1){
+			coluna = SCREEN_W -graphs_profiles[LOJA_OPTION_1 + i].w -20;
+			linha = (500)-(graphs_profiles[LOJA_OPTION_1 + i].h*2 +10);}
+		else if (i%2 == 0){
 			coluna = 20;
 			linha = (500)-(graphs_profiles[LOJA_OPTION_1 + i].h +10)*j;
 			j++;
-		}
-		else
+		} else
 			coluna = graphs_profiles[LOJA_OPTION_1 + i].w +100;
 			
 		
 		vetor2d_type loja_pos{coluna,linha};
 		loja_options[i].body.pos =	loja_pos;
 	}
-
 }
