@@ -9,18 +9,30 @@
 
 #ifndef __SOCKET_H__
 #define __SOCKET_H__
+// Defines p�blicos ========================================
+#define SOCK_BUFF_LEN 64
 
-// Types Públicos ==========================================
-
+// Types P�blicos ==========================================
 typedef struct{
-	int port;
-	sockaddr_in address;
-}socket_type;
-
-typedef struct{
-	unsigned char pack_count;
+	unsigned int pack_count;
 	unsigned int buff_size;
-	char *buffer;
+}pack_control_type;
+
+
+typedef struct{
+	
+	pack_control_type ctrl;
+	char buff[SOCK_BUFF_LEN];
 }packet_type;
+
+// Prot�tipos p�blicos ======================================
+int initSocket (short port);
+int startClient (char *server_ip,short server_port);
+int connectToServer();
+int waitClient (void);
+int getPacket (packet_type &pack);
+int sendPacket(packet_type &p);
 // ==========================================================
+
+
 #endif
