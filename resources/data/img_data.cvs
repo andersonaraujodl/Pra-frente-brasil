@@ -23,28 +23,27 @@
 306,62, ,../resources/imagens/mnu_connect_server.gif
 306,62, ,../resources/imagens/mnu_host_game.gif
 306,62, ,../resources/imagens/mnu_exit.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-306,62, ,../resources/imagens/mnu_host_game.gif
-
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_01_legalizaDrogas.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_02_combateDrogas.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_03_reformaAgraria.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_04_investeLatifundios.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_05_autonomiaBC.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_06_regulaMercado.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_07_ampliaUniversidadesPublicas.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_08_privatizaUniversidadesPublicas.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_09_investeEnsinoFundamental.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_10_reduzMaioridadePenal.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_11_ampliaPoliticasSociais.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_12_reduzPoliticasSociais.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_13_protegeIndustriaNacional.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_14_reduzTarifaAlfandegaria.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_15_reformaPolitica.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_16_alca.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_17_preservaVerde.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_18_cotasUniversidades.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_19_descriminalizaAborto.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_20_regulaMidia.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_21_casamentoHomoafetivo.gif
+380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_22_impostoProporcional.gif
+115,83,../resources/imagens/lojaOk_MASK.gif,../resources/imagens/lojaOk.gif
+115,109,../resources/imagens/lojaReset_MASK.gif,../resources/imagens/lojaReset.gif
