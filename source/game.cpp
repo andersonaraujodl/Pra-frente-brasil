@@ -27,6 +27,7 @@
 #define BOUNCE 0.5
 #define SPEED_LIM_X 2000
 #define SPEED_LIM_Y 2000
+#define MAX_BONUS 0.2
 
 // typedefs privados ===========================================
 typedef struct{
@@ -51,6 +52,7 @@ int showCredits (float dt);
 float variaForca(float valor);
 int initLoja (float dt);
 void resetGame();
+void resetLoja();
 
 //Variáveis privadas ============================================
 game_object_type player1,player2, ground;
@@ -193,7 +195,7 @@ int initGame (float dt){
 	using namespace std;	
 	ifstream file(RESOURCES_ROOT);
 	int pos =0;
-	char data[3000];
+	char data[8000];
 	
 	while(file.good()){
 		data[pos] = file.get();
@@ -206,7 +208,7 @@ int initGame (float dt){
 	pch = strtok(data,",");//carrega o primeiro booleano
 	
 	for(int i = 0; i <NUM_OBJECTS_DEFINE; ++i){
-		static char temp[200],tempmsk[200], t_width[4], t_height[5];
+		static char temp[300],tempmsk[300], t_width[4], t_height[5];
 		
 
 		
@@ -237,10 +239,11 @@ int initGame (float dt){
 	// Inicializa o gráfico do player1
 	player1.graph = graphs_profiles[PLAYER1];
 	
-	for(int i = 0; i < NUM_BLOCKS;++i){
-		profile_collision_bonus[i] = 0.0;
 	
-	}
+	//inicializa o fator inicial de bonus
+	for(int i = 0; i < NUM_BLOCKS;++i)	profile_collision_bonus[i] = 0.0;
+	
+
 	
 	// Inicializa o gráfico do player2
 	player2.graph = graphs_profiles[PLAYER2];
@@ -260,6 +263,7 @@ int initGame (float dt){
 		menu_options[i].body.pos =	menu_pos;
 	}
 	
+	resetGame();
 
 
 	
@@ -398,28 +402,12 @@ int showMenu (float dt){
  */
 int initLoja (float dt){
 	
-	int coluna, j=0, linha;
 	
-		//Itens da loja
-	for(int i = 0; i < NUM_LOJA_MENU; ++i){
-		loja_options[i].graph = graphs_profiles[LOJA_OPTION_1 + i];
-		
-		if (i == NUM_LOJA_MENU-1){
-			coluna = graphs_profiles[LOJA_OPTION_1 + i].w *2 +200;
-			linha = (500)-(graphs_profiles[LOJA_OPTION_1 + i].h +10);}
-		else
-		if (i%2 == 0){
-			coluna = 20;
-			linha = (500)-(graphs_profiles[LOJA_OPTION_1 + i].h +10)*j;
-			j++;
-		}
-		else
-			coluna = graphs_profiles[LOJA_OPTION_1 + i].w +100;
-			
-		
-		vetor2d_type loja_pos{coluna,linha};
-		loja_options[i].body.pos =	loja_pos;
-	}
+	
+	for(int i = 0; i < NUM_BLOCKS;++i)	profile_collision_bonus[i] = 0.0;// reseta o bonus
+	
+				
+
 	
 	if(kbhit()){
 		getch();
@@ -430,26 +418,45 @@ int initLoja (float dt){
 }
 int showLoja (float dt){
 	
-	
-	int i, prim_select, segun_select, a=0;
+	static int selected = 0;
+	int i, a=0;
 	char texto[50];
-	float bonus[NUM_LOJA_MENU-1][NUM_BLOCKS] = {{0.1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{0.2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{0.3,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{0.4,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{0.5,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{0.6,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{0.7,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{0.8,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{0.9,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{1.1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
-												{1.2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0}
-												};
+	static game_object_type *moving_object = 0;
+	const float bonus[NUM_LOJA_MENU-1][NUM_BLOCKS] = {	{0.3,	0.0,	0.0,	0.0,	0.0,	-0.3,	0.3,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+														{0.0,	0.3,	0.0,	0.0,	0.0,	-0.3,	0.0,	0.0,	0.0,	0.1,	0.0,	-0.3,	0.0,	0.1,	0.0},
+														{0.0,	-0.3,	0.0,	0.0,	0.0,	0.2,	0.0,	0.0,	0.0,	0.0,	0.0,	-0.3,	0.0,	0.0,	0.0},
+														{0.0,	0.0,	0.0,	0.0,	-0.1,	0.0,	0.0,	0.0,	-0.1,	-0.3,	-0.1,	0.0,	0.0,	0.3,	0.3},
+														{0.0,	0.0,	0.0,	0.0,	0.2,	0.0,	0.0,	0.1,	0.1,	0.3,	0.1,	0.0,	0.0,	-0.3,	-0.3},
+														{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	-0.2,	-0.2,	0.0,	0.0,	0.0,	0.0,	0.3},
+														{0.0,	0.0,	-0.3,	0.0,	0.0,	0.0,	0.0,	-0.3,	-0.3,	-0.1,	0.0,	-0.1,	0.0,	0.0,	0.0},
+														{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.2,	0.2,	0.2,	-0.1,	0.0,	0.0,	0.0,	0.0},
+														{0.3,	0.1,	-0.1,	0.0,	0.0,	0.0,	0.3,	0.0,	0.0,	-0.1,	0.0,	-0.3,	-0.2,	0.3,	0.3},
+														{0.0,	0.0,	0.0,	0.3,	-0.1,	0.0,	0.0,	0.0,	-0.3,	-0.3,	0.0,	0.0,	0.0,	0.3,	0.0},
+														{0.3,	0.0,	-0.2,	0.3,	0.0,	-0.3,	0.3,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+														{0.1,	0.1,	0.0,	0.0,	0.0,	0.1,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.1,	0.1},
+														{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+														{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+														{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+														{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+														{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+														{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+														{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+														{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+														{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+														{0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0}
+														};
 												
 												
 	for(i=0;i < NUM_LOJA_MENU;i++)
         print(loja_options[i].body.pos,&loja_options[i].graph);
+
+	if(moving_object){
+		moving_object->body.pos.x -= 25;
+		
+		if( moving_object->body.pos.x< (0 - moving_object->graph.w)) moving_object=0;
+		
+		return 0;
+	}
 
 	for(int i = 0; i <= NUM_LOJA_MENU; ++i){
 		if(GetKeyState(VK_LBUTTON)&0x80){ //clique do mouse
@@ -468,20 +475,36 @@ int showLoja (float dt){
 					// Verifica os limites de y
 					if((mouse_pos.y < (int)loja_options[i].bottomLeft().y) || (mouse_pos.y > (int)loja_options[i].topRight().y)) continue;
 					// Retorna a opção do menu			
-					loja_options[i].body.pos.y = -100;
-					//carrega em profile_collision_bonus os valores selecionados
-					for(int u = 0; u <NUM_BLOCKS ; ++u){
-						 profile_collision_bonus[u] = profile_collision_bonus[u]+bonus[i][u];
-					}	
-					
-					return 1;
+					if(i == LOJA_OK - LOJA_OPTION_1) {
+						selected = 0;
+						return 1;
+					}
+					if(i == LOJA_RESET - LOJA_OPTION_1) {
+						resetLoja();
+						selected = 0;
+						return 0;
+					}
+					if(selected <2){
+						++selected;					
+						moving_object = &loja_options[i];
+						//carrega em profile_collision_bonus os valores selecionados
+						for(int u = 0; u <NUM_BLOCKS ; ++u){
+							profile_collision_bonus[u] = profile_collision_bonus[u]+bonus[i][u]*MAX_BONUS;
+							if(u == NUVEM_POLUICAO) profile_collision_bonus[u] = -1* MAX_BONUS;
+							
+							obstacles_weight[u] = obstacles_weight[u]-bonus[i][u];
+							
+							
+						}	
+					}
+				
 					
 					
 				}
 			}
 		}
 	}
-	delay(100);
+
 	return 0;
 } 
 
@@ -626,14 +649,7 @@ int loadSingleGame (float dt){
 	initObstacles();
 	
 	
-#ifdef ON_DEBUG	
-	// LIXO A SER RETIRADO
-	for(int i = 0; i < NUM_BLOCKS;++i){
-		profile_collision_bonus[i] = (float)(rand()%10)/10;
-		if(i%2) profile_collision_bonus[i] = -profile_collision_bonus[i];
-	}
-#endif
-	
+
 	
 	ground_offset = 0;
 	left_obstacles_index = 0;
@@ -719,6 +735,8 @@ int singleStep (float dt){
 	
 	setObstaclesRange(player1,left_index,right_index);
 	atualizaObjetos(player1,left_index,right_index);
+
+
 	if(green_aura_frames){
 		--green_aura_frames;
 		print(vetor2d_type{PLAYER_FIX_POS - ((green_aura.graph.w - player1.graph.w)/2),player1.body.pos.y - ((green_aura.graph.h - player1.graph.h)/2)},&green_aura.graph);
@@ -780,7 +798,8 @@ int singleStep (float dt){
 	left_index = 0; 
 	right_index = 0;
 	last_colide = -1;
-
+	red_aura_frames = 0;
+	green_aura_frames = 0;
 	total_score+= (int)(player1.body.pos.x - PLAYER_INIT_X)/50;
 	total_rounds--;
 	return 1;
@@ -828,6 +847,8 @@ int singleEnd(float dt){
 		
 		left_index = 0;
 		right_index = 0;
+		
+
 		return ret;
 		 
 	}
@@ -893,6 +914,8 @@ float variaForca(float valor){
 }
 
 void resetGame(){
+	
+
 	total_obstacles = 0;
 	total_score = 0; 
 	total_rounds = 5;	
@@ -902,4 +925,32 @@ void resetGame(){
 	player1.body.pos.y = PLAYER_INIT_Y;	
 	player1.body.speed.setVector(0,0);
 	ground_offset = 0;
+	resetLoja();	
+
+
+}
+
+void resetLoja(){
+	//Itens da loja
+	int coluna, linha, j=0;
+	for(int i = 0; i < NUM_LOJA_MENU; ++i){
+		loja_options[i].graph = graphs_profiles[LOJA_OPTION_1 + i];
+		
+		if (i == NUM_LOJA_MENU-2){
+			coluna = SCREEN_W -graphs_profiles[LOJA_OPTION_1 + i].w -20;
+			linha = (500)-(graphs_profiles[LOJA_OPTION_1 + i].h +10);}
+		else if (i == NUM_LOJA_MENU-1){
+			coluna = SCREEN_W -graphs_profiles[LOJA_OPTION_1 + i].w -20;
+			linha = (500)-(graphs_profiles[LOJA_OPTION_1 + i].h*2 +10);}
+		else if (i%2 == 0){
+			coluna = 20;
+			linha = (500)-(graphs_profiles[LOJA_OPTION_1 + i].h +10)*j;
+			j++;
+		} else
+			coluna = graphs_profiles[LOJA_OPTION_1 + i].w +100;
+			
+		
+		vetor2d_type loja_pos{coluna,linha};
+		loja_options[i].body.pos =	loja_pos;
+	}
 }

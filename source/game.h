@@ -29,6 +29,7 @@ void endGame (void);
 extern game_state_type *game_states;
 extern game_state_type load_menu_state;
 extern game_state_type menu_state;
+extern game_state_type load_loja;
 extern game_state_type pre_lancamento;
 extern game_state_type step_single;
 extern game_state_type load_single;
