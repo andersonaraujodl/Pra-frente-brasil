@@ -1478,9 +1478,9 @@ void exibirSeta (){
  */
 void mudarVelocidade(vetor2d_type *speed){
 	// aumenta a velocidade em 20%
-	speed->x = speed->x * 1.2;
+	speed->x = speed->x * 1.5;
 	
-	speed->y = speed->y * 1.2;
+	speed->y = speed->y * 1.5;
 	
 }
 
