@@ -12,10 +12,18 @@
 // Defines p�blicos ========================================
 #define SOCK_BUFF_LEN 64
 
+enum{
+	CONNECTION_REQ,
+	OBSTACLE_UPDATE,
+	PLAYER_STATUS,
+	WAINTING_GAME	
+};
+
 // Types P�blicos ==========================================
 typedef struct{
 	unsigned int pack_count;
 	unsigned int buff_size;
+	unsigned int operation;
 }pack_control_type;
 
 
@@ -26,8 +34,8 @@ typedef struct{
 }packet_type;
 
 // Prot�tipos p�blicos ======================================
-int initSocket (short port);
-int startClient (char *server_ip,short server_port);
+void setServerConfig (char *ip, short port);
+int initSocket ();
 int connectToServer();
 int waitClient (void);
 int getPacket (packet_type &pack);

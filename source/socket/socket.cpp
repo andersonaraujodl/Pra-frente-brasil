@@ -3,26 +3,46 @@
 *  \brief Funções de gerenciamento das conexões UDP
 */
 #include "socket.h"
-int m_socket;
+int m_socket = 0;
 sockaddr_in my_addr;
 sockaddr_in other_addr;
 int pack_counter = 0; /**< Contador de packeds enviados*/
- 
+
+short server_port;
+char server_ip[16];
+
+
+void setServerConfig (char *ip, short port){
+	server_port = port;
+	
+	strcpy(server_ip,ip);
+}
+
+
 /**
  *  @brief Função de inicialização dos sockets
  *  
  *  @return -1 erro
  */
-int initSocket (short port){
+int initSocket (){
+	
+	if(m_socket) return 0;
+	
 	WSADATA wsaData;
 	
 	if(WSAStartup(MAKEWORD(2,2),&wsaData) != NO_ERROR) return -1;
 	
 	if(!(m_socket = socket(AF_INET,SOCK_DGRAM,0))) return -1;
 	
+	// Inicializa o endereço da máquina
 	my_addr.sin_family = AF_INET;
 	my_addr.sin_addr.s_addr = INADDR_ANY;
-	my_addr.sin_port = htons(port);
+	my_addr.sin_port = htons(server_port);
+	
+	// Inicializa o endereço da outra
+	other_addr.sin_family = AF_INET;
+	other_addr.sin_addr.s_addr = inet_addr(server_ip);
+	other_addr.sin_port = htons(server_port);
 
 	if(bind(m_socket,(struct sockaddr *)&my_addr , sizeof(my_addr)) == SOCKET_ERROR)
 		return -1;
@@ -34,33 +54,19 @@ int initSocket (short port){
 	return 0;
 }
 
-/**
- *  @brief Brief
- *  
- *  @param [in] server_ip   IP do server no formato xxx.xxx.xxx.xxx
- *  @param [in] server_port Número da porta do server
- *  @return Return_Description
- */
-int startClient (char *server_ip,short server_port){
-		
-	other_addr.sin_family = AF_INET;
-	other_addr.sin_addr.s_addr = inet_addr(server_ip);
-	other_addr.sin_port = htons(server_port);
-}
-
 int connectToServer(){
 	packet_type p;
-	
-	strcpy(p.buff,"REQ CONECT");
-	
-	p.ctrl.buff_size = strlen("REQ CONECT");
-	sendPacket(p);
 	
 	if(getPacket(p)){
 		if(!(strcmp(p.buff,"CONNECT OK")))
 			return 1;
 	}
-
+	
+	strcpy(p.buff,"REQ CONECT");
+	p.ctrl.buff_size = strlen("REQ CONECT") +1; // Tamanho da string + terminador 0
+	p.ctrl.operation = CONNECTION_REQ;
+	sendPacket(p);
+	
 	return 0;
 }
 
@@ -78,6 +84,7 @@ int waitClient (void){
 		if(!strcmp(pack.buff,"REQ CONECT")){
 			strcpy(pack.buff,"CONNECT OK");
 			pack.ctrl.buff_size = strlen(pack.buff);
+			pack.ctrl.operation = CONNECTION_REQ;
 			sendPacket(pack);
 			
 			return 1;

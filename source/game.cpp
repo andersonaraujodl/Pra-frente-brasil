@@ -10,6 +10,7 @@
 #include "game.h"
 #include "graph/grafico.h"
 #include "physics/physics.h"
+#include "socket/socket.h"
 #include <stdlib.h>
 #include <conio.h>
 #include <iostream>
@@ -22,6 +23,7 @@
 #define PLAYER_INIT_X 10 /**< Posição incial do player em x*/
 #define PLAYER_INIT_Y 0  /**< Posição incial do player em y*/
 #define RESOURCES_ROOT "../resources/data/img_data.cvs"
+#define SERVER_CONF_PATH "../resources/data/server.inf"
 
 #define ATRITO 50
 #define BOUNCE 0.5
@@ -42,9 +44,16 @@ int initGame (float dt);
 int initMenu (float dt);
 int showMenu (float dt);
 int showLoja (float dt);
+int initServer (float dt);
+int serverSendObstacles (float dt);
+int initClient (float dt);
+int clientGetObstacles (float dt);
 int loadSingleGame (float dt);
+int setLaunchVector (game_object_type &ref);
 int preLancamento (float dt);
+int preLancamentoMult (float dt);
 int singleStep (float dt);
+int multiStep (float dt);
 void floorCheck(game_object_type *player);
 void groundStep(game_object_type *objeto, game_object_type *ground, float dt);
 int singleEnd(float dt);
@@ -96,8 +105,8 @@ game_state_type menu_state ={
 	(game_state_type*[]){
 		&menu_state,		 // return 0
 		&load_single, 	 // return 1
-		&termina_programa,		 // return 2	
-		&termina_programa,		 // return 3
+		&client_conect,		 // return 2	
+		&server_conect,		 // return 3
 		&termina_programa // return 4
 	}
 };
@@ -176,6 +185,128 @@ game_state_type termina_programa ={
 /**
 *  
 */
+game_state_type server_conect ={
+	initServer,
+	(game_state_type*[]){
+		&server_conect,
+		&server_obstacles
+	}
+};
+/**
+*  
+*/
+game_state_type client_conect ={
+	initClient,
+	(game_state_type*[]){
+		&client_conect,
+		&client_obstacles
+	}
+};
+/**
+*  
+*/
+game_state_type server_obstacles ={
+	serverSendObstacles,
+	(game_state_type*[]){
+		&server_obstacles,
+		&server_prelancamento
+	}
+};
+/**
+*  
+*/
+game_state_type client_obstacles ={
+	clientGetObstacles,
+	(game_state_type*[]){
+		&client_obstacles,
+		&client_prelancamento
+	}
+};
+
+game_state_type server_prelancamento ={
+	preLancamentoMult,
+	(game_state_type*[]){
+		&server_prelancamento,
+		&step_server
+	}
+};
+
+game_state_type client_prelancamento ={
+	preLancamentoMult,
+	(game_state_type*[]){
+		&client_prelancamento,
+		&step_client
+	}
+};
+
+game_state_type step_server ={
+	multiStep,
+	(game_state_type*[]){
+		&step_server,	 // return 0
+		&end_server     // return 1
+	}
+};
+
+game_state_type step_client ={
+	multiStep,
+	(game_state_type*[]){
+		&step_client,	 // return 0
+		&end_client     // return 1
+	}
+};
+
+game_state_type end_server ={
+	singleEnd,
+	(game_state_type*[]){
+		&end_server,	 // return 0
+		&load_loja_server,	 // return 1
+		&load_menu_state // return 2
+	}
+};
+
+game_state_type end_client ={
+	singleEnd,
+	(game_state_type*[]){
+		&end_client,	 // return 0
+		&load_loja_client,	 // return 1
+		&load_menu_state // return 2
+	}
+};
+
+game_state_type load_loja_server ={
+	initLoja,
+	(game_state_type*[]){
+		&load_loja_server,	 // return 0
+		&loja_server	 // return 1
+	}
+};
+
+game_state_type load_loja_client ={
+	initLoja,
+	(game_state_type*[]){
+		&load_loja_client,	 // return 0
+		&loja_client	 // return 1
+	}
+};
+
+game_state_type loja_server ={
+	showLoja,
+	(game_state_type*[]){
+		&loja_server,	 // return 0
+		&server_obstacles	 // return 1
+	}
+};
+
+game_state_type loja_client ={
+	showLoja,
+	(game_state_type*[]){
+		&loja_client,	 // return 0
+		&client_obstacles	 // return 1
+	}
+};
+/**
+*  
+*/
 game_state_type *game_states =  &load_state;
 
 static void debugTrace (char *msg){
@@ -193,15 +324,18 @@ int initGame (float dt){
 	
 	// FAZER LOAD DO ARQUIVO COM OS NOMES DAS IMAGENS ==========
 	using namespace std;	
-	ifstream file(RESOURCES_ROOT);
-	int pos =0;
+	int f_index =0;
 	char data[8000];
 	
-	while(file.good()){
-		data[pos] = file.get();
-		pos++;
+	{// Truque para deixar o tempo de vida do file mínima
+		ifstream file(RESOURCES_ROOT);
+		while(file.good()){
+			data[f_index] = file.get();
+			f_index++;
+		}
+		file.close();
 	}
-	data[pos] = '\0';
+	data[f_index] = '\0';
 	
 	char * pch;
 		
@@ -273,6 +407,23 @@ int initGame (float dt){
 	
 	//carrega lista de pesos dos objetos
 	for(int i = 0; i < NUM_BLOCKS; i++) obstacles_weight[i] = 1;
+	
+	f_index =0;
+	{// Truque para deixar o tempo de vida do file mínima
+		ifstream file(SERVER_CONF_PATH);
+		while(file.good()){
+			data[f_index] = file.get();
+			f_index++;
+		}
+		file.close();
+	}
+	data[f_index] = '\0';
+	
+	char *ip = strtok(data,":");
+	pch = strtok(NULL,":");
+	short port = strtoul(pch,0,10);
+	
+	setServerConfig(ip,port);
 	
 	
 	return 1;
@@ -401,13 +552,8 @@ int showMenu (float dt){
  *  @details Details
  */
 int initLoja (float dt){
-	
-	
-	
+		
 	for(int i = 0; i < NUM_BLOCKS;++i)	profile_collision_bonus[i] = 0.0;// reseta o bonus
-	
-				
-
 	
 	if(kbhit()){
 		getch();
@@ -564,24 +710,220 @@ void initObstacles (void){
 /**
  *  @brief Brief
  *  
+ *  @param [in] dt Parameter_Description
  *  @return Return_Description
  *  
  *  @details Details
  */
-void loadMultiGame (void){
-
+int initServer (float dt){
+	initSocket();
+	
+	char texto[] = "Wating for client";
+	printTxt(texto, vetor2d_type{(SCREEN_W/2)-(textwidth(texto)/2), SCREEN_H/2});
+	
+	
+	if(!waitClient()) return 0;
+	
+	return 1;
 }
 
 /**
  *  @brief Brief
  *  
+ *  @param [in] dt Parameter_Description
  *  @return Return_Description
  *  
  *  @details Details
  */
-void connectToServer (void){
+int serverSendObstacles (float dt){
 
+	static bool new_round = true;
+
+	if(new_round){
+		initObstacles();
+		new_round = false;
+	}
+	
+	char texto[] = "Loading Map";
+	printTxt(texto, vetor2d_type{(SCREEN_W/2)-(textwidth(texto)/2), SCREEN_H/2});
+	
+	packet_type resp;
+	if(getPacket(resp) > 0){
+		if(resp.ctrl. operation == OBSTACLE_UPDATE){
+			union{
+				short i_16;
+				char i_8[2];
+			};
+			
+			// Converte o 8 bits em 16. (altamente inseguro devido os diferentes endiands entre máquinas
+			i_8[0] = resp.buff[0];
+			i_8[1] = resp.buff[1];
+		
+			// Preenche as informações sobre o obstaculo
+			gam_obj_pack_type obst{
+					world_obstacles[i_16].profile,
+					world_obstacles[i_16].body.pos.x,
+					world_obstacles[i_16].body.pos.y,
+					0
+			};
+			// Prepara o packed de resposta
+			packet_type resp{
+				{
+					0,
+					(sizeof(gam_obj_pack_type)+2),
+					OBSTACLE_UPDATE
+				},
+				{}
+			};
+			
+			memcpy(&resp.buff[2],&obst,sizeof(gam_obj_pack_type));
+			resp.buff[0] = i_8[0];
+			resp.buff[1] = i_8[1];
+			sendPacket(resp);	
+		}
+		else if(resp.ctrl. operation == WAINTING_GAME){
+			player1.body.pos.x = PLAYER_INIT_X;
+			player1.body.pos.y = PLAYER_INIT_Y;
+			
+			player2.body.pos.x = PLAYER_INIT_X;
+			player2.body.pos.y = PLAYER_INIT_Y;
+	
+			return 1;
+		}
+	}
+	return 0;
 }
+
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] dt Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
+int initClient (float dt){
+	#define RELOAD_RETRY 0.8
+	static float retry_time =0.0;
+	initSocket();
+		
+	retry_time -= dt;
+	if(retry_time <= 0){
+		if(connectToServer()){
+			debugTrace("Conected");
+			return 1;
+		}
+		retry_time = RELOAD_RETRY;
+	}
+	
+/*	char texto[] = "Searching Server";
+	printTxt(texto, vetor2d_type{(SCREEN_W/2)-(textwidth(texto)/2), SCREEN_H/2});
+	*/
+	
+	return 0;
+}
+
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] dt Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
+int clientGetObstacles (float dt){
+	static bool new_round = true;
+	
+	if(new_round){
+		debugTrace("clientGetObstacles: new_round");
+		
+		memset(world_obstacles,0,sizeof(game_object_type) * MAX_OBSTACLES);
+		new_round = false;
+	}
+	
+	char texto[] = "Loading Map";
+	printTxt(texto, vetor2d_type{(SCREEN_W/2)-(textwidth(texto)/2), SCREEN_H/2});
+	
+	packet_type resp;
+	if(getPacket(resp) > 0){
+		if(resp.ctrl. operation == OBSTACLE_UPDATE){
+		
+			union{
+				short i_16;
+				char i_8[2];
+			};
+			
+			// Converte o 8 bits em 16. (altamente inseguro devido os diferentes endiands entre máquinas
+			i_8[0] = resp.buff[0];
+			i_8[1] = resp.buff[1];
+			
+			world_obstacles[i_16].profile = ((gam_obj_pack_type *)(&resp.buff[2]))->profile;  // profile
+			world_obstacles[i_16].body.pos.x = ((gam_obj_pack_type *)(&resp.buff[2]))->pos_x; // posição x
+			world_obstacles[i_16].body.pos.y = ((gam_obj_pack_type *)(&resp.buff[2]))->pos_y; // posição y
+			world_obstacles[i_16].graph = graphs_profiles[world_obstacles[i_16].profile];
+		}	
+	}
+	
+	#define RELOAD_RETRY (1.0/30.0) *2.0
+	static float retry_time =0.0;
+	retry_time -= dt;
+	if(retry_time <= 0){
+		for(short i =0; i <  MAX_OBSTACLES;++i){
+			if(!world_obstacles[i].graph.img){
+				
+				// Converte o 8 bits em 16. (altamente inseguro devido os diferentes endiands entre máquinas
+				
+				union{
+					short i_16;
+					char i_8[2];
+				};
+				i_16 =i;
+				packet_type req = {
+					{
+						0, // a função de send se preocupa com o pack count
+						2, // Só transmitirá 2 bytes de buffer
+						OBSTACLE_UPDATE //
+					},
+					{i_8[0],i_8[1]} // O indice do objeto faltante
+				};
+				
+				sendPacket(req);
+				
+				#ifdef ON_DEBUG
+					char buff [30];
+					sprintf(buff,"Request obstacle %d",i);
+					debugTrace(buff);
+				#endif
+				retry_time = RELOAD_RETRY;
+				return 0;
+			}
+		}
+		
+	}
+	else return 0;
+	packet_type req{
+		{
+			0,
+			0,
+			WAINTING_GAME
+		},
+		{}
+	
+	};
+	sendPacket(req);	
+	
+	player1.body.pos.x = PLAYER_INIT_X;
+	player1.body.pos.y = PLAYER_INIT_Y;
+	
+	player2.body.pos.x = PLAYER_INIT_X;
+	player2.body.pos.y = PLAYER_INIT_Y;
+	
+	new_round = true;
+	debugTrace("clientGetObstacles: loading finished");
+	return 1;
+	
+}
+
 
 /**
  *  @brief Acha quais são os objetos de fronteira em relação ao objeto referência
@@ -664,6 +1006,18 @@ int loadSingleGame (float dt){
 }
 
 /**
+ *  @brief Brief
+ *  
+ *  @param [in] ref Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
+int setLaunchVector (game_object_type &ref){
+
+}
+
+/**
 *	@brief Estado no qual o jogo aguarda o jogador escolher o ângulo e 
 *	o momento em que ele deseja lançar o player1.
 *
@@ -710,8 +1064,28 @@ int preLancamento (float dt){
 	groundStep( &player1, &ground,dt);	
 	atualizaObjetos(player1,0,0);
 	printDirection(vetor2d_type{player1.body.pos.x+(player1.graph.w/2) ,player1.body.pos.y+(player1.graph.h/2)}, angulo,300);
-
 	return 0; // preLancamento
+}
+
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] dt Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
+int preLancamentoMult (float dt){
+	
+	packet_type player_pos;
+	if(getPacket(player_pos) > 0){
+		if(player_pos.ctrl. operation == PLAYER_STATUS){
+			player2.body.pos.x = ((gam_obj_pack_type *)(&player_pos.buff[0]))->pos_x; // posição x
+			player2.body.pos.y = ((gam_obj_pack_type *)(&player_pos.buff[0]))->pos_y; // posição y
+		}
+	}
+	print(player2.body.pos,&player2.graph);
+	return preLancamento(dt);
 }
 
 /**
@@ -759,7 +1133,7 @@ int singleStep (float dt){
 					green_aura_frames = 30;
 					red_aura_frames = 0;
 				}
-				else if(profile_collision_bonus[world_obstacles[i].profile]<=0){
+				else if(profile_collision_bonus[world_obstacles[i].profile]<0){
 					player1.body.speed.x *= 0.9 + profile_collision_bonus[world_obstacles[i].profile];
 					player1.body.speed.y*= 0.9 + profile_collision_bonus[world_obstacles[i].profile];
 					
@@ -803,6 +1177,50 @@ int singleStep (float dt){
 	total_score+= (int)(player1.body.pos.x - PLAYER_INIT_X)/50;
 	total_rounds--;
 	return 1;
+}
+
+int multiStep (float dt){
+		
+	// Envia a posição do player1 =====================================
+	#define RELOAD_RETRY (1.0/30.0) * 2 // De certa forma dá lag mas evita overflow na rede
+	static float retry_time =0.0;
+	retry_time -= dt;
+	if(retry_time <= 0){
+	
+		packet_type report = {
+			{
+				0, // a função de send se preocupa com o pack count
+				sizeof(gam_obj_pack_type),
+				PLAYER_STATUS //
+			},
+			{}
+		};
+		
+		gam_obj_pack_type player_pos{
+				player1.profile,
+				player1.body.pos.x,
+				player1.body.pos.y,
+				player1.body.speed.modulo()
+		};
+				
+		memcpy(&report.buff[0],&player_pos,sizeof(gam_obj_pack_type));
+		sendPacket(report);
+		retry_time = RELOAD_RETRY;
+	}
+	// =================================================================
+	packet_type player2_pos;
+	if(getPacket(player2_pos) > 0){
+		if(player2_pos.ctrl. operation == PLAYER_STATUS){
+			player2.body.pos.x = ((gam_obj_pack_type *)(&player2_pos.buff[0]))->pos_x; // posição x
+			player2.body.pos.y = ((gam_obj_pack_type *)(&player2_pos.buff[0]))->pos_y; // posição y
+		}
+	}
+	
+	if(((player2.body.pos.x + player2.graph.w) > player1.body.pos.x - PLAYER_FIX_POS) &&
+	   (player2.body.pos.x < player1.body.pos.x +(SCREEN_W - PLAYER_FIX_POS)))
+		print(player2.body.pos,&player2.graph);
+	
+	return singleStep(dt);
 }
 
 /**
