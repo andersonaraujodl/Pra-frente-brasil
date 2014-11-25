@@ -86,7 +86,7 @@ typedef struct
 	int profile; /**< Máscara para a análise de colisões entre objetos*/
 	
 	vetor2d_type bottomLeft() {return this->body.pos;}
-	vetor2d_type topRight() { return vetor2d_type{this->body.pos.x + this->graph.w,this->body.pos.y + this->graph.h};}
+	vetor2d_type topRight() { return vetor2d_type{this->body.pos.x + this->graph.w, this->body.pos.y + this->graph.h }; }
 	
 	
 }game_object_type;
