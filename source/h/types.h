@@ -91,6 +91,14 @@ typedef struct
 	
 }game_object_type;
 
+typedef struct{
+	int profile;
+	float pos_x;
+	float pos_y;
+	float speed_module;
+}gam_obj_pack_type;
+
+
 /**
 * Enumeração dos bloqueios encontrados durante o jogo
 * 

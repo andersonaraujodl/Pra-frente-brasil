@@ -34,5 +34,18 @@ extern game_state_type pre_lancamento;
 extern game_state_type step_single;
 extern game_state_type load_single;
 extern game_state_type termina_programa;
-
+extern game_state_type server_conect;
+extern game_state_type client_conect;
+extern game_state_type server_obstacles;
+extern game_state_type client_obstacles;
+extern game_state_type server_prelancamento;
+extern game_state_type client_prelancamento;
+extern game_state_type step_server;
+extern game_state_type step_client;
+extern game_state_type end_server;
+extern game_state_type end_client;
+extern game_state_type load_loja_server;
+extern game_state_type load_loja_client;
+extern game_state_type loja_server;
+extern game_state_type loja_client;
 #endif
