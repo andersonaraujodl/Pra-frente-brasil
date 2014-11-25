@@ -97,10 +97,7 @@ typedef struct
 * @todo Definir os bloqueios finais
 */
 enum{
-/*	MIDIA,
-	CLASSE_MEDIA,
-	MONTADORAS,
-*/
+
 	FEMINISTAS,
 	LEGALIZACAO,
 	CONGRESSO,
@@ -115,8 +112,9 @@ enum{
 	MILITARES,
 	COMUNICACAO,
 	ECOLOGIA,
+	ESCOLA,
 	
-	MTST, // Deixar esse por último dos blocks
+	MST, // Deixar esse por último dos blocks
 	
 	GROUND,
 	PLAYER1,
@@ -152,6 +150,12 @@ enum{
 	LOJA_OPTION_22,
 	LOJA_OK,
 	LOJA_RESET,
+	SETA_CIMA_P1,
+	SETA_DIREITA_P1,
+	SETA_ESQUERDA_P1,
+	SETA_CIMA_P2,
+	SETA_DIREITA_P2,
+	SETA_ESQUERDA_P2,
 	//imagens antes do NUM_OBJECTS_DEFINE
 	NUM_OBJECTS_DEFINE
 
@@ -160,7 +164,7 @@ enum{
 /**
  *  Quantidade de Objetos - o player
  */
-#define NUM_BLOCKS (MTST +1)
+#define NUM_BLOCKS (MST +1)
 #define NUM_OPTIONS_MENU 4
 #define NUM_LOJA_MENU 24
 #define ON_DEBUG

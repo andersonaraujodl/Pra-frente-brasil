@@ -29,6 +29,8 @@
 #define SPEED_LIM_Y 2000
 #define MAX_BONUS 0.2
 
+#define POWER_UP_UNITS 1
+
 // typedefs privados ===========================================
 typedef struct{
 	char *file_name;
@@ -53,6 +55,8 @@ float variaForca(float valor);
 int initLoja (float dt);
 void resetGame();
 void resetLoja();
+void exibirSeta();
+void mudarVelocidade(vetor2d_type *speed);
 
 //Variáveis privadas ============================================
 game_object_type player1,player2, ground;
@@ -423,28 +427,28 @@ int showLoja (float dt){
 	static game_object_type *moving_object = 0;
 	static game_object_type *moving_pairobject = 0;
 	const int pairpolitics[] = {1,0,3,2,5,4,7,6,9,8,11,10,13,12,-1,-1,-1,-1,-1,-1,-1,-1};
-	const float bonus[NUM_LOJA_MENU-1][NUM_BLOCKS] = {	{0.0,	1.0,	0.0,	0.5,	0.0,	-1.0,	0.0,	0.5,	0.0,	0.0,	0.0,	-1.0,	0.0,	0.0,	0.0},
-														{0.0,	-1.0,	0.0,	0.0,	0.0,	0.5,	0.0,	0.0,	0.0,	0.0,	0.0,	1.0,	0.0,	0.0,	0.0},
-														{0.0,	0.0,	0.0,	0.5,	0.5,	0.0,	0.0,	-1.0,	0.0,	-1.0,	0.0,	0.0,	0.0,	0.5,	1.0},
-														{0.0,	0.0,	0.0,	-0.5,	2.0,	0.0,	0.0,	1.0,	0.0,	1.0,	0.0,	0.0,	0.0,	-1.0,	-1.0},
-														{-0.5,	-0.5,	-0.5,	0.0,	0.0,	0.0,	-0.5,	1.0,	1.0,	0.0,	1.0,	0.0,	0.0,	-0.5,	-0.5},
-														{0.5,	0.5,	0.5,	0.0,	0.0,	0.0,	0.5,	-1.0,	-1.0,	0.0,	-1.0,	0.0,	0.0,	0.5,	0.5},
-														{0.5,	0.5,	0.0,	0.0,	0.0,	0.0,	0.5,	-0.5,	0.0,	0.0,	0.0,	0.0,	-0.5,	0.5,	0.5},
-														{-0.5,	-0.5,	0.0,	0.0,	0.0,	0.0,	-0.5,	0.5,	0.0,	0.0,	0.0,	0.0,	0.5,	-0.5,	-0.5},
-														{0.5,	-0.5,	0.0,	0.0,	0.5,	0.0,	0.5,	0.0,	0.0,	0.0,	0.0,	0.0,	-0.5,	0.5,	0.0},
-														{0.0,	-1.0,	0.0,	0.0,	0.0,	0.5,	0.0,	0.0,	0.0,	0.0,	0.0,	1.0,	0.0,	0.0,	0.0},
-														{1.0,	1.0,	-1.0,	0.5,	0.0,	0.0,	1.0,	-0.5,	0.5,	0.0,	0.0,	0.0,	0.0,	1.0,	1.0},
-														{-1.0,	-1.0,	-1.0,	-0.5,	0.0,	0.0,	-1.0,	0.5,	-0.5,	0.0,	0.0,	0.0,	0.0,	-1.0,	-1.0},
-														{0.0,	0.5,	0.5,	0.0,	1.5,	0.0,	-0.5,	-1.0,	1.0,	1.0,	-1.0,	0.0,	0.0,	-0.5,	0.0},
-														{0.0,	-0.5,	0.5,	0.0,	0.0,	0.0,	0.5,	1.0,	-1.0,	-1.0,	1.0,	0.0,	0.0,	0.0,	0.0},
-														{0.5,	0.5,	-1.0,	0.0,	0.0,	0.0,	0.5,	-0.5,	0.0,	0.0,	0.0,	0.0,	-0.5,	0.5,	0.5},
-														{-0.5,	-0.5,	0.0,	0.0,	0.0,	0.0,	-0.5,	1.0,	-1.0,	0.5,	1.0,	0.0,	0.0,	-0.5,	-0.5},
-														{0.0,	0.0,	0.0,	1.0,	0.5,	0.0,	0.0,	0.0,	0.0,	-1.0,	0.0,	0.0,	0.0,	1.0,	0.0},
-														{0.5,	0.5,	-0.5,	0.0,	0.0,	0.0,	0.5,	0.0,	0.0,	0.0,	0.0,	0.0,	-0.5,	0.5,	0.5},
-														{1.0,	0.0,	0.0,	1.0,	0.0,	-1.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
-														{1.0,	0.5,	-1.0,	0.0,	0.0,	-0.5,	1.0,	0.0,	0.0,	0.0,	-1.0,	0.0,	-1.0,	0.0,	0.5},
-														{0.5,	0.0,	0.0,	0.0,	0.0,	-1.0,	1.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
-														{1.0,	1.0,	-1.0,	0.0,	0.0,	0.0,	1.0,	-1.0,	0.0,	0.0,	-1.0,	0.0,	-0.5,	1.0,	1.0}
+	const float bonus[NUM_LOJA_MENU-1][NUM_BLOCKS] = {	{0.0,	1.0,	0.0,	0.5,	0.0,	-1.0,	0.0,	0.5,	0.0,	0.0,	0.0,	-1.0,	0.0,	0.0,	0.0,	0.0},
+														{0.0,	-1.0,	0.0,	0.0,	0.0,	0.5,	0.0,	0.0,	0.0,	0.0,	0.0,	1.0,	0.0,	0.0,	0.0,	0.0},
+														{0.0,	0.0,	0.0,	0.5,	0.5,	0.0,	0.0,	-1.0,	0.0,	-1.0,	0.0,	0.0,	0.0,	0.5,	0.0,	1.0},
+														{0.0,	0.0,	0.0,	-0.5,	2.0,	0.0,	0.0,	1.0,	0.0,	1.0,	0.0,	0.0,	0.0,	-1.0,	0.0,	-1.0},
+														{-0.5,	-0.5,	-0.5,	0.0,	0.0,	0.0,	-0.5,	1.0,	1.0,	0.0,	1.0,	0.0,	0.0,	-0.5,	0.0,	-0.5},
+														{0.5,	0.5,	0.5,	0.0,	0.0,	0.0,	0.5,	-1.0,	-1.0,	0.0,	-1.0,	0.0,	0.0,	0.5,	0.0,	0.5},
+														{0.5,	0.5,	0.0,	0.0,	0.0,	0.0,	0.5,	-0.5,	0.0,	0.0,	0.0,	0.0,	-0.5,	0.5,	1.0,	0.5},
+														{-0.5,	-0.5,	0.0,	0.0,	0.0,	0.0,	-0.5,	0.5,	0.0,	0.0,	0.0,	0.0,	0.5,	-0.5,	-1.0,	-0.5},
+														{0.5,	-0.5,	0.0,	0.0,	0.5,	0.0,	0.5,	0.0,	0.0,	0.0,	0.0,	0.0,	-0.5,	0.5,	1.0,	0.0},
+														{0.0,	-1.0,	0.0,	0.0,	0.0,	0.5,	0.0,	0.0,	0.0,	0.0,	0.0,	1.0,	0.0,	0.0,	-1.0,	0.0},
+														{1.0,	1.0,	-1.0,	0.5,	0.0,	0.0,	1.0,	-0.5,	0.5,	0.0,	0.0,	0.0,	0.0,	1.0,	0.5,	1.0},
+														{-1.0,	-1.0,	-1.0,	-0.5,	0.0,	0.0,	-1.0,	0.5,	-0.5,	0.0,	0.0,	0.0,	0.0,	-1.0,	-0.5,	-1.0},
+														{0.0,	0.5,	0.5,	0.0,	1.5,	0.0,	-0.5,	-1.0,	1.0,	1.0,	-1.0,	0.0,	0.0,	-0.5,	0.0,	0.0},
+														{0.0,	-0.5,	0.5,	0.0,	0.0,	0.0,	0.5,	1.0,	-1.0,	-1.0,	1.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+														{0.5,	0.5,	-1.0,	0.0,	0.0,	0.0,	0.5,	-0.5,	0.0,	0.0,	0.0,	0.0,	-0.5,	0.5,	1.0,	0.5},
+														{-0.5,	-0.5,	0.0,	0.0,	0.0,	0.0,	-0.5,	1.0,	-1.0,	0.5,	1.0,	0.0,	0.0,	-0.5,	0.0,	-0.5},
+														{0.0,	0.0,	0.0,	1.0,	0.5,	0.0,	0.0,	0.0,	0.0,	-1.0,	0.0,	0.0,	0.0,	1.0,	0.0,	0.0},
+														{0.5,	0.5,	-0.5,	0.0,	0.0,	0.0,	0.5,	0.0,	0.0,	0.0,	0.0,	0.0,	-0.5,	0.5,	1.0,	0.5},
+														{1.0,	0.0,	0.0,	1.0,	0.0,	-1.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+														{1.0,	0.5,	-1.0,	0.0,	0.0,	-0.5,	1.0,	0.0,	0.0,	0.0,	-1.0,	0.0,	-1.0,	0.0,	0.5,	0.5},
+														{0.5,	0.0,	0.0,	0.0,	0.0,	-1.0,	1.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0,	0.0},
+														{1.0,	1.0,	-1.0,	0.0,	0.0,	0.0,	1.0,	-1.0,	0.0,	0.0,	-1.0,	0.0,	-0.5,	1.0,	1.0,	1.0}
 														};
 												
 												
@@ -535,12 +539,22 @@ void initObstacles (void){
 		total_obstacles+=max_obstacles_per_type[i];
 	}
 	
-	//testa se o total de obstaculos previstos ultrapassa o numero maximo do sistema
-	if(total_obstacles> MAX_OBSTACLES)
-		total_obstacles= MAX_OBSTACLES;
+	//garante que o número de obstáculos seja sempre MAX_OBSTACLES
+	int z = 0;
+	while(total_obstacles<MAX_OBSTACLES){
+		if(z!=CONGRESSO ){
+			max_obstacles_per_type[z]++;
+			total_obstacles++;
+			
+		}
+		z++;
+		if(z>=NUM_BLOCKS)	 z=0;
+	}
+	
+
 	//	
 	int obstacles_defined = 0;
-	while(obstacles_defined < total_obstacles){
+	while(obstacles_defined < NUM_BLOCKS){
 
 		// Randomiza qual o perfil (tipo) de obstáculo ele será, Igreja, nuvem....
 		unsigned int obj_profile = (rand() % NUM_BLOCKS);
@@ -735,6 +749,10 @@ int singleStep (float dt){
 	static int last_colide = -1;
 	static int red_aura_frames = 0;
 	static int green_aura_frames = 0;
+	static int show_power = 0;
+	static char power_msg[100] = "";
+	static int boost = POWER_UP_UNITS;
+	static int angle = POWER_UP_UNITS;
 	
 	lancamento(&player1,dt);
 	floorCheck(&player1);
@@ -754,8 +772,31 @@ int singleStep (float dt){
 		--red_aura_frames;
 		print(vetor2d_type{PLAYER_FIX_POS - ((red_aura.graph.w - player1.graph.w)/2),player1.body.pos.y  - ((red_aura.graph.h - player1.graph.h)/2)},&red_aura.graph);
 	}
-
 	
+
+		// verifica se o player saiu da tela:
+	if (player1.body.pos.y > SCREEN_H){
+		exibirSeta();
+	}
+	
+	if(kbhit()){
+		char key = getch();
+		
+		if ((key == 's' || key == 'S') && (boost>0)){
+			mudarVelocidade(&player1.body.speed);
+			sprintf(power_msg,"Apoio Popular!");
+			show_power = 30;
+			boost--;
+		}
+		
+		if ((key == 'a' || key == 'A') && (angle>0)){
+			player1.body.speed.setVector(player1.body.speed.modulo(), 45);
+			sprintf(power_msg,"Distribuição de Renda!");
+			show_power = 30;
+			angle--;
+		}
+	}
+	//std::cout<<"vel x = "<<player1.body.speed.x<<" e vel y = "<<player1.body.speed.y<<std::endl;
 	for(int i = left_index; i <= right_index;++i){
 		if(last_colide < i){ // Maior pois o player nunca anda para trás
 			if(colide(player1,world_obstacles[i])){
@@ -795,6 +836,13 @@ int singleStep (float dt){
 	fontSize(1);
 	printTxt(texto, vetor2d_type{SCREEN_W-(textwidth(texto)+20), 20});
 	
+	if(show_power){
+		setcolor(COLOR(255,0,0));
+		fontSize(3);
+		printTxt(power_msg, vetor2d_type{(SCREEN_W/2)-(textwidth(power_msg)/2), SCREEN_H/2-(textheight(power_msg)+20)});
+		show_power--;
+	}
+	
 	if(player1.body.speed.modulo())
 		return 0;     //singleStep
 
@@ -810,6 +858,8 @@ int singleStep (float dt){
 	green_aura_frames = 0;
 	total_score+= (int)(player1.body.pos.x - PLAYER_INIT_X)/50;
 	total_rounds--;
+	boost = POWER_UP_UNITS;
+	angle = POWER_UP_UNITS;
 	return 1;
 }
 
@@ -846,7 +896,7 @@ int singleEnd(float dt){
 	fontSize(5);
 	printTxt(texto, vetor2d_type{(SCREEN_W/2)-(textwidth(texto)/2), SCREEN_H/2});
 
-	if(kbhit()){
+	if(kbhit()) {
 		
 		if(ret == 2){
 			total_score = 0;
@@ -903,7 +953,14 @@ void groundStep(game_object_type *objeto, game_object_type *ground, float dt){
 		print(vetor2d_type{posground, ground->body.pos.y}, &ground->graph);
 	}	
 }
-
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] dt Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
 float variaForca(float valor){
 	static float incremento = 0.02;
 
@@ -920,7 +977,14 @@ float variaForca(float valor){
 	return valor;	
 	
 }
-
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] dt Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
 void resetGame(){
 	
 
@@ -939,7 +1003,14 @@ void resetGame(){
 	for(int i = 0; i < NUM_BLOCKS;++i)	profile_collision_bonus[i] = 0.0;
 
 }
-
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] dt Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
 void resetLoja(){
 	//Itens da loja
 	int coluna, linha, j=0;
@@ -964,3 +1035,31 @@ void resetLoja(){
 		loja_options[i].body.pos =	loja_pos;
 	}
 }
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] dt Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
+void exibirSeta (){
+	print(vetor2d_type { (player1.body.pos.x< PLAYER_FIX_POS)?player1.body.pos.x: PLAYER_FIX_POS, SCREEN_H - graphs_profiles[SETA_CIMA_P1].h-10}, &graphs_profiles[SETA_CIMA_P1]);
+}
+/**
+ *  @brief Brief
+ *  
+ *  @param [in] dt Parameter_Description
+ *  @return Return_Description
+ *  
+ *  @details Details
+ */
+void mudarVelocidade(vetor2d_type *speed){
+	// aumenta a velocidade em 20%
+	speed->x = speed->x * 1.2;
+	
+	speed->y = speed->y * 1.2;
+	
+}
+
+

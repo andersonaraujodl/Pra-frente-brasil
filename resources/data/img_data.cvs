@@ -12,6 +12,7 @@
 152,77,../resources/imagens/militares_MASK.gif,../resources/imagens/militares.gif
 157,350,../resources/imagens/comunicacao_MASK.gif,../resources/imagens/comunicacao.gif
 287,100,../resources/imagens/mob_ecologia_MASK.gif,../resources/imagens/mob_ecologia.gif	
+169,121,../resources/imagens/escola_MASK.gif,../resources/imagens/escola.gif
 165,57,../resources/imagens/mob_mtst_MASK.gif,../resources/imagens/mob_mtst.gif
 200,10, ,../resources/imagens/ground.gif
 55,55,../resources/imagens/players_mask.gif,../resources/imagens/player1.gif
@@ -47,3 +48,9 @@
 380,27,../resources/imagens/optLoja_single_MASK.gif,../resources/imagens/optLoja_22_impostoProporcional.gif
 115,83,../resources/imagens/lojaOk_MASK.gif,../resources/imagens/lojaOk.gif
 115,109,../resources/imagens/lojaReset_MASK.gif,../resources/imagens/lojaReset.gif
+43,55,../resources/imagens/players_seta_cima_MASK.gif,../resources/imagens/player1_seta_cima.gif
+55,43,../resources/imagens/players_seta_direita_MASK.gif,../resources/imagens/player1_seta_direita.gif
+55,43,../resources/imagens/players_seta_esquerda_MASK.gif,../resources/imagens/player1_seta_esquerda.gif
+43,55,../resources/imagens/players_seta_cima_MASK.gif,../resources/imagens/player2_seta_cima.gif
+55,43,../resources/imagens/players_seta_direita_MASK.gif,../resources/imagens/player2_seta_direita.gif
+55,43,../resources/imagens/players_seta_esquerda_MASK.gif,../resources/imagens/player2_seta_esquerda.gif
