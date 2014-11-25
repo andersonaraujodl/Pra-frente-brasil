@@ -764,64 +764,7 @@ int initServer (float dt){
  *  
  *  @details Details
  */
-int serverSendObstacles (float dt){
-
-	static bool new_round = true;
-
-	if(new_round){
-		initObstacles();
-		new_round = false;
-	}
-	
-	char texto[] = "Loading Map";
-	printTxt(texto, vetor2d_type{(SCREEN_W/2)-(textwidth(texto)/2), SCREEN_H/2});
-	
-	packet_type resp;
-	if(getPacket(resp) > 0){
-		if(resp.ctrl. operation == OBSTACLE_UPDATE){
-			union{
-				short i_16;
-				char i_8[2];
-			};
-			
-			// Converte o 8 bits em 16. (altamente inseguro devido os diferentes endiands entre máquinas
-			i_8[0] = resp.buff[0];
-			i_8[1] = resp.buff[1];
-		
-			// Preenche as informações sobre o obstaculo
-			gam_obj_pack_type obst{
-					world_obstacles[i_16].profile,
-					world_obstacles[i_16].body.pos.x,
-					world_obstacles[i_16].body.pos.y,
-					0
-			};
-			// Prepara o packed de resposta
-			packet_type resp{
-				{
-					0,
-					(sizeof(gam_obj_pack_type)+2),
-					OBSTACLE_UPDATE
-				},
-				{}
-			};
-			
-			memcpy(&resp.buff[2],&obst,sizeof(gam_obj_pack_type));
-			resp.buff[0] = i_8[0];
-			resp.buff[1] = i_8[1];
-			sendPacket(resp);	
-		}
-		else if(resp.ctrl. operation == WAINTING_GAME){
-			player1.body.pos.x = PLAYER_INIT_X;
-			player1.body.pos.y = PLAYER_INIT_Y;
-			
-			player2.body.pos.x = PLAYER_INIT_X;
-			player2.body.pos.y = PLAYER_INIT_Y;
-	
-			return 1;
-		}
-	}
-	return 0;
-}
+int serverSendObstacles (float dt){}
 
 /**
  *  @brief Brief
@@ -1181,15 +1124,15 @@ int singleStep (float dt){
 			if(colide(player1,world_obstacles[i])){
 				last_colide = i;
 				if(profile_collision_bonus[world_obstacles[i].profile]>0){
-					player1.body.speed.x *= 1 + profile_collision_bonus[world_obstacles[i].profile];
-					player1.body.speed.y*= 1 + profile_collision_bonus[world_obstacles[i].profile];
+					player1.body.speed.x *= (1 + profile_collision_bonus[world_obstacles[i].profile]);
+					player1.body.speed.y*= (1 + profile_collision_bonus[world_obstacles[i].profile]);
 					
 					green_aura_frames = 30;
 					red_aura_frames = 0;
 				}
 				else if(profile_collision_bonus[world_obstacles[i].profile]<=0){
-					player1.body.speed.x *= 0.9 + profile_collision_bonus[world_obstacles[i].profile];
-					player1.body.speed.y*= 0.9 + profile_collision_bonus[world_obstacles[i].profile];
+					player1.body.speed.x *= (1 + profile_collision_bonus[world_obstacles[i].profile]);
+					player1.body.speed.y*= (1 + profile_collision_bonus[world_obstacles[i].profile]);
 					
 					red_aura_frames = 30;
 					green_aura_frames = 0;
