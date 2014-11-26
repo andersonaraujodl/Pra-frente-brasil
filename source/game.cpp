@@ -444,16 +444,17 @@ int initGame (float dt){
  *  @details Details
  */
 int showCredits (float dt){
-	
-	setcolor(COLOR(255,255,255));
-	fontSize(2);
-	printTxt("Obrigado por jogar!", vetor2d_type{(SCREEN_W/2)-(textwidth("Obrigado por jogar!")/2), SCREEN_H/2-(textheight("Obrigado por jogar!")+20)});
-	
-	printTxt("Anderson Araújo", vetor2d_type{(SCREEN_W/2)-(textwidth("Anderson Araújo")/2), SCREEN_H/2-(textheight("Anderson Araújo"))});
-	printTxt("Carol Fernandes", vetor2d_type{(SCREEN_W/2)-(textwidth("Carol Fernandes")/2), SCREEN_H/2-(textheight("Carol Fernandes")-20)});
-	printTxt("Diego Hortiz", vetor2d_type{(SCREEN_W/2)-(textwidth("Diego Hortiz")/2), SCREEN_H/2-(textheight("Diego Hortiz")-40)});
-	printTxt("Lucas Pina", vetor2d_type{(SCREEN_W/2)-(textwidth("Lucas Pina")/2), SCREEN_H/2-(textheight("Lucas Pina")-60)});
-	printTxt("Marcelo Pietragala", vetor2d_type{(SCREEN_W/2)-(textwidth("Marcelo Pietragala")/2), SCREEN_H/2-(textheight("Marcelo Pietragala")-80)});
+	setbkcolor(COLOR(222,219,190));
+	print(vetor2d_type{0,-10},&graphs_profiles[CREDITOS]);
+	setcolor(COLOR(85,63,18));
+	fontSize(6);
+	printTxt("Obrigado por jogar!", vetor2d_type{100, SCREEN_H/2-(textheight("Obrigado por jogar!")+40)});
+	fontSize(4);
+	printTxt("Anderson Araújo", vetor2d_type{150, SCREEN_H/2-(textheight("Anderson Araújo")-30)});
+	printTxt("Carol Fernandes", vetor2d_type{150, SCREEN_H/2-(textheight("Carol Fernandes")-70)});
+	printTxt("Diego Hortiz", vetor2d_type{150, SCREEN_H/2-(textheight("Diego Hortiz")-110)});
+	printTxt("Lucas Pina", vetor2d_type{150, SCREEN_H/2-(textheight("Lucas Pina")-150)});
+	printTxt("Marcelo Pietragala", vetor2d_type{150, SCREEN_H/2-(textheight("Marcelo Pietragala")-190)});
 	
 	if(kbhit())
 		return -1;

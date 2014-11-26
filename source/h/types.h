@@ -86,7 +86,7 @@ typedef struct
 	int profile; /**< Máscara para a análise de colisões entre objetos*/
 	
 	vetor2d_type bottomLeft() {return this->body.pos;}
-	vetor2d_type topRight() { return vetor2d_type{this->body.pos.x + this->graph.w, this->body.pos.y + this->graph.h }; }
+	vetor2d_type topRight() {return vetor2d_type{this->body.pos.x + this->graph.w, this->body.pos.y + this->graph.h}; }
 	
 	
 }game_object_type;
@@ -165,6 +165,7 @@ enum{
 	SETA_CIMA_P2,
 	SETA_DIREITA_P2,
 	SETA_ESQUERDA_P2,
+	CREDITOS,
 	//imagens antes do NUM_OBJECTS_DEFINE
 	NUM_OBJECTS_DEFINE
 
