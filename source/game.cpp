@@ -764,7 +764,64 @@ int initServer (float dt){
  *  
  *  @details Details
  */
-int serverSendObstacles (float dt){}
+int serverSendObstacles (float dt){
+
+	static bool new_round = true;
+
+	if(new_round){
+		initObstacles();
+		new_round = false;
+	}
+	
+	char texto[] = "Loading Map";
+	printTxt(texto, vetor2d_type{(SCREEN_W/2)-(textwidth(texto)/2), SCREEN_H/2});
+	
+	packet_type resp;
+	if(getPacket(resp) > 0){
+		if(resp.ctrl. operation == OBSTACLE_UPDATE){
+			union{
+				short i_16;
+				char i_8[2];
+			};
+			
+			// Converte o 8 bits em 16. (altamente inseguro devido os diferentes endiands entre m?quinas
+			i_8[0] = resp.buff[0];
+			i_8[1] = resp.buff[1];
+		
+			// Preenche as informa??es sobre o obstaculo
+			gam_obj_pack_type obst{
+					world_obstacles[i_16].profile,
+					world_obstacles[i_16].body.pos.x,
+					world_obstacles[i_16].body.pos.y,
+					0
+			};
+			// Prepara o packed de resposta
+			packet_type resp{
+				{
+					0,
+					(sizeof(gam_obj_pack_type)+2),
+					OBSTACLE_UPDATE
+				},
+				{}
+			};
+			
+			memcpy(&resp.buff[2],&obst,sizeof(gam_obj_pack_type));
+			resp.buff[0] = i_8[0];
+			resp.buff[1] = i_8[1];
+			sendPacket(resp);	
+		}
+		else if(resp.ctrl. operation == WAINTING_GAME){
+			player1.body.pos.x = PLAYER_INIT_X;
+			player1.body.pos.y = PLAYER_INIT_Y;
+			
+			player2.body.pos.x = PLAYER_INIT_X;
+			player2.body.pos.y = PLAYER_INIT_Y;
+	
+			return 1;
+		}
+	}
+	return 0;
+}
 
 /**
  *  @brief Brief
@@ -1528,9 +1585,9 @@ void exibirSeta (){
  */
 void mudarVelocidade(vetor2d_type *speed){
 	// aumenta a velocidade em 20%
-	speed->x = speed->x * 1.5;
+	speed->x = speed->x * 1.2;
 	
-	speed->y = speed->y * 1.5;
+	speed->y = speed->y * 1.2;
 	
 }
 
