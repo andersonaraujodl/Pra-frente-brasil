@@ -58,7 +58,7 @@ int singleStep (float dt);
 int multiStep (float dt);
 void floorCheck(game_object_type *player);
 void groundStep(game_object_type *objeto, game_object_type *ground, float dt);
-int MultiEnd(float dt);
+int multiEnd(float dt);
 int singleEnd(float dt);
 int showCredits (float dt);
 float variaForca(float valor);
@@ -262,7 +262,7 @@ game_state_type step_client ={
 };
 
 game_state_type end_server ={
-	MultiEnd,
+	multiEnd,
 	(game_state_type*[]){
 		&end_server,	 // return 0
 		&load_loja_server,	 // return 1
@@ -271,7 +271,7 @@ game_state_type end_server ={
 };
 
 game_state_type end_client ={
-	MultiEnd,
+	multiEnd,
 	(game_state_type*[]){
 		&end_client,	 // return 0
 		&load_loja_client,	 // return 1
@@ -967,15 +967,17 @@ bool setObstaclesRange (const game_object_type &ref,int &left, int &right){
 	
 	// Enquanto o objeto.pos.x mais a esquerda for menor que o canto mais a esquerda da tela
 	while((world_obstacles[left].body.pos.x + world_obstacles[left].graph.w) < ref.body.pos.x - PLAYER_FIX_POS){
-		if(++left == total_obstacles)
+		if(++left == total_obstacles){
 			left = total_obstacles-1;
 			return false;// impede que estoure o buffer
+		}
 	}
 	// Enquanto o objeto mais a direita (+1) for menor que o canto direito da tela
 	while(world_obstacles[right+1].body.pos.x < ref.body.pos.x +(SCREEN_W - PLAYER_FIX_POS)){
-		if(++right == total_obstacles)
+		if(++right == total_obstacles){
 			right = total_obstacles-1;
 			return false; // Impede que estoure o buffer
+		}
 	}
 }
 
@@ -1263,7 +1265,8 @@ int multiStep (float dt){
 				player1.profile,
 				player1.body.pos.x,
 				player1.body.pos.y,
-				player1.body.speed.modulo()
+				player1.body.speed.x,
+				player1.body.speed.y
 		};
 				
 		memcpy(&report.buff[0],&player_pos,sizeof(gam_obj_pack_type));
@@ -1276,6 +1279,8 @@ int multiStep (float dt){
 		if(player2_pos.ctrl. operation == PLAYER_STATUS){
 			player2.body.pos.x = ((gam_obj_pack_type *)(&player2_pos.buff[0]))->pos_x; // posição x
 			player2.body.pos.y = ((gam_obj_pack_type *)(&player2_pos.buff[0]))->pos_y; // posição y
+			player2.body.speed.x = ((gam_obj_pack_type *)(&player2_pos.buff[0]))->speed_x; // velocidade x
+			player2.body.speed.y = ((gam_obj_pack_type *)(&player2_pos.buff[0]))->speed_y; // velocidade y
 		}
 	}
 	
@@ -1343,13 +1348,32 @@ int singleEnd(float dt){
  *  
  *  \details Details
  */
-int MultiEnd(float dt){
+int multiEnd(float dt){
 	char *texto ="TENTE NOVAMENTE", score[50];
 	int ret = 1;
 	int left_index = 0;
 	static int right_index = 0;
 	static bool show_score = false;
 	static int other_score = 0;
+	
+	
+	static float retry_time =0.0;
+	retry_time -= dt;
+	if(retry_time <= 0){
+
+		packet_type report = {
+			{
+				0, // a função de send se preocupa com o pack count
+				sizeof(int),
+				SCORE_UPDATE //
+			},
+			{}
+		};
+					
+		memcpy(report.buff,&total_score,sizeof(int));
+		sendPacket(report);
+		retry_time = 0.5;
+	}
 	
 	
 	if(!show_score){
@@ -1364,6 +1388,12 @@ int MultiEnd(float dt){
 				left_index = 0;
 				right_index = 0;
 				return 0;
+			}
+			else if(resp.ctrl.operation == PLAYER_STATUS){
+				player2.body.pos.x = ((gam_obj_pack_type *)(&resp.buff[0]))->pos_x; // posição x
+				player2.body.pos.y = ((gam_obj_pack_type *)(&resp.buff[0]))->pos_y; // posição y
+				player2.body.speed.x = ((gam_obj_pack_type *)(&resp.buff[0]))->speed_x; // velocidade x
+				player2.body.speed.y = ((gam_obj_pack_type *)(&resp.buff[0]))->speed_y; // velocidade y
 			}
 		}
 		
@@ -1389,6 +1419,7 @@ int MultiEnd(float dt){
 		
 		setObstaclesRange(player2,left_index,right_index);
 		atualizaObjetos(player2,left_index,right_index);
+		groundStep(&player2,&ground,dt);	
 		
 	}
 	else{
