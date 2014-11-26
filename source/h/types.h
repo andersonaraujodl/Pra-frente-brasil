@@ -95,7 +95,8 @@ typedef struct{
 	int profile;
 	float pos_x;
 	float pos_y;
-	float speed_module;
+	float speed_x;
+	float speed_y;
 }gam_obj_pack_type;
 
 
