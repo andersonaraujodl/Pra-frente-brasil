@@ -11,7 +11,12 @@ int pack_counter = 0; /**< Contador de packeds enviados*/
 short server_port;
 char server_ip[16];
 
-
+/**
+ *  @brief Define as configurações do servidor (porta e ip)
+ *
+ *	@param [ch] *ip define o ip do server
+ *	@param [short] port define a porta do server
+ */
 void setServerConfig (char *ip, short port){
 	server_port = port;
 	
@@ -55,11 +60,9 @@ int initSocket (){
 }
 
 /**
- *  \brief Brief
+ *  @brief Valida a conexão entre Server e Client
  *  
- *  \return Return_Description
- *  
- *  \details Details
+ *  @return 1 houve recebimento de mensagem
  */
 int connectToServer(){
 	packet_type p;
@@ -78,11 +81,9 @@ int connectToServer(){
 }
 
 /**
-*  \brief Brief
+*  @brief aguarda confirmação de conexão
 *  
-*  \return Return_Description
-*  
-*  \details Details
+*  @return 1 estabelece conexão
 */
 int waitClient (void){
 	int num_b;
@@ -104,15 +105,13 @@ int waitClient (void){
 
 
 /**
- *  @brief Brief
+ *  @brief recebe conteúdo transferido
  *  
- *  @param [in] p Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
+ *  @param [packet_type *] &pack buffer no qual será armazenado a mensagem a ser trasnferida
  */
 int getPacket (packet_type &pack){
 	int sz = sizeof(other_addr);
+	//recvfrom (socket, buffer, lenght, flags, adrress, adress_lenght)
 	int ret =  recvfrom(m_socket,(char *)&pack,(sizeof(packet_type)),0,(struct sockaddr *)&other_addr,&sz );
 	
 	if ((ret < 0) && (WSAGetLastError() == WSAEWOULDBLOCK)) return 0;
@@ -121,14 +120,12 @@ int getPacket (packet_type &pack){
 }
 
 /**
- *  @brief Brief
+ *  @brief transfere conteúdo
  *  
- *  @param [in] p Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
+ *  @param [packet_type *] &p buffer com conteúdo a ser enviado
  */
 int sendPacket(packet_type &p){
 	p.ctrl.pack_count = ++pack_counter;
+	//sendto (socket, message, length, flags, dest_address, dest_lenght)
 	return sendto(m_socket,(char *)&p,sizeof(pack_control_type) + p.ctrl.buff_size,0,(LPSOCKADDR)&other_addr,sizeof(sockaddr));
 }

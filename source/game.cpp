@@ -436,12 +436,10 @@ int initGame (float dt){
 }
 
 /**
- *  @brief Brief
+ *  @brief Exibe créditos do jogo
  *  
  *  @param [in] dt Parameter_Description
  *  @return Return_Description
- *  
- *  @details Details
  */
 int showCredits (float dt){
 	setbkcolor(COLOR(222,219,190));
@@ -741,12 +739,12 @@ void initObstacles (void){
 }
 
 /**
- *  @brief Brief
+ *  @brief Inicialização do servidor
  *  
- *  @param [in] dt Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
+ *  @param [in] dt
+ * 
+ *  @return 1 conexão client server estabelecida
+ *  @return 0 aguardando client (sem conexão)
  */
 int initServer (float dt){
 	initSocket();
@@ -763,12 +761,11 @@ int initServer (float dt){
 }
 
 /**
- *  @brief Brief
+ *  @brief envia informações de tela
  *  
- *  @param [in] dt Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
+ *  @param [in] dt
+ *
+ *  @return 1 aguarda o inicio do jogo
  */
 int serverSendObstacles (float dt){
 
@@ -838,12 +835,11 @@ int serverSendObstacles (float dt){
 }
 
 /**
- *  @brief Brief
+ *  @brief inicializa o client
  *  
- *  @param [in] dt Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
+ *  @param [in] dt 
+ *
+ *  @return 1 estabelece conexão com servidor
  */
 int initClient (float dt){
 	static float retry_time =0.0;
@@ -866,12 +862,12 @@ int initClient (float dt){
 }
 
 /**
- *  @brief Brief
+ *  @brief recebe informações dos elementos da tela 
  *  
- *  @param [in] dt Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
+ *  @param [in] dt
+ *
+ *  @return 1
+ *	@return 0
  */
 int clientGetObstacles (float dt){
 	static bool new_round = true;
@@ -1628,23 +1624,15 @@ void resetLoja(){
 	}
 }
 /**
- *  @brief Brief
- *  
- *  @param [in] dt Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
+ *  @brief Exibe uma seta no canto superior da tela caso o usuário ultrapasse as bordas, representando sua posição atual 
  */
 void exibirSeta (){
 	print(vetor2d_type { (player1.body.pos.x< PLAYER_FIX_POS)?player1.body.pos.x: PLAYER_FIX_POS, SCREEN_H - graphs_profiles[SETA_CIMA_P1].h-10}, &graphs_profiles[SETA_CIMA_P1]);
 }
 /**
- *  @brief Brief
+ *  @brief aumenta a velocidade do player em 20%
  *  
- *  @param [in] dt Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
+ *  @param [vetor2d_type] *speed Parameter_Description
  */
 void mudarVelocidade(vetor2d_type *speed){
 	// aumenta a velocidade em 20%
