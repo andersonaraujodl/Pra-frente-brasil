@@ -86,7 +86,7 @@ typedef struct
 	int profile; /**< Máscara para a análise de colisões entre objetos*/
 	
 	vetor2d_type bottomLeft() {return this->body.pos;}
-	vetor2d_type topRight() {return vetor2d_type{this->body.pos.x + this->graph.w, this->body.pos.y + this->graph.h}; }
+	vetor2d_type topRight() { return vetor2d_type{this->body.pos.x + this->graph.w, this->body.pos.y + this->graph.h }; }
 	
 	
 }game_object_type;
@@ -177,6 +177,6 @@ enum{
 #define NUM_BLOCKS (MST +1)
 #define NUM_OPTIONS_MENU 4
 #define NUM_LOJA_MENU 24
-#define ON_DEBUG
+//#define ON_DEBUG
 
 #endif

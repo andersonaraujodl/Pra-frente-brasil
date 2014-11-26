@@ -81,7 +81,7 @@ float  ground_offset;
 float obstacles_weight[NUM_BLOCKS],max_obstacles_per_type[NUM_BLOCKS]; 
 int total_obstacles = 0;
 int total_score = 0; 
-int total_rounds = 5;
+int total_rounds = 3;
 float profile_collision_bonus[NUM_BLOCKS];
 /**
 *  
@@ -784,7 +784,6 @@ int serverSendObstacles (float dt){
 	setcolor(COLOR(255,255,255));
 	rectangle((SCREEN_W/2)-150,(SCREEN_H/2)+30,(SCREEN_W/2-150)+300,(SCREEN_H/2)+40);
 	bar((SCREEN_W/2)-150,(SCREEN_H/2)+30,(SCREEN_W/2-150)+count,(SCREEN_H/2)+40);
-	std::cout<<"count = "<<count<<std::endl;
 	
 	packet_type resp;
 	if(getPacket(resp) > 0){
@@ -827,7 +826,9 @@ int serverSendObstacles (float dt){
 			
 			player2.body.pos.x = PLAYER_INIT_X;
 			player2.body.pos.y = PLAYER_INIT_Y;
-	
+			
+			count = 0;
+			
 			return 1;
 		}
 	}
@@ -1387,7 +1388,7 @@ int singleEnd(float dt){
 		
 		if(ret == 2){
 			total_score = 0;
-			total_rounds =5;
+			total_rounds = 3;
 		}
 		
 		left_index = 0;
@@ -1624,7 +1625,7 @@ void resetGame(){
 
 	total_obstacles = 0;
 	total_score = 0; 
-	total_rounds = 5;	
+	total_rounds = 3;	
 	left_obstacles_index = 0;
 	right_obstacles_index = 0;
 	player1.body.pos.x = PLAYER_INIT_X;
