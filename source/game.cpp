@@ -67,6 +67,7 @@ void resetGame();
 void resetLoja();
 void exibirSeta();
 void mudarVelocidade(vetor2d_type *speed);
+void printP2(game_object_type &ref, game_object_type &p2);
 
 //Variáveis privadas ============================================
 game_object_type player1,player2, ground;
@@ -705,7 +706,7 @@ void initObstacles (void){
 
 	//	
 	int obstacles_defined = 0;
-	while(obstacles_defined < NUM_BLOCKS){
+	while(obstacles_defined < MAX_OBSTACLES){
 
 		// Randomiza qual o perfil (tipo) de obstáculo ele será, Igreja, nuvem....
 		unsigned int obj_profile = (rand() % NUM_BLOCKS);
@@ -732,6 +733,8 @@ void initObstacles (void){
 				++obstacles_defined;
 		}
 	}
+	
+
 }
 
 /**
@@ -745,7 +748,9 @@ void initObstacles (void){
 int initServer (float dt){
 	initSocket();
 	
-	char texto[] = "Wating for client";
+	char texto[] = "Waiting for client";
+	setcolor(COLOR(255,255,255));
+	fontSize(2);
 	printTxt(texto, vetor2d_type{(SCREEN_W/2)-(textwidth(texto)/2), SCREEN_H/2});
 	
 	
@@ -764,17 +769,25 @@ int initServer (float dt){
 int serverSendObstacles (float dt){
 
 	static bool new_round = true;
-
+	static int count = 0;
 	if(new_round){
 		initObstacles();
 		new_round = false;
 	}
 	
 	char texto[] = "Loading Map";
+	setcolor(COLOR(255,255,255));
+	fontSize(2);
 	printTxt(texto, vetor2d_type{(SCREEN_W/2)-(textwidth(texto)/2), SCREEN_H/2});
+	
+	setcolor(COLOR(255,255,255));
+	rectangle((SCREEN_W/2)-150,(SCREEN_H/2)+30,(SCREEN_W/2-150)+300,(SCREEN_H/2)+40);
+	bar((SCREEN_W/2)-150,(SCREEN_H/2)+30,(SCREEN_W/2-150)+count,(SCREEN_H/2)+40);
+	std::cout<<"count = "<<count<<std::endl;
 	
 	packet_type resp;
 	if(getPacket(resp) > 0){
+		count++;
 		if(resp.ctrl. operation == OBSTACLE_UPDATE){
 			union{
 				short i_16;
@@ -857,6 +870,7 @@ int initClient (float dt){
  */
 int clientGetObstacles (float dt){
 	static bool new_round = true;
+	static int count = 0;
 	
 	if(new_round){
 		debugTrace("clientGetObstacles: new_round");
@@ -866,7 +880,13 @@ int clientGetObstacles (float dt){
 	}
 	
 	char texto[] = "Loading Map";
+	setcolor(COLOR(255,255,255));
+	fontSize(2);
 	printTxt(texto, vetor2d_type{(SCREEN_W/2)-(textwidth(texto)/2), SCREEN_H/2});
+	
+	setcolor(COLOR(255,255,255));
+	rectangle((SCREEN_W/2)-150,(SCREEN_H/2)+30,(SCREEN_W/2-150)+300,(SCREEN_H/2)+40);
+	bar((SCREEN_W/2)-150,(SCREEN_H/2)+30,(SCREEN_W/2-150)+count,(SCREEN_H/2)+40);
 	
 	packet_type resp;
 	if(getPacket(resp) > 0){
@@ -912,7 +932,7 @@ int clientGetObstacles (float dt){
 				};
 				
 				sendPacket(req);
-				
+				count = i;
 				#ifdef ON_DEBUG
 					char buff [30];
 					sprintf(buff,"Request obstacle %d",i);
@@ -962,15 +982,16 @@ bool setObstaclesRange (const game_object_type &ref,int &left, int &right){
 	
 	// Enquanto o objeto.pos.x mais a esquerda for menor que o canto mais a esquerda da tela
 	while((world_obstacles[left].body.pos.x + world_obstacles[left].graph.w) < ref.body.pos.x - PLAYER_FIX_POS){
-		if(++left == total_obstacles){
-			left = total_obstacles-1;
+		if(++left == MAX_OBSTACLES){
+			left = MAX_OBSTACLES-1;
 			return false;// impede que estoure o buffer
 		}
 	}
 	// Enquanto o objeto mais a direita (+1) for menor que o canto direito da tela
 	while(world_obstacles[right+1].body.pos.x < ref.body.pos.x +(SCREEN_W - PLAYER_FIX_POS)){
-		if(++right == total_obstacles){
-			right = total_obstacles-1;
+		std::cout<<"pos: "<<right<<" eh "<< world_obstacles[right+1].body.pos.x<<" < "<<ref.body.pos.x +(SCREEN_W - PLAYER_FIX_POS)<<std::endl;
+		if(++right == MAX_OBSTACLES){
+			right = MAX_OBSTACLES-1;
 			return false; // Impede que estoure o buffer
 		}
 	}
@@ -988,12 +1009,16 @@ bool atualizaObjetos (game_object_type &ref,const int &left_index,const int &rig
 	
 
 	// Imprime todos aqueles que estão dentro do range da tela
+
 	for (int i = left_index; i <= right_index; ++i){
+		
+
 		float obj_x = world_obstacles[i].body.pos.x -  ref.body.pos.x + PLAYER_FIX_POS;
 		print(vetor2d_type{obj_x,world_obstacles[i].body.pos.y}, &world_obstacles[i].graph);
 	
 	}
 	
+
 	float ref_x = (ref.body.pos.x < PLAYER_FIX_POS) ? ref.body.pos.x: PLAYER_FIX_POS;
 	print(vetor2d_type{ref_x, ref.body.pos.y},&ref.graph);
 }
@@ -1109,7 +1134,7 @@ int preLancamentoMult (float dt){
 			player2.body.pos.y = ((gam_obj_pack_type *)(&player_pos.buff[0]))->pos_y; // posição y
 		}
 	}
-	print(player2.body.pos,&player2.graph);
+	printP2(player1, player2);
 	return preLancamento(dt);
 }
 
@@ -1130,13 +1155,16 @@ int singleStep (float dt){
 	static char power_msg[100] = "";
 	static int boost = POWER_UP_UNITS;
 	static int angle = POWER_UP_UNITS;
-	
+
 	lancamento(&player1,dt);
+
 	floorCheck(&player1);
+
 	groundStep( &player1, &ground, dt);
 	
-	
+
 	setObstaclesRange(player1,left_index,right_index);
+
 	atualizaObjetos(player1,left_index,right_index);
 
 
@@ -1145,6 +1173,7 @@ int singleStep (float dt){
 		print(vetor2d_type{PLAYER_FIX_POS - ((green_aura.graph.w - player1.graph.w)/2),player1.body.pos.y - ((green_aura.graph.h - player1.graph.h)/2)},&green_aura.graph);
 	}
 	
+
 	if(red_aura_frames){
 		--red_aura_frames;
 		print(vetor2d_type{PLAYER_FIX_POS - ((red_aura.graph.w - player1.graph.w)/2),player1.body.pos.y  - ((red_aura.graph.h - player1.graph.h)/2)},&red_aura.graph);
@@ -1156,6 +1185,7 @@ int singleStep (float dt){
 		exibirSeta();
 	}
 	
+
 	if(kbhit()){
 		char key = getch();
 		
@@ -1166,14 +1196,14 @@ int singleStep (float dt){
 			boost--;
 		}
 		
-		if ((key == 'a' || key == 'A') && (angle>0)){
+		if ((key == 'd' || key == 'D') && (angle>0)){
 			player1.body.speed.setVector(player1.body.speed.modulo(), 45);
 			sprintf(power_msg,"Distribuição de Renda!");
 			show_power = 30;
 			angle--;
 		}
 	}
-	//std::cout<<"vel x = "<<player1.body.speed.x<<" e vel y = "<<player1.body.speed.y<<std::endl;
+
 	for(int i = left_index; i <= right_index;++i){
 		if(last_colide < i){ // Maior pois o player nunca anda para trás
 			if(colide(player1,world_obstacles[i])){
@@ -1197,6 +1227,7 @@ int singleStep (float dt){
 		}
 	}
 
+
 	//limitador de velocidade
 	if(player1.body.speed.y> SPEED_LIM_Y)
 		player1.body.speed.y =SPEED_LIM_Y;	
@@ -1207,11 +1238,13 @@ int singleStep (float dt){
 	if(player1.body.speed.x< -SPEED_LIM_X)
 		player1.body.speed.x = -SPEED_LIM_X;
 
+
 	char  texto [100];
 	sprintf(texto,"Distancia:\n %d metros",(int)(player1.body.pos.x - PLAYER_INIT_X)/50);
 	setcolor(COLOR(255,255,255));
 	fontSize(1);
 	printTxt(texto, vetor2d_type{SCREEN_W-(textwidth(texto)+20), 20});
+
 	
 	if(show_power){
 		setcolor(COLOR(255,0,0));
@@ -1219,7 +1252,7 @@ int singleStep (float dt){
 		printTxt(power_msg, vetor2d_type{(SCREEN_W/2)-(textwidth(power_msg)/2), SCREEN_H/2-(textheight(power_msg)+20)});
 		show_power--;
 	}
-	
+
 	if(player1.body.speed.modulo())
 		return 0;     //singleStep
 
@@ -1279,9 +1312,7 @@ int multiStep (float dt){
 		}
 	}
 	
-	if(((player2.body.pos.x + player2.graph.w) > player1.body.pos.x - PLAYER_FIX_POS) &&
-	   (player2.body.pos.x < player1.body.pos.x +(SCREEN_W - PLAYER_FIX_POS)))
-		print(player2.body.pos,&player2.graph);
+	printP2(player1, player2);
 	
 	return singleStep(dt);
 }
@@ -1609,5 +1640,30 @@ void mudarVelocidade(vetor2d_type *speed){
 	speed->y = speed->y * 1.2;
 	
 }
-
+void printP2(game_object_type &ref, game_object_type &p2){
+	
+	float dist_to_ref = p2.body.pos.x - ref.body.pos.x;
+	
+	
+	if((dist_to_ref> -PLAYER_FIX_POS)&&(dist_to_ref< SCREEN_W)){
+		
+		print(vetor2d_type{dist_to_ref, p2.body.pos.y},&p2.graph);	
+		
+		if(p2.body.pos.y > SCREEN_H) 
+			print(vetor2d_type { p2.body.pos.x, SCREEN_H - graphs_profiles[SETA_CIMA_P2].h-10}, &graphs_profiles[SETA_CIMA_P2]);
+	}
+	//checa se p2 ficou pra trás e exibe seta esquerda
+	if(dist_to_ref< (-PLAYER_FIX_POS - graphs_profiles[SETA_ESQUERDA_P2].h) ){
+		print(vetor2d_type { 0,(p2.body.pos.y>SCREEN_H -graphs_profiles[SETA_ESQUERDA_P2].h )?SCREEN_H -graphs_profiles[SETA_ESQUERDA_P2].h : p2.body.pos.y}, &graphs_profiles[SETA_ESQUERDA_P2]);
+	}
+	
+	//checa se p2 está a frente e exibe seta direita
+	if(dist_to_ref > SCREEN_W){
+		
+		print(vetor2d_type { SCREEN_W -graphs_profiles[SETA_DIREITA_P2].w ,(p2.body.pos.y>SCREEN_H -graphs_profiles[SETA_DIREITA_P2].h )?SCREEN_H -graphs_profiles[SETA_DIREITA_P2].h : p2.body.pos.y}, &graphs_profiles[SETA_DIREITA_P2]);
+	}
+	
+	
+	
+}
 
