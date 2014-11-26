@@ -1248,8 +1248,36 @@ int singleStep (float dt){
 	char  texto [100];
 	sprintf(texto,"Distancia:\n %d metros",(int)(player1.body.pos.x - PLAYER_INIT_X)/50);
 	setcolor(COLOR(255,255,255));
+	fontSize(3);
+	printTxt(texto, vetor2d_type{SCREEN_W-(textwidth(texto)+0), 20});
+	
+	
+	
+	
+	
+	sprintf(texto,"Power ups:");
 	fontSize(1);
-	printTxt(texto, vetor2d_type{SCREEN_W-(textwidth(texto)+20), 20});
+	printTxt(texto, vetor2d_type{SCREEN_W-(textwidth(texto)+20), 60});
+
+	if(boost>0){
+
+		sprintf(texto,"(A)");
+		setcolor(COLOR(255,246,0));
+		fontSize(2);
+		printTxt(texto, vetor2d_type{SCREEN_W-(textwidth(texto)+30),80});
+		
+	}
+	if(angle>0){
+
+		sprintf(texto,"(D)");
+		setcolor(COLOR(0,110,25));
+		fontSize(2);
+		printTxt(texto, vetor2d_type{SCREEN_W-(textwidth(texto)+100), 80});
+	}
+	
+	
+	
+	
 	
 	if(show_power){
 		setcolor(COLOR(255,0,0));
