@@ -81,7 +81,7 @@ float  ground_offset;
 float obstacles_weight[NUM_BLOCKS],max_obstacles_per_type[NUM_BLOCKS]; 
 int total_obstacles = 0;
 int total_score = 0; 
-int total_rounds = 5;
+int total_rounds = 3;
 float profile_collision_bonus[NUM_BLOCKS];
 /**
 *  
@@ -784,7 +784,6 @@ int serverSendObstacles (float dt){
 	setcolor(COLOR(255,255,255));
 	rectangle((SCREEN_W/2)-150,(SCREEN_H/2)+30,(SCREEN_W/2-150)+300,(SCREEN_H/2)+40);
 	bar((SCREEN_W/2)-150,(SCREEN_H/2)+30,(SCREEN_W/2-150)+count,(SCREEN_H/2)+40);
-	std::cout<<"count = "<<count<<std::endl;
 	
 	packet_type resp;
 	if(getPacket(resp) > 0){
@@ -827,6 +826,8 @@ int serverSendObstacles (float dt){
 			
 			player2.body.pos.x = PLAYER_INIT_X;
 			player2.body.pos.y = PLAYER_INIT_Y;
+			
+			count = 0;
 	
 			return 1;
 		}
@@ -906,6 +907,7 @@ int clientGetObstacles (float dt){
 			world_obstacles[i_16].body.pos.x = ((gam_obj_pack_type *)(&resp.buff[2]))->pos_x; // posição x
 			world_obstacles[i_16].body.pos.y = ((gam_obj_pack_type *)(&resp.buff[2]))->pos_y; // posição y
 			world_obstacles[i_16].graph = graphs_profiles[world_obstacles[i_16].profile];
+			++count;
 		}	
 	}
 	
@@ -933,7 +935,7 @@ int clientGetObstacles (float dt){
 				};
 				
 				sendPacket(req);
-				count = i;
+				
 				#ifdef ON_DEBUG
 					char buff [30];
 					sprintf(buff,"Request obstacle %d",i);
@@ -964,6 +966,7 @@ int clientGetObstacles (float dt){
 	player2.body.pos.y = PLAYER_INIT_Y;
 	
 	new_round = true;
+	count = 0;
 	debugTrace("clientGetObstacles: loading finished");
 	return 1;
 	
@@ -990,7 +993,6 @@ bool setObstaclesRange (const game_object_type &ref,int &left, int &right){
 	}
 	// Enquanto o objeto mais a direita (+1) for menor que o canto direito da tela
 	while(world_obstacles[right+1].body.pos.x < ref.body.pos.x +(SCREEN_W - PLAYER_FIX_POS)){
-		std::cout<<"pos: "<<right<<" eh "<< world_obstacles[right+1].body.pos.x<<" < "<<ref.body.pos.x +(SCREEN_W - PLAYER_FIX_POS)<<std::endl;
 		if(++right == MAX_OBSTACLES){
 			right = MAX_OBSTACLES-1;
 			return false; // Impede que estoure o buffer
@@ -1387,7 +1389,7 @@ int singleEnd(float dt){
 		
 		if(ret == 2){
 			total_score = 0;
-			total_rounds =5;
+			total_rounds =3;
 		}
 		
 		left_index = 0;
@@ -1504,13 +1506,13 @@ int multiEnd(float dt){
 		setObstaclesRange(player1,left_index,right_index);
 		atualizaObjetos(player1,left_index,right_index);
 		
-		sprintf(score,"Você percorreu\n %d metros em %d rodadas.",(int)total_score,5-total_rounds);
+		sprintf(score,"Você percorreu\n %d metros em %d rodadas.",(int)total_score,3-total_rounds);
 		
 		setcolor(COLOR(255,255,255));
 		fontSize(2);
 		printTxt(score, vetor2d_type{(SCREEN_W/2)-(textwidth(score)/2), SCREEN_H/2-(textheight(score)+20)});
 		
-		sprintf(score,"O player 2 percorreu\n %d metros em %d rodadas.",(int)other_score,5-total_rounds);
+		sprintf(score,"O player 2 percorreu\n %d metros em %d rodadas.",(int)other_score,3-total_rounds);
 		
 		setcolor(COLOR(255,255,255));
 		fontSize(2);
@@ -1529,7 +1531,7 @@ int multiEnd(float dt){
 			
 			if(ret == 2){
 				total_score = 0;
-				total_rounds =5;
+				total_rounds =3;
 			}
 			
 			left_index = 0;
@@ -1624,7 +1626,7 @@ void resetGame(){
 
 	total_obstacles = 0;
 	total_score = 0; 
-	total_rounds = 5;	
+	total_rounds = 3;	
 	left_obstacles_index = 0;
 	right_obstacles_index = 0;
 	player1.body.pos.x = PLAYER_INIT_X;

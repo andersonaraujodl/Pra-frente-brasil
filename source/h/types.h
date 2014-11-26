@@ -177,6 +177,6 @@ enum{
 #define NUM_BLOCKS (MST +1)
 #define NUM_OPTIONS_MENU 4
 #define NUM_LOJA_MENU 24
-#define ON_DEBUG
+//#define ON_DEBUG
 
 #endif
