@@ -67,6 +67,7 @@ void resetGame();
 void resetLoja();
 void exibirSeta();
 void mudarVelocidade(vetor2d_type *speed);
+void printP2(game_object_type &ref, game_object_type &p2);
 
 //Variáveis privadas ============================================
 game_object_type player1,player2, ground;
@@ -1111,7 +1112,7 @@ int preLancamentoMult (float dt){
 			player2.body.pos.y = ((gam_obj_pack_type *)(&player_pos.buff[0]))->pos_y; // posição y
 		}
 	}
-	print(player2.body.pos,&player2.graph);
+	printP2(player1, player2);
 	return preLancamento(dt);
 }
 
@@ -1267,7 +1268,7 @@ int multiStep (float dt){
 				
 		memcpy(&report.buff[0],&player_pos,sizeof(gam_obj_pack_type));
 		sendPacket(report);
-		retry_time = RELOAD_RETRY;
+		retry_time = 0;
 	}
 	// =================================================================
 	packet_type player2_pos;
@@ -1278,9 +1279,7 @@ int multiStep (float dt){
 		}
 	}
 	
-	if(((player2.body.pos.x + player2.graph.w) > player1.body.pos.x - PLAYER_FIX_POS) &&
-	   (player2.body.pos.x < player1.body.pos.x +(SCREEN_W - PLAYER_FIX_POS)))
-		print(player2.body.pos,&player2.graph);
+	printP2(player1, player2);
 	
 	return singleStep(dt);
 }
@@ -1483,5 +1482,22 @@ void mudarVelocidade(vetor2d_type *speed){
 	speed->y = speed->y * 1.5;
 	
 }
-
+void printP2(game_object_type &ref, game_object_type &p2){
+	
+	float dist_to_ref = p2.body.pos.x - ref.body.pos.x;
+	if((dist_to_ref> -PLAYER_FIX_POS)&&(dist_to_ref< SCREEN_W)){
+		
+		print(vetor2d_type{dist_to_ref, p2.body.pos.y},&p2.graph);	
+	}
+	//checa se p2 ficou pra trás e exibe seta esquerda
+	if(dist_to_ref< -PLAYER_FIX_POS){
+		print(vetor2d_type { 0,(p2.body.pos.y>SCREEN_H -graphs_profiles[SETA_DIREITA_P2].h )?SCREEN_H -graphs_profiles[SETA_DIREITA_P2].h : p2.body.pos.y}, &graphs_profiles[SETA_ESQUERDA_P2]);
+	}
+	
+	//checa se p2 está a frente e exibe seta direita
+	if(dist_to_ref > SCREEN_W - PLAYER_FIX_POS ){
+		print(vetor2d_type { SCREEN_W -graphs_profiles[SETA_DIREITA_P2].w ,(p2.body.pos.y>SCREEN_H -graphs_profiles[SETA_DIREITA_P2].h )?SCREEN_H -graphs_profiles[SETA_DIREITA_P2].h : p2.body.pos.y}, &graphs_profiles[SETA_DIREITA_P2]);
+	}
+	
+}
 
