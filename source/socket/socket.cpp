@@ -14,8 +14,8 @@ char server_ip[16];
 /**
  *  @brief Define as configurações do servidor (porta e ip)
  *
- *	@param [ch] *ip define o ip do server
- *	@param [short] port define a porta do server
+ *	@param [in] *ip define o ip do server
+ *	@param [in] port define a porta do server
  */
 void setServerConfig (char *ip, short port){
 	server_port = port;
@@ -107,7 +107,7 @@ int waitClient (void){
 /**
  *  @brief recebe conteúdo transferido
  *  
- *  @param [packet_type *] &pack buffer no qual será armazenado a mensagem a ser trasnferida
+ *  @param [out] &pack buffer no qual será armazenado a mensagem a ser trasnferida
  */
 int getPacket (packet_type &pack){
 	int sz = sizeof(other_addr);
@@ -122,7 +122,7 @@ int getPacket (packet_type &pack){
 /**
  *  @brief transfere conteúdo
  *  
- *  @param [packet_type *] &p buffer com conteúdo a ser enviado
+ *  @param [in/out] &p buffer com conteúdo a ser enviado
  */
 int sendPacket(packet_type &p){
 	p.ctrl.pack_count = ++pack_counter;

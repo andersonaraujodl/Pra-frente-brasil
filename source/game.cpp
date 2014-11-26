@@ -788,8 +788,8 @@ int serverSendObstacles (float dt){
 	
 	packet_type resp;
 	if(getPacket(resp) > 0){
-		count++;
 		if(resp.ctrl. operation == OBSTACLE_UPDATE){
+			count++;
 			union{
 				short i_16;
 				char i_8[2];
@@ -1190,7 +1190,7 @@ int singleStep (float dt){
 	if(kbhit()){
 		char key = getch();
 		
-		if ((key == 's' || key == 'S') && (boost>0)){
+		if ((key == 'a' || key == 'A') && (boost>0)){
 			mudarVelocidade(&player1.body.speed);
 			sprintf(power_msg,"Apoio Popular!");
 			show_power = 30;
@@ -1216,13 +1216,18 @@ int singleStep (float dt){
 					green_aura_frames = 30;
 					red_aura_frames = 0;
 				}
-				else if(profile_collision_bonus[world_obstacles[i].profile]<=0){
+				else if(profile_collision_bonus[world_obstacles[i].profile]<0){
 					player1.body.speed.x *= (1 + profile_collision_bonus[world_obstacles[i].profile]);
 					player1.body.speed.y*= (1 + profile_collision_bonus[world_obstacles[i].profile]);
 					
 					red_aura_frames = 30;
 					green_aura_frames = 0;
 				}
+				else{
+					red_aura_frames = 0;
+					green_aura_frames = 0;
+				}
+					
 				break; // Afinal só colide um por vez
 			}
 		}
@@ -1245,7 +1250,6 @@ int singleStep (float dt){
 	setcolor(COLOR(255,255,255));
 	fontSize(1);
 	printTxt(texto, vetor2d_type{SCREEN_W-(textwidth(texto)+20), 20});
-
 	
 	if(show_power){
 		setcolor(COLOR(255,0,0));
@@ -1449,6 +1453,20 @@ int multiEnd(float dt){
 		setObstaclesRange(player2,left_index,right_index);
 		atualizaObjetos(player2,left_index,right_index);
 		groundStep(&player2,&ground,dt);	
+		
+	
+	static float blink_time = 0.5;
+	static char blue = 255, green = 255;
+	blink_time -=dt;
+	if(blink_time <=0){
+		green = blue = (blue) ? 0:255;
+		blink_time = 0.5;
+	}
+		
+	char texto[] = "Spectator mode";
+	setcolor(COLOR(255,green,blue));
+	fontSize(2);
+	printTxt(texto, vetor2d_type{(SCREEN_W/2)-(textwidth(texto)/2), SCREEN_H/2});
 		
 	}
 	else{
