@@ -24,7 +24,6 @@
 #define PLAYER_INIT_Y 0  /**< Posição incial do player em y*/
 #define RESOURCES_ROOT "../resources/data/img_data.cvs"
 #define SERVER_CONF_PATH "../resources/data/server.inf"
-#define RELOAD_RETRY (1.0/30.0) *2.0
 
 #define ATRITO 50
 #define BOUNCE 0.5
@@ -59,6 +58,7 @@ int singleStep (float dt);
 int multiStep (float dt);
 void floorCheck(game_object_type *player);
 void groundStep(game_object_type *objeto, game_object_type *ground, float dt);
+int MultiEnd(float dt);
 int singleEnd(float dt);
 int showCredits (float dt);
 float variaForca(float valor);
@@ -261,7 +261,7 @@ game_state_type step_client ={
 };
 
 game_state_type end_server ={
-	singleEnd,
+	MultiEnd,
 	(game_state_type*[]){
 		&end_server,	 // return 0
 		&load_loja_server,	 // return 1
@@ -270,7 +270,7 @@ game_state_type end_server ={
 };
 
 game_state_type end_client ={
-	singleEnd,
+	MultiEnd,
 	(game_state_type*[]){
 		&end_client,	 // return 0
 		&load_loja_client,	 // return 1
@@ -784,7 +784,7 @@ int initClient (float dt){
 			debugTrace("Conected");
 			return 1;
 		}
-		retry_time = RELOAD_RETRY;
+		retry_time = 0.5;
 	}
 	
 /*	char texto[] = "Searching Server";
@@ -865,7 +865,7 @@ int clientGetObstacles (float dt){
 					sprintf(buff,"Request obstacle %d",i);
 					debugTrace(buff);
 				#endif
-				retry_time = RELOAD_RETRY;
+				retry_time = (0.06);
 				return 0;
 			}
 		}
@@ -1210,7 +1210,7 @@ int multiStep (float dt){
 				
 		memcpy(&report.buff[0],&player_pos,sizeof(gam_obj_pack_type));
 		sendPacket(report);
-		retry_time = RELOAD_RETRY;
+		retry_time = 0;
 	}
 	// =================================================================
 	packet_type player2_pos;
@@ -1278,6 +1278,113 @@ int singleEnd(float dt){
 	
 	return 0;
 }
+
+/**
+ *  \brief Brief
+ *  
+ *  \param [in] dt Parameter_Description
+ *  \return Return_Description
+ *  
+ *  \details Details
+ */
+int MultiEnd(float dt){
+	char *texto ="TENTE NOVAMENTE", score[50];
+	int ret = 1;
+	int left_index = 0;
+	static int right_index = 0;
+	static bool show_score = false;
+	static int other_score = 0;
+	
+	
+	if(!show_score){
+		
+		packet_type resp;
+		if(getPacket(resp) > 0){
+			if(resp.ctrl.operation == SCORE_UPDATE){
+				
+				memcpy(&other_score,resp.buff,sizeof(int));
+				
+				show_score = true;
+				left_index = 0;
+				right_index = 0;
+				return 0;
+			}
+		}
+		
+			// =====================================
+		static float retry_time =0.0;
+		retry_time -= dt;
+		if(retry_time <= 0){
+		
+			packet_type report = {
+				{
+					0, // a função de send se preocupa com o pack count
+					sizeof(int),
+					SCORE_UPDATE //
+				},
+				{}
+			};
+						
+			memcpy(report.buff,&total_score,sizeof(int));
+			sendPacket(report);
+			retry_time = 0.5;
+		}
+
+		
+		setObstaclesRange(player2,left_index,right_index);
+		atualizaObjetos(player2,left_index,right_index);
+		
+	}
+	else{
+	
+		groundStep( &player1, &ground, dt);
+	
+		setObstaclesRange(player1,left_index,right_index);
+		atualizaObjetos(player1,left_index,right_index);
+		
+		sprintf(score,"Você percorreu\n %d metros em %d rodadas.",(int)total_score,5-total_rounds);
+		
+		setcolor(COLOR(255,255,255));
+		fontSize(2);
+		printTxt(score, vetor2d_type{(SCREEN_W/2)-(textwidth(score)/2), SCREEN_H/2-(textheight(score)+20)});
+		
+		sprintf(score,"O player 2 percorreu\n %d metros em %d rodadas.",(int)other_score,5-total_rounds);
+		
+		setcolor(COLOR(255,255,255));
+		fontSize(2);
+		printTxt(score, vetor2d_type{(SCREEN_W/2)-(textwidth(score)/2), SCREEN_H/2-(textheight(score)+40)});
+		
+		if(total_rounds<=0){
+		
+			setcolor(COLOR(255,0,0));
+			texto ="GAME OVER";
+			ret=2;
+		}
+		fontSize(5);
+		printTxt(texto, vetor2d_type{(SCREEN_W/2)-(textwidth(texto)/2), SCREEN_H/2});
+
+		if(kbhit()) {
+			
+			if(ret == 2){
+				total_score = 0;
+				total_rounds =5;
+			}
+			
+			left_index = 0;
+			right_index = 0;
+			
+			show_score = false;;
+			
+			return ret;
+			 
+		}
+		
+		return 0;
+	
+	}
+	return 0;
+}
+
 
 /**
 *	@brief Testa o contato do player com o chão 

@@ -54,6 +54,13 @@ int initSocket (){
 	return 0;
 }
 
+/**
+ *  \brief Brief
+ *  
+ *  \return Return_Description
+ *  
+ *  \details Details
+ */
 int connectToServer(){
 	packet_type p;
 	
