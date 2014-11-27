@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['radianos',['radianos',['../physics_8cpp.html#aeed1f489d03ddbdee4a1cd02c2fbc780',1,'physics.cpp']]],
+  ['readimagefile',['readimagefile',['../graphics_8h.html#a62471a7567f65e2a0b410d5fcbf97b1f',1,'graphics.h']]],
+  ['rectangle',['rectangle',['../graphics_8h.html#afb34d171d7fcfe385aac1011febb44b8',1,'graphics.h']]],
+  ['red',['RED',['../graphics_8h.html#aedd64c3f92da850b93776c65fd1cced3af80f9a890089d211842d59625e561f88',1,'graphics.h']]],
+  ['red_5faura',['RED_AURA',['../types_8h.html#a06fc87d81c62e9abb8790b6e5713c55ba0247a282b7af335c48c53a56217231b8',1,'RED_AURA():&#160;types.h'],['../game_8cpp.html#a44aede7214e1d9148f03415272292399',1,'red_aura():&#160;game.cpp']]],
+  ['red_5fvalue',['RED_VALUE',['../graphics_8h.html#a20f2f9e7c5b225b259a7e97b5480847a',1,'graphics.h']]],
+  ['refreshallbgi',['refreshallbgi',['../graphics_8h.html#a4c94fd7e4594bc546f41ad31b38262a3',1,'graphics.h']]],
+  ['refreshbgi',['refreshbgi',['../graphics_8h.html#af71feb466512a83133039ad8e286f620',1,'graphics.h']]],
+  ['registerbgidriver',['registerbgidriver',['../graphics_8h.html#a8ee236a38979398f24f27a1696d5c798',1,'graphics.h']]],
+  ['registerbgifont',['registerbgifont',['../graphics_8h.html#aa292f70b75a0bc91a68782f24229eb19',1,'graphics.h']]],
+  ['registermousehandler',['registermousehandler',['../graphics_8h.html#a7bd90e58131117eabe66246c8efed070',1,'graphics.h']]],
+  ['resetgame',['resetGame',['../game_8cpp.html#af1de076469d08f717d537d1b6b028566',1,'game.cpp']]],
+  ['resetloja',['resetLoja',['../game_8cpp.html#a01f7391d04447a1558b31bfd905a6d42',1,'game.cpp']]],
+  ['resources_5froot',['RESOURCES_ROOT',['../game_8cpp.html#ae0d20ee5e11fb0ea5e85fe144bb4b245',1,'game.cpp']]],
+  ['restorecrtmode',['restorecrtmode',['../graphics_8h.html#a5f8937ba609a5c12010a56d46ff7c812',1,'graphics.h']]],
+  ['right',['right',['../structviewporttype.html#a2f54f8b71f0d765e2b7dbd9a8b9774ff',1,'viewporttype::right()'],['../game_8h.html#a80fb826a684cf3f0d306b22aa100ddac',1,'RIGHT():&#160;game.h']]],
+  ['right_5fobstacles_5findex',['right_obstacles_index',['../game_8cpp.html#a171915a55ab19214c0b900d74f4cebbd',1,'game.cpp']]],
+  ['right_5ftext',['RIGHT_TEXT',['../graphics_8h.html#a92d4e48b203a72f10f2471d0906d7f43a182b84b35f49e4e57b7d4d5b9e894cec',1,'graphics.h']]],
+  ['ruralistas',['RURALISTAS',['../types_8h.html#a06fc87d81c62e9abb8790b6e5713c55baf4a2ed177f4c8a69d276b0190f568e44',1,'types.h']]]
+];

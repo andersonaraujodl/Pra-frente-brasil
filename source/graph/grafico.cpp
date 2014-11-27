@@ -11,14 +11,10 @@ using namespace std;
 
 
 /**
- *  @brief Imprime na tela imagem contida no graph_dta_type passado.
+ *  @brief Imprime na tela imagem contida no graph_dta_type passado, se tiver máscara faz o uso dela para simular transparência
  *  
- *  @param [in] pos  Parameter_Description
- *  @param [in] obj  Parameter_Description
- *  @param [in] mode Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
+ *  @param [in] pos  Posição do objeto (só será impresso se estiver dentro dos limites da tela @see SCREEN_H @see SCREEN_W
+ *  @param [in] obj  Objeto a ser impresso
  */
 void print(vetor2d_type pos, graph_data_type *obj){
 	int mode = COPY_PUT;
@@ -34,26 +30,18 @@ void print(vetor2d_type pos, graph_data_type *obj){
 }
 
 /**
- *  @brief Brief
- *  
- *  @return Return_Description
- *  
- *  @details Details
+ *  @brief Limpa a page corrente (não necessariamente a aparete)
  */
 void erase(){
 	cleardevice();
 	setbkcolor(BGCOLOR);
-	
 }
 
 /**
- *  @brief Brief
+ *  @brief Faz a carga de uma imagem apartir do path do arquivo para a memória do programa
  *  
- *  @param [in] objeto  Parameter_Description
- *  @param [in] caminho Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
+ *  @param [put] objeto  Onde a imagem será estocada
+ *  @param [in] caminho Path da imagem
  */
 void graphInitObjects(graph_data_type *objeto, const char* caminho, const char* caminhomsk){
 	unsigned size;
@@ -87,14 +75,11 @@ void graphInitObjects(graph_data_type *objeto, const char* caminho, const char* 
 }
 
 /**
- *  @brief Brief
+ *  @brief Imprime a linha referência de lançamento assim como a barra de força
  *  
- *  @param [in] pos    Parameter_Description
- *  @param [in] angulo Parameter_Description
- *  @param [in] forca  Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
+ *  @param [in] pos    posição referência
+ *  @param [in] angulo Angulo da linha em relação ao chão
+ *  @param [in] forca  formça em %  
  */
 void printDirection(vetor2d_type pos,float angulo, float forca){
 	vetor2d_type temp = {pos.x, pos.y };
@@ -106,11 +91,8 @@ void printDirection(vetor2d_type pos,float angulo, float forca){
 }
 
 /**
- *  @brief Brief
+ *  @brief Faz a comutação entre a página de escrita com a página visual.
  *  
- *  @return Return_Description
- *  
- *  @details Details
  */
 void updateScreen(){
 	int page = getactivepage();
@@ -122,13 +104,9 @@ void updateScreen(){
 }
 
 /**
- *  @brief Brief
+ *  @brief Define o tamanho da fonte da letras a serem impressas
  *  
- *  @param [in] objeto  Parameter_Description
- *  @param [in] caminho Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
+ *  @param [in] char_size  tamanho da fonte
  */
 void fontSize(int char_size){
 		settextstyle(4,HORIZ_DIR, char_size);
@@ -148,13 +126,6 @@ void printTxt(char *texto, vetor2d_type pos){
 }
 
 /**
- *  @brief Brief
- *  
- *  @param [in] objeto  Parameter_Description
- *  @param [in] caminho Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
  */
 void drawProgressBar(float value, vetor2d_type pos){
 	float r = 0, g = 0, b = 255;

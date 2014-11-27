@@ -1,0 +1,20 @@
+var searchData=
+[
+  ['target_5fframe_5frate',['TARGET_FRAME_RATE',['../game_8h.html#a011c7c1a26071e2d252541b32814c95d',1,'game.h']]],
+  ['termina_5fprograma',['termina_programa',['../game_8cpp.html#add6a89161617c0e9c87727992206f1f0',1,'termina_programa():&#160;game.cpp'],['../game_8h.html#add6a89161617c0e9c87727992206f1f0',1,'termina_programa():&#160;game.cpp']]],
+  ['textheight',['textheight',['../graphics_8h.html#ad01eb34e21ea9a037dfd0babfd3ef149',1,'graphics.h']]],
+  ['textsettingstype',['textsettingstype',['../structtextsettingstype.html',1,'']]],
+  ['textwidth',['textwidth',['../graphics_8h.html#ab08786d38d093ff099b7266d263c1f59',1,'graphics.h']]],
+  ['thick_5fwidth',['THICK_WIDTH',['../graphics_8h.html#a58ddf97599681def42ef76283032c176',1,'graphics.h']]],
+  ['thickness',['thickness',['../structlinesettingstype.html#a4ae4bed5e7efe23b97dad176fe6524c3',1,'linesettingstype']]],
+  ['to_5fground_5flevel',['TO_GROUND_LEVEL',['../grafico_8cpp.html#a486664d639507ec9de76b1ced32b4822',1,'grafico.cpp']]],
+  ['top',['top',['../structviewporttype.html#af93f4f37fc2ad9c37af4a715423b110c',1,'viewporttype']]],
+  ['top_5ftext',['TOP_TEXT',['../graphics_8h.html#a33dff256605d1f044e3d4fd788eaf671acc6bfa526f598599fd9e712f378cb53a',1,'graphics.h']]],
+  ['topright',['topRight',['../structgame__object__type.html#ac5c97537964597857e6080e56e9b5051',1,'game_object_type']]],
+  ['total_5fobstacles',['total_obstacles',['../game_8cpp.html#af047fc6fcef56c4fddaa1a89c9a78c24',1,'game.cpp']]],
+  ['total_5frounds',['total_rounds',['../game_8cpp.html#aa35a55ca3d0a16a006996cdcdc15a600',1,'game.cpp']]],
+  ['total_5fscore',['total_score',['../game_8cpp.html#ad5255b2ed36beca0ba85eda17d99c421',1,'game.cpp']]],
+  ['triplex_5ffont',['TRIPLEX_FONT',['../graphics_8h.html#a5822271fd8ed5c81902d9c7921339a27ac05ac089e5be8b54e8fd9ff8e20baf32',1,'graphics.h']]],
+  ['triplex_5fscr_5ffont',['TRIPLEX_SCR_FONT',['../graphics_8h.html#a5822271fd8ed5c81902d9c7921339a27a915775b55e3f6f6b6373e87b3bf806cc',1,'graphics.h']]],
+  ['types_2eh',['types.h',['../types_8h.html',1,'']]]
+];

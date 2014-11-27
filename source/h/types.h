@@ -49,6 +49,9 @@ typedef struct vetor2d_type{
 		y = sin(angle)*modulo;
 	}
 	
+	/**
+	*  Soma ao vetor um outro vetor
+	*/
 	void sum(vetor2d_type *vec){
 		x+= vec->x;
 		y+= vec->y;
@@ -56,12 +59,12 @@ typedef struct vetor2d_type{
 }vetor2d_type;
 
 /**
-* Carol preencher a doc aqui
+* Informações do corpo virtual do objeto
 */
 typedef struct {
-    vetor2d_type speed; /**< Carol, explica o que é isso*/
-    vetor2d_type pos;   /**< Carol, explica o que é isso*/
-    float mass;
+    vetor2d_type speed; /**< Velocidade virtual do objeto*/
+    vetor2d_type pos;   /**< Posição virtual do objeto*/
+    float mass;			/**< Massa virtual*/
 } physics_data_type;
 
 /**
@@ -85,12 +88,15 @@ typedef struct
 	graph_data_type graph; /**< Propriedades gráficas*/
 	int profile; /**< Máscara para a análise de colisões entre objetos*/
 	
-	vetor2d_type bottomLeft() {return this->body.pos;}
-	vetor2d_type topRight() {return vetor2d_type{this->body.pos.x + this->graph.w, this->body.pos.y + this->graph.h}; }
+	vetor2d_type bottomLeft() {return this->body.pos;} /**< Posição bottom left do objeto*/
+	vetor2d_type topRight() { return vetor2d_type{this->body.pos.x + this->graph.w, this->body.pos.y + this->graph.h }; } /**< Posição top right do objeto*/
 	
 	
 }game_object_type;
 
+/**
+*  Struct com apenas as informações mínimas para a sincronização dos objetos entre computadores
+*/
 typedef struct{
 	int profile;
 	float pos_x;
@@ -172,11 +178,14 @@ enum{
 };
 
 /**
- *  Quantidade de Objetos - o player
+ *  Quantidade de Objetos - o ground em diante
  */
 #define NUM_BLOCKS (MST +1)
 #define NUM_OPTIONS_MENU 4
 #define NUM_LOJA_MENU 24
+/**
+*  define para testes
+*/
 //#define ON_DEBUG
 
 #endif

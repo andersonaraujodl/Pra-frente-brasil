@@ -18,7 +18,7 @@
 #include <fstream>
 
 // Defines =====================================================
-#define MAX_OBSTACLES 300 /**< Número máximo de obstáculos que serão gerados por partida.*/
+#define MAX_OBSTACLES 150 /**< Número máximo de obstáculos que serão gerados por partida.*/
 #define PLAYER_FIX_POS PLAYER_SPOT /**< Posição máxima que o player avançará em relação a tela*/
 #define PLAYER_INIT_X 10 /**< Posição incial do player em x*/
 #define PLAYER_INIT_Y 0  /**< Posição incial do player em y*/
@@ -83,9 +83,10 @@ int total_obstacles = 0;
 int total_score = 0; 
 int total_rounds = 3;
 float profile_collision_bonus[NUM_BLOCKS];
-/**
-*  
-*/
+
+////////////////////////// Declaração dos estados da máquina do game ////////////////
+
+//Primeiro estado do jogo. Carrga as inf do resources e chama a inicialização do menu
 game_state_type load_state ={
 	initGame,
 	(game_state_type*[]){
@@ -93,9 +94,7 @@ game_state_type load_state ={
 		&load_menu_state	 // return 1
 	}
 };
-/**
-*  
-*/
+// Reseta o menu para o estado incial
 game_state_type load_menu_state ={
 	initMenu,
 	(game_state_type*[]){
@@ -103,9 +102,8 @@ game_state_type load_menu_state ={
 		&menu_state       // return 1
 	}
 };
-/**
-*  
-*/
+
+// Menu principal
 game_state_type menu_state ={
 	showMenu,
 	(game_state_type*[]){
@@ -116,9 +114,8 @@ game_state_type menu_state ={
 		&termina_programa // return 4
 	}
 };
-/**
-*  
-*/
+
+// Reseta as variáveis para o início do jogo
 game_state_type load_single ={
 	loadSingleGame,
 	(game_state_type*[]){
@@ -126,9 +123,8 @@ game_state_type load_single ={
 		&pre_lancamento  // return 1
 	}
 };
-/**
-*  
-*/
+
+// Loop de escolha do angulo e força do lançamento
 game_state_type pre_lancamento ={
 	preLancamento,
 	(game_state_type*[]){
@@ -136,9 +132,8 @@ game_state_type pre_lancamento ={
 		&step_single 		// return 1
 	},
 };
-/**
-*  
-*/
+
+// Loop de "loja" com as propostas que serão escolidas pelo jogador
 game_state_type loja_state ={
 	showLoja,
 	(game_state_type*[]){
@@ -146,9 +141,8 @@ game_state_type loja_state ={
 		&load_single	 // return 1
 	}
 };
-/**
-*  
-*/
+
+// Inicialização da loja
 game_state_type load_loja ={
 	initLoja,
 	(game_state_type*[]){
@@ -157,7 +151,7 @@ game_state_type load_loja ={
 	}
 };
 
-
+// Finalização das rodadas do singleplayer
 game_state_type end_single ={
 	singleEnd,
 	(game_state_type*[]){
@@ -168,9 +162,7 @@ game_state_type end_single ={
 };
 
 
-/**
-*  
-*/
+// Loop da rodada (inicio do lançamento até speed = 0) para single player
 game_state_type step_single ={
 	singleStep,
 	(game_state_type*[]){
@@ -178,9 +170,8 @@ game_state_type step_single ={
 		&end_single     // return 1
 	}
 };
-/**
-*  
-*/
+
+// Tela final do jogo quando ecolhido a opção de menu de finalização
 game_state_type termina_programa ={
 	showCredits,
 	(game_state_type*[]){
@@ -188,9 +179,8 @@ game_state_type termina_programa ={
 		&load_menu_state
 	}
 };
-/**
-*  
-*/
+
+// Loop de espera de conexão do servidor
 game_state_type server_conect ={
 	initServer,
 	(game_state_type*[]){
@@ -198,9 +188,8 @@ game_state_type server_conect ={
 		&server_obstacles
 	}
 };
-/**
-*  
-*/
+
+// Loop de requisição de conexão do client
 game_state_type client_conect ={
 	initClient,
 	(game_state_type*[]){
@@ -208,9 +197,8 @@ game_state_type client_conect ={
 		&client_obstacles
 	}
 };
-/**
-*  
-*/
+
+// Loop de inicialização dos obstáculos do servidor para o client
 game_state_type server_obstacles ={
 	serverSendObstacles,
 	(game_state_type*[]){
@@ -218,9 +206,8 @@ game_state_type server_obstacles ={
 		&server_prelancamento
 	}
 };
-/**
-*  
-*/
+
+// Loop de requisição dos obstáculos do client ao server
 game_state_type client_obstacles ={
 	clientGetObstacles,
 	(game_state_type*[]){
@@ -229,6 +216,7 @@ game_state_type client_obstacles ={
 	}
 };
 
+// Pré lançamento para multiplayer do server
 game_state_type server_prelancamento ={
 	preLancamentoMult,
 	(game_state_type*[]){
@@ -237,6 +225,7 @@ game_state_type server_prelancamento ={
 	}
 };
 
+// Pré lançamento para multiplayer do client
 game_state_type client_prelancamento ={
 	preLancamentoMult,
 	(game_state_type*[]){
@@ -244,7 +233,7 @@ game_state_type client_prelancamento ={
 		&step_client
 	}
 };
-
+// Loop da rodada do server
 game_state_type step_server ={
 	multiStep,
 	(game_state_type*[]){
@@ -253,6 +242,7 @@ game_state_type step_server ={
 	}
 };
 
+// Loop da rodada do client
 game_state_type step_client ={
 	multiStep,
 	(game_state_type*[]){
@@ -261,6 +251,7 @@ game_state_type step_client ={
 	}
 };
 
+// Fim de rodada do server
 game_state_type end_server ={
 	multiEnd,
 	(game_state_type*[]){
@@ -270,6 +261,7 @@ game_state_type end_server ={
 	}
 };
 
+// Fim de rodada do client
 game_state_type end_client ={
 	multiEnd,
 	(game_state_type*[]){
@@ -279,6 +271,7 @@ game_state_type end_client ={
 	}
 };
 
+// Inicialização da loja do server
 game_state_type load_loja_server ={
 	initLoja,
 	(game_state_type*[]){
@@ -287,6 +280,7 @@ game_state_type load_loja_server ={
 	}
 };
 
+// Inicialização da loja do client
 game_state_type load_loja_client ={
 	initLoja,
 	(game_state_type*[]){
@@ -295,6 +289,7 @@ game_state_type load_loja_client ={
 	}
 };
 
+// Loop da loja do server
 game_state_type loja_server ={
 	showLoja,
 	(game_state_type*[]){
@@ -303,6 +298,7 @@ game_state_type loja_server ={
 	}
 };
 
+// Loop da loja do client
 game_state_type loja_client ={
 	showLoja,
 	(game_state_type*[]){
@@ -310,9 +306,10 @@ game_state_type loja_client ={
 		&client_obstacles	 // return 1
 	}
 };
+
 /**
-*  
-*/
+ *  Ponteiro de trabalho da máquina de estado. Será ele que apontará para cada estado
+ */
 game_state_type *game_states =  &load_state;
 
 static void debugTrace (char *msg){
@@ -438,8 +435,8 @@ int initGame (float dt){
 /**
  *  @brief Exibe créditos do jogo
  *  
- *  @param [in] dt Parameter_Description
- *  @return Return_Description
+ *  @param [in] dt não faz nada aqui
+ *  @return -1 para interromper o loop da máquina de estados
  */
 int showCredits (float dt){
 	setbkcolor(COLOR(222,219,190));
@@ -471,12 +468,10 @@ void endGame (void){
 }
 
 /**
- *  @brief Brief
+ *  @brief Faz  incilização do menu
  *  
- *  @param [in] dt Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
+ *  @param [in] dt N/A
+ *  @return Sempre retorna 1
  */
 int initMenu (float dt){
 	
@@ -496,10 +491,8 @@ int initMenu (float dt){
 /**
  *  @brief Brief
  *  
- *  @param [in] dt Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
+ *  @param [in] dt delta t para a paresentação das animações
+ *  @return 0-> Continua o loop, de 1 a 4 a opção escolhida no menu
  */
 int showMenu (float dt){
 	
@@ -548,13 +541,12 @@ int showMenu (float dt){
 	}	
 	return 0;
 }
+
 /**
- *  @brief Brief
+ *  @brief Iniciliza as variáveis da loja
  *  
- *  @param [in] dt Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
+ *  @param [in] dt N/A
+ *  @return Sempre 1
  */
 int initLoja (float dt){
 	
@@ -572,6 +564,13 @@ int initLoja (float dt){
 
 	return 1;
 }
+
+/**
+*  *brief Exibe e gerencia a escolha do player das propostas de governo
+*  
+*  *param [in] dt delta tempo usado para as animações
+*  *return 0->loop, 1-> próximo estado
+*/
 int showLoja (float dt){
 	
 	static int selected = 0;
@@ -674,11 +673,7 @@ int showLoja (float dt){
 } 
 
 /**
- *  @brief Brief
- *  
- *  @return Return_Description
- *  
- *  @details Details
+ *  @brief Cria de forma randômica os obstáculos na tela respeitando os limites de cada um
  */
 void initObstacles (void){
 	//carrega lista de números máximos de cada objeto
@@ -741,10 +736,9 @@ void initObstacles (void){
 /**
  *  @brief Inicialização do servidor
  *  
- *  @param [in] dt
+ *  @param [in] dt N/A
  * 
- *  @return 1 conexão client server estabelecida
- *  @return 0 aguardando client (sem conexão)
+ *  @return 1 conexão client server estabelecida,0 aguardando client (sem conexão)
  */
 int initServer (float dt){
 	initSocket();
@@ -761,11 +755,11 @@ int initServer (float dt){
 }
 
 /**
- *  @brief envia informações de tela
+ *  @brief envia informações de obstáculos ao client quando requisitado
  *  
- *  @param [in] dt
+ *  @param [in] dt N/A
  *
- *  @return 1 aguarda o inicio do jogo
+ *  @return 1 0->Loop, 1->Próximo estado
  */
 int serverSendObstacles (float dt){
 
@@ -836,11 +830,11 @@ int serverSendObstacles (float dt){
 }
 
 /**
- *  @brief inicializa o client
+ *  @brief Loop de requisição de conexão com o client
  *  
- *  @param [in] dt 
+ *  @param [in] dt delta t para cálculo do tempo de retry das requisições
  *
- *  @return 1 estabelece conexão com servidor
+ *  @return 0-> Loop, 1->Próximo estado
  */
 int initClient (float dt){
 	static float retry_time =0.0;
@@ -863,12 +857,11 @@ int initClient (float dt){
 }
 
 /**
- *  @brief recebe informações dos elementos da tela 
+ *  @brief Requesita ao server os obstáculos do mapa
  *  
- *  @param [in] dt
+ *  @param [in] dt delta t para cálculo do tempo de retry das requisições
  *
- *  @return 1
- *	@return 0
+ *  @return 0-> Loop, 1->Próximo estado
  */
 int clientGetObstacles (float dt){
 	static bool new_round = true;
@@ -978,9 +971,8 @@ int clientGetObstacles (float dt){
  *  @param [in] ref   Objeto de referência
  *  @param [out] left  Objeto mais a esquerda
  *  @param [out] right Objeto mais a direita
- *  @return Return_Description
+ *  @return False-> Fim dos obstáculos em relação à referência
  *  
- *  @details Details
  */
 bool setObstaclesRange (const game_object_type &ref,int &left, int &right){
 	
@@ -1001,14 +993,12 @@ bool setObstaclesRange (const game_object_type &ref,int &left, int &right){
 }
 
 /**
- *  @brief Brief
+ *  @brief Imprime os objetos presentes na tela em relação a ref
  *  
- *  @param [in] ref Parameter_Description
- *  @return Return_Description
+ *  @param [in] ref Objeto referência
  *  
- *  @details Details
  */
-bool atualizaObjetos (game_object_type &ref,const int &left_index,const int &right_index){
+void atualizaObjetos (game_object_type &ref,const int &left_index,const int &right_index){
 	
 
 	// Imprime todos aqueles que estão dentro do range da tela
@@ -1031,7 +1021,7 @@ bool atualizaObjetos (game_object_type &ref,const int &left_index,const int &rig
 *  o player no local certo e gerando um novo mapa.
 *	@param dt Nessa função não há utilidade a não ser compatibilidade com os demais states
 *
-*   @return 1 para passar para o próximo estado, -1 em caso de erro
+*   @return 1 para passar para o próximo estado.
 */
 int loadSingleGame (float dt){
 
@@ -1056,18 +1046,6 @@ int loadSingleGame (float dt){
 	fflush(stdin);
 
 	return 1; // next state = preLancamento
-}
-
-/**
- *  @brief Brief
- *  
- *  @param [in] ref Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
- */
-int setLaunchVector (game_object_type &ref){
-
 }
 
 /**
@@ -1121,12 +1099,11 @@ int preLancamento (float dt){
 }
 
 /**
- *  @brief Brief
+ *  @brief O mesmo que o @ref preLancamento porém com a atualização da posição do segundo player
  *  
- *  @param [in] dt Parameter_Description
- *  @return Return_Description
+ *  @param [in] dt delta t para as animações
+ *  @return Os mesmos de @ref preLancamento
  *  
- *  @details Details
  */
 int preLancamentoMult (float dt){
 	
@@ -1144,7 +1121,7 @@ int preLancamentoMult (float dt){
 /**
 *	@brief Estado no qual o jogo está rodando. 
 *
-*	@param dt delta tempo para o cálculo do espaço percorrido.
+*	@param dt delta tempo para o cálculo do espaço percorrido e animações
 *	@return 0 para o jogo em andamento, 1 para quando a velocidade seja igual a 0.
 */
 int singleStep (float dt){
@@ -1308,6 +1285,13 @@ int singleStep (float dt){
 	return 1;
 }
 
+
+/**
+*  *brief Estado no qual o jogo está rodando em multiplayer
+*  
+*  *param [in] dt delta tempo para o cálculo do espaço percorrido e animações
+*  *return Mesmos que @ref singleStep
+*/
 int multiStep (float dt){
 		
 	// Envia a posição do player1 =====================================
@@ -1353,12 +1337,11 @@ int multiStep (float dt){
 }
 
 /**
- *  @brief Brief
+ *  @brief Exibe a somatória dos scores das rodadas
  *  
- *  @param [in] dt Parameter_Description
- *  @return Return_Description
+ *  @param [in] dt N/A
+ *  @return 0-> Loop, 1-> Próximo estado, 2-> fim de jogo
  *  
- *  @details Details
  */
 int singleEnd(float dt){
 	char *texto ="TENTE NOVAMENTE", score[50];
@@ -1371,7 +1354,7 @@ int singleEnd(float dt){
 	setObstaclesRange(player1,left_index,right_index);
 	atualizaObjetos(player1,left_index,right_index);
 	
-	sprintf(score,"Você percorreu\n %d metros em %d rodadas.",(int)total_score,5-total_rounds);
+	sprintf(score,"Você percorreu\n %d metros em %d rodadas.",(int)total_score,3-total_rounds);
 	
 	setcolor(COLOR(255,255,255));
 	fontSize(2);
@@ -1404,12 +1387,10 @@ int singleEnd(float dt){
 }
 
 /**
- *  \brief Brief
+ *  \brief Caso seja o primeiro player a parar, exibe o jogo do outro player, depois, exibe a somatória dos scores das rodadas
  *  
- *  \param [in] dt Parameter_Description
- *  \return Return_Description
- *  
- *  \details Details
+ *  \param [in] dt delta tempo para as animações
+ *  \return @return 0-> Loop, 1-> Próximo estado
  */
 int multiEnd(float dt){
 	char *texto ="TENTE NOVAMENTE", score[50];
@@ -1553,7 +1534,7 @@ int multiEnd(float dt){
 /**
 *	@brief Testa o contato do player com o chão 
 *
-*	@param player - game_object_type do jogador
+*	@param player Objeto a ser testado
 */
 void floorCheck(game_object_type *player){
 	
@@ -1569,7 +1550,7 @@ void floorCheck(game_object_type *player){
 }
 
 /**
-*	@brief Função que calcula o deslocamento do chão em funão da posição do player1 
+*	@brief Função que calcula o deslocamento do chão em função da posição do player1 
 *
 *	@param objeto 	player
 *	@param ground   ground
@@ -1589,14 +1570,13 @@ void groundStep(game_object_type *objeto, game_object_type *ground, float dt){
 		print(vetor2d_type{posground, ground->body.pos.y}, &ground->graph);
 	}	
 }
+
 /**
- *  @brief Brief
- *  
- *  @param [in] dt Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
- */
+*  @brief Varia valor de força de 10% à 100%
+*  
+*  @param [in] valor Valor inicial
+*  @return valor final
+*/
 float variaForca(float valor){
 	static float incremento = 0.02;
 
@@ -1614,12 +1594,7 @@ float variaForca(float valor){
 	
 }
 /**
- *  @brief Brief
- *  
- *  @param [in] dt Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
+ *  @brief Faz o processo de reinicialização de todos os parâmetros necessário para o reset do jogo
  */
 void resetGame(){
 	
@@ -1640,12 +1615,7 @@ void resetGame(){
 
 }
 /**
- *  @brief Brief
- *  
- *  @param [in] dt Parameter_Description
- *  @return Return_Description
- *  
- *  @details Details
+ *  @brief Reinicia os objetos da loja
  */
 void resetLoja(){
 	//Itens da loja
@@ -1671,17 +1641,25 @@ void resetLoja(){
 		loja_options[i].body.pos =	loja_pos;
 	}
 }
+
 /**
  *  @brief Exibe uma seta no canto superior da tela caso o usuário ultrapasse as bordas, representando sua posição atual 
  */
 void exibirSeta (){
 	print(vetor2d_type { (player1.body.pos.x< PLAYER_FIX_POS)?player1.body.pos.x: PLAYER_FIX_POS, SCREEN_H - graphs_profiles[SETA_CIMA_P1].h-10}, &graphs_profiles[SETA_CIMA_P1]);
 }
+
 /**
  *  @brief aumenta a velocidade do player em 20%
  *  
- *  @param [vetor2d_type] *speed Parameter_Description
+ *  @param [out] *speed Parameter_Description
  */
+ 
+/**
+*  @brief Power up que aumenta a velocidade do objeto em 20%
+*  
+*  @param [out] speed Velocidade do objeto
+*/
 void mudarVelocidade(vetor2d_type *speed){
 	// aumenta a velocidade em 20%
 	speed->x = speed->x * 1.2;
@@ -1689,6 +1667,13 @@ void mudarVelocidade(vetor2d_type *speed){
 	speed->y = speed->y * 1.2;
 	
 }
+
+/**
+*  @brief Função de impressão de feedback da pocisão do segundo player em relação ao primeiro
+*  
+*  @param [in] ref referência do player
+*  @param [in] p2  player a ser impresso conforme a referência
+*/
 void printP2(game_object_type &ref, game_object_type &p2){
 	
 	float dist_to_ref = p2.body.pos.x - ref.body.pos.x;
