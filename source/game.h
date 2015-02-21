@@ -21,7 +21,7 @@ typedef struct game_state_type{
 #define PWUP_1	'A'
 #define PWUP_2	'S'
 #define ESC 27
-#define TARGET_FRAME_RATE (1.0/60.0)
+#define TARGET_FRAME_RATE (1.0/120.0)
 // Protótipos Públicos ==================================
 void endGame (void);
 
