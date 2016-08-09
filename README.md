@@ -1,4 +1,3 @@
--Algumas padronizações que serão de grande ajuda quando nosso desenvolvimento ficar mais complicado:
   +# **Pra Frente Brasil**
   +**-----------------------------------------------------------------------------------------------------**
    
