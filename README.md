@@ -2,8 +2,7 @@
   
   **-----------------------------------------------------------------------------------------------------**
 
-  This game was created as a school project for the Computer Network course
-  at FATEC São Caetano do Sul, São Paulo, Brazil.
+  This game was created as a school project for the Computer Network course at FATEC São Caetano do Sul, São Paulo, Brazil.
   **-----------------------------------------------------------------------------------------------------**
   
   It is a multiplayer game about Brazilian politics designed for personal computers.
