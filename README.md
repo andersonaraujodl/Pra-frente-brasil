@@ -1,6 +1,5 @@
 # Pra Frente Brasil
   
-  **-----------------------------------------------------------------------------------------------------**
 
   This game was created as a school project for the Computer Network course
   
