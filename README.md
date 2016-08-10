@@ -1,9 +1,9 @@
 # Pra Frente Brasil
   
 
-  This game was created as a school project for the Computer Network course
+  *This game was created as a school project for the Computer Network course
   
-  at FATEC São Caetano do Sul, São Paulo, Brazil.
+  at FATEC São Caetano do Sul, São Paulo, Brazil.*
   
   -----------------------------------------------------------------------------------------------------
   
