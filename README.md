@@ -4,11 +4,11 @@ _Pra Frente Brasil_ is a multiplayer game created as a school project for the Co
 
 ## Getting Started
 
-* 1 - Clone the project to your machine;
-* 2 - Open Dev C++;
-* 3 - Open the porject located in Pra-frente-brasil/proj;
-* 4 - Compile & Run it;
-* 5 - Enjoy it.
+* Clone the project to your machine;
+* Open Dev C++;
+* Open the porject located in Pra-frente-brasil/proj;
+* Compile & Run it;
+* Enjoy it.
 
 ### Game Instructions
 
